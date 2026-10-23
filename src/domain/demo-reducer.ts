@@ -1,17 +1,24 @@
 import { evaluateIncident, resolveAcknowledgement } from "@/domain/incident-engine";
 import type { DemoAction, DemoState } from "@/domain/types";
 
-export const initialDemoState: DemoState = {
-  selectedShift: "day",
-  screen: "shift",
-  handoffStatus: "not_requested",
-  activationMode: "none",
-  simulation: {
-    isPanelOpen: false,
-    nightHistory: [],
-    securityTest: null,
-  },
-};
+export function createInitialDemoState(): DemoState {
+  return {
+    selectedShift: "day",
+    screen: "shift",
+    handoffStatus: "not_requested",
+    activationMode: "none",
+    simulation: {
+      isPanelOpen: false,
+      nightHistory: [],
+      securityTest: null,
+    },
+    morning: {
+      isSimulated: false,
+    },
+  };
+}
+
+export const initialDemoState = createInitialDemoState();
 
 export function demoReducer(state: DemoState, action: DemoAction): DemoState {
   switch (action.type) {
@@ -48,6 +55,15 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
       return state.screen === "activation"
         ? { ...state, simulation: { ...state.simulation, isPanelOpen: !state.simulation.isPanelOpen } }
         : state;
+    case "simulate_morning":
+      return state.screen === "activation" && (state.activationMode === "protected" || state.activationMode === "filtered")
+        ? {
+            ...state,
+            screen: "morning",
+            simulation: { ...state.simulation, isPanelOpen: false },
+            morning: { isSimulated: true },
+          }
+        : state;
     case "inject_incident": {
       if (state.screen !== "activation") return state;
 
@@ -81,6 +97,6 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     case "hydrate":
       return action.state;
     case "reset":
-      return initialDemoState;
+      return createInitialDemoState();
   }
 }

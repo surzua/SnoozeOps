@@ -1,6 +1,7 @@
 "use client";
 
 import { andrea, rodrigo, tickets } from "@/data/fixtures";
+import { MorningScreen } from "@/components/morning-screen";
 import { SimulationPanel } from "@/components/simulation-panel";
 import { handoffSummary, getShiftPlan } from "@/domain/shifts";
 import type { DemoAction, DemoState, HandoffStatus, ShiftPlan } from "@/domain/types";
@@ -215,7 +216,7 @@ function HandoffScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift:
   );
 }
 
-function ActivationScreen({ state, dispatch, shift }: { state: DemoState; dispatch: Dispatch; shift: ShiftPlan }) {
+function ActivationScreen({ state, dispatch, shift, onReset }: { state: DemoState; dispatch: Dispatch; shift: ShiftPlan; onReset: () => void }) {
   const protectedMode = state.activationMode === "protected";
   const title = protectedMode ? "Sueño protegido" : "Guardia filtrada";
   return (
@@ -257,7 +258,7 @@ function ActivationScreen({ state, dispatch, shift }: { state: DemoState; dispat
       <button className="button button--activity" type="button" onClick={() => dispatch({ type: "toggle_simulation" })}>
         {state.simulation.isPanelOpen ? "Ocultar actividad" : "Ver actividad"} <span aria-hidden="true">↑</span>
       </button>
-      <button className="button button--secondary" type="button" onClick={() => dispatch({ type: "reset" })}>Preparar otro turno</button>
+      <button className="button button--secondary" type="button" onClick={onReset}>Preparar otro turno</button>
       {state.simulation.isPanelOpen && (
         <SimulationPanel
           dispatch={dispatch}
@@ -270,23 +271,24 @@ function ActivationScreen({ state, dispatch, shift }: { state: DemoState; dispat
 }
 
 export function DemoApp() {
-  const { state, dispatch, isHydrated } = useDemoState();
+  const { state, dispatch, isHydrated, resetDemo } = useDemoState();
   const shift = getShiftPlan(state.selectedShift);
-  const step = state.screen === "shift" ? 1 : state.screen === "plan" ? 2 : state.screen === "handoff" ? 3 : 4;
+  const step = state.screen === "shift" ? 1 : state.screen === "plan" ? 2 : state.screen === "handoff" ? 3 : state.screen === "activation" ? 4 : 5;
 
   return (
     <main className="app-shell">
       <div className="app-shell__topbar">
         <a className="wordmark" href="#main-content" aria-label="SnoozeOps, ir al contenido principal">Snooze<span>Ops</span></a>
-        <button className="reset-button" type="button" onClick={() => dispatch({ type: "reset" })}>Reiniciar demo</button>
+        <button className="reset-button" type="button" onClick={resetDemo}>Reiniciar demo</button>
       </div>
-      <div className="progress" aria-label={`Paso ${step} de 4`}><span style={{ width: `${step * 25}%` }} /></div>
+      <div className="progress" aria-label={`Paso ${step} de 5`}><span style={{ width: `${step * 20}%` }} /></div>
       {!isHydrated && <p className="loading-state" role="status">Cargando demo…</p>}
       <div id="main-content" className={isHydrated ? "app-shell__content" : "app-shell__content app-shell__content--loading"}>
         {state.screen === "shift" && <ShiftScreen state={state} dispatch={dispatch} shift={shift} />}
         {state.screen === "plan" && <PlanScreen dispatch={dispatch} shift={shift} status={state.handoffStatus} />}
         {state.screen === "handoff" && <HandoffScreen dispatch={dispatch} shift={shift} status={state.handoffStatus} />}
-        {state.screen === "activation" && <ActivationScreen state={state} dispatch={dispatch} shift={shift} />}
+        {state.screen === "activation" && <ActivationScreen state={state} dispatch={dispatch} shift={shift} onReset={resetDemo} />}
+        {state.screen === "morning" && <MorningScreen state={state} shift={shift} onReset={resetDemo} />}
       </div>
       <p className="synthetic-note">Demo local · Datos sintéticos</p>
     </main>

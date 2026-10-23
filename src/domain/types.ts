@@ -1,6 +1,6 @@
 export type ShiftKind = "day" | "night";
 
-export type Screen = "shift" | "plan" | "handoff" | "activation";
+export type Screen = "shift" | "plan" | "handoff" | "activation" | "morning";
 
 export type HandoffStatus = "not_requested" | "pending" | "accepted" | "declined";
 
@@ -41,6 +41,25 @@ export type SimulationState = {
   securityTest: RoutingDecision | null;
 };
 
+export type MorningMetrics = {
+  usualWindow: string;
+  proposedWindow: string;
+  usualDurationMinutes: number;
+  proposedDurationMinutes: number;
+  minutesReserved: number;
+};
+
+export type NightSummary = {
+  groupedIncidents: RoutingDecision[];
+  reviewAt: string | null;
+};
+
+export type HealthSuggestion = {
+  title: string;
+  guidance: string;
+  medicationWarning: string;
+};
+
 export type ShiftPlan = {
   kind: ShiftKind;
   label: "Día" | "Noche";
@@ -68,16 +87,20 @@ export type DemoState = {
   handoffStatus: HandoffStatus;
   activationMode: ActivationMode;
   simulation: SimulationState;
+  morning: {
+    isSimulated: boolean;
+  };
 };
 
 export type DemoAction =
   | { type: "select_shift"; shift: ShiftKind }
-  | { type: "navigate"; screen: Exclude<Screen, "activation"> }
+  | { type: "navigate"; screen: Exclude<Screen, "activation" | "morning"> }
   | { type: "request_handoff" }
   | { type: "respond_handoff"; response: "accepted" | "declined" }
   | { type: "activate_protected" }
   | { type: "activate_filtered" }
   | { type: "toggle_simulation" }
+  | { type: "simulate_morning" }
   | { type: "inject_incident"; incident: Incident }
   | { type: "resolve_security_test"; outcome: "acknowledged" | "timed_out" }
   | { type: "hydrate"; state: DemoState }

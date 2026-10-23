@@ -1,4 +1,4 @@
-import type { ShiftPlan, Ticket } from "@/domain/types";
+import type { HealthSuggestion, ShiftPlan, Ticket } from "@/domain/types";
 
 export const rodrigo = {
   name: "Rodrigo Salas",
@@ -61,3 +61,10 @@ export const tickets: Ticket[] = [
     status: "Programado para las 10:00",
   },
 ];
+
+export const healthSuggestion: HealthSuggestion = {
+  title: "Sugerencia de descanso",
+  guidance:
+    "Si presentas ronquidos frecuentes, pausas al respirar o fatiga persistente durante el día, consulta con un profesional de salud.",
+  medicationWarning: "Evita automedicarte o usar medicamentos no recetados para dormir.",
+};

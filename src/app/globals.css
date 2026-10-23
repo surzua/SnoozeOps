@@ -160,6 +160,31 @@ button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset:
 .simulation-outcomes { display: grid; gap: 0.55rem; }
 .simulation-outcomes p { margin: 0; color: var(--muted); font-size: 0.76rem; line-height: 1.35; }
 .simulation-panel__close { margin-top: -0.25rem; }
+.screen--morning { padding-bottom: 1rem; }
+.morning-intro { margin: -0.45rem 0 0; color: var(--muted); line-height: 1.5; }
+.morning-card, .health-disclaimer { display: grid; gap: 0.9rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 1rem; background: rgba(16, 35, 58, 0.88); }
+.morning-card h2, .health-disclaimer h2 { margin: 0.25rem 0 0; font-size: 1.12rem; letter-spacing: -0.03em; }
+.sleep-comparison__windows { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 0.75rem; }
+.sleep-comparison__windows > div { display: grid; gap: 0.3rem; padding: 0.85rem; }
+.sleep-comparison__windows > div + div { border-left: 1px solid var(--line); }
+.sleep-comparison__windows span { color: var(--muted); font-size: 0.75rem; }
+.sleep-comparison__windows strong { font-size: 0.95rem; letter-spacing: -0.03em; }
+.sleep-comparison__windows p { margin: 0; color: var(--muted); font-size: 0.84rem; }
+.sleep-comparison__proposed { background: rgba(120, 221, 203, 0.1); }
+.sleep-comparison__proposed strong, .sleep-comparison__proposed p { color: var(--teal); }
+.sleep-comparison__gain { margin: 0; color: var(--teal); font-size: 1.18rem; font-weight: 900; letter-spacing: -0.04em; }
+.sleep-comparison .measurement-note { text-align: left; }
+.night-summary, .health-disclaimer { grid-template-columns: auto 1fr; align-items: start; }
+.night-summary > div, .health-disclaimer > div { min-width: 0; }
+.night-summary p, .health-disclaimer p { margin: 0.5rem 0 0; color: var(--muted); font-size: 0.88rem; line-height: 1.48; }
+.night-summary--empty { border-color: #526b85; }
+.morning-icon { display: grid; flex: 0 0 1.55rem; place-items: center; width: 1.55rem; height: 1.55rem; border-radius: 50%; color: var(--night); background: var(--muted); font-size: 0.82rem; font-weight: 900; }
+.morning-icon--safe { background: var(--teal); }
+.morning-icon--warning { color: #412b07; background: var(--amber); }
+.night-summary__pending { color: var(--amber) !important; font-weight: 800; }
+.health-disclaimer { border-color: #8b693a; background: rgba(76, 56, 32, 0.34); }
+.health-disclaimer h2 { color: var(--amber); }
+.health-disclaimer__warning { color: var(--text) !important; font-weight: 800; }
 .synthetic-note { margin: 1.5rem 0 0; color: #8096af; font-size: 0.72rem; text-align: center; }
 @keyframes enter { from { opacity: 0; transform: translateY(0.35rem); } to { opacity: 1; transform: translateY(0); } }
 @keyframes sheet-enter { from { opacity: 0; transform: translateY(2rem); } to { opacity: 1; transform: translateY(0); } }

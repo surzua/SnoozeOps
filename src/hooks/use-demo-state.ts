@@ -6,7 +6,7 @@ import type { DemoState, SimulationState } from "@/domain/types";
 
 const storageKey = "snoozeops-demo-state-v1";
 const shifts = new Set(["day", "night"]);
-const screens = new Set(["shift", "plan", "handoff", "activation"]);
+const screens = new Set(["shift", "plan", "handoff", "activation", "morning"]);
 const handoffs = new Set(["not_requested", "pending", "accepted", "declined"]);
 const activations = new Set(["none", "protected", "filtered"]);
 
@@ -37,7 +37,14 @@ export function useDemoState() {
       if (stored) {
         const parsed: unknown = JSON.parse(stored);
         if (isDemoState(parsed)) {
-          dispatch({ type: "hydrate", state: { ...parsed, simulation: parsed.simulation ?? initialSimulationState } });
+          dispatch({
+            type: "hydrate",
+            state: {
+              ...parsed,
+              simulation: parsed.simulation ?? initialSimulationState,
+              morning: parsed.morning ?? { isSimulated: parsed.screen === "morning" },
+            },
+          });
         }
       }
     } catch {
@@ -60,5 +67,14 @@ export function useDemoState() {
     }
   }, [isHydrated, state]);
 
-  return { state, dispatch, isHydrated };
+  const resetDemo = () => {
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // La demo puede reiniciarse incluso cuando localStorage no está disponible.
+    }
+    dispatch({ type: "reset" });
+  };
+
+  return { state, dispatch, isHydrated, resetDemo };
 }

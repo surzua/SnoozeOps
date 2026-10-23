@@ -89,4 +89,34 @@ describe("demoReducer", () => {
     expect(acknowledged.simulation.securityTest?.status).toBe("acknowledged_by_backup");
     expect(unchanged).toEqual(acknowledged);
   });
+
+  it("simula la mañana sin alterar los escenarios de incidentes", () => {
+    const pending = demoReducer(initialDemoState, { type: "request_handoff" });
+    const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });
+    const active = demoReducer(accepted, { type: "activate_protected" });
+    const withNightIncident = demoReducer(active, { type: "inject_incident", incident: passwordIncident });
+    const withSecurityTest = demoReducer(withNightIncident, { type: "inject_incident", incident: databaseIncident });
+    const morning = demoReducer(withSecurityTest, { type: "simulate_morning" });
+
+    expect(morning.screen).toBe("morning");
+    expect(morning.morning.isSimulated).toBe(true);
+    expect(morning.simulation.isPanelOpen).toBe(false);
+    expect(morning.simulation.nightHistory).toEqual(withSecurityTest.simulation.nightHistory);
+    expect(morning.simulation.securityTest).toEqual(withSecurityTest.simulation.securityTest);
+  });
+
+  it("no permite simular la mañana fuera de una ventana activa", () => {
+    expect(demoReducer(initialDemoState, { type: "simulate_morning" })).toEqual(initialDemoState);
+  });
+
+  it("restaura un estado limpio con el reset", () => {
+    const pending = demoReducer(initialDemoState, { type: "request_handoff" });
+    const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });
+    const active = demoReducer(accepted, { type: "activate_protected" });
+    const withIncident = demoReducer(active, { type: "inject_incident", incident: passwordIncident });
+    const reset = demoReducer(withIncident, { type: "reset" });
+
+    expect(reset).toEqual(initialDemoState);
+    expect(reset).not.toBe(initialDemoState);
+  });
 });

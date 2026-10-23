@@ -91,6 +91,9 @@ export function SimulationPanel({
           </div>
         )}
       </section>
+      <button className="button button--primary" onClick={() => dispatch({ type: "simulate_morning" })} type="button">
+        Simular la mañana <span aria-hidden="true">→</span>
+      </button>
       <button className="button button--quiet simulation-panel__close" onClick={() => dispatch({ type: "toggle_simulation" })} type="button">
         Cerrar simulador
       </button>
