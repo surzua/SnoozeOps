@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useState } from "react";
 import { demoReducer, initialDemoState } from "@/domain/demo-reducer";
-import type { DemoState } from "@/domain/types";
+import type { DemoState, SimulationState } from "@/domain/types";
 
 const storageKey = "snoozeops-demo-state-v1";
 const shifts = new Set(["day", "night"]);
@@ -10,7 +10,13 @@ const screens = new Set(["shift", "plan", "handoff", "activation"]);
 const handoffs = new Set(["not_requested", "pending", "accepted", "declined"]);
 const activations = new Set(["none", "protected", "filtered"]);
 
-function isDemoState(value: unknown): value is DemoState {
+const initialSimulationState: SimulationState = {
+  isPanelOpen: false,
+  nightHistory: [],
+  securityTest: null,
+};
+
+function isDemoState(value: unknown): value is Omit<DemoState, "simulation"> & { simulation?: SimulationState } {
   if (!value || typeof value !== "object") return false;
   const state = value as DemoState;
   return (
@@ -30,7 +36,9 @@ export function useDemoState() {
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
         const parsed: unknown = JSON.parse(stored);
-        if (isDemoState(parsed)) dispatch({ type: "hydrate", state: parsed });
+        if (isDemoState(parsed)) {
+          dispatch({ type: "hydrate", state: { ...parsed, simulation: parsed.simulation ?? initialSimulationState } });
+        }
       }
     } catch {
       try {

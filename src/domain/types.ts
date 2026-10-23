@@ -6,6 +6,41 @@ export type HandoffStatus = "not_requested" | "pending" | "accepted" | "declined
 
 export type ActivationMode = "none" | "protected" | "filtered";
 
+export type SeverityLevel = "P1" | "P2" | "P3" | "Unknown";
+
+export type RoutingStatus =
+  | "grouped_pending_review"
+  | "escalated_waiting_for_ack"
+  | "acknowledged_by_backup"
+  | "alerted_to_primary"
+  | "routed_directly_to_primary";
+
+export type IncidentScenario = "night_simulation" | "security_test";
+
+export type Incident = {
+  id: string;
+  title: string;
+  severity: SeverityLevel;
+  confidence: "high" | "low";
+  impact: "stable" | "growing";
+  scenario: IncidentScenario;
+};
+
+export type RoutingDecision = {
+  incident: Incident;
+  status: RoutingStatus;
+  rule: string;
+  nextOwner: "Andrea" | "Rodrigo" | "Revisión al cierre";
+  reviewAt?: string;
+  timeoutSeconds?: number;
+};
+
+export type SimulationState = {
+  isPanelOpen: boolean;
+  nightHistory: RoutingDecision[];
+  securityTest: RoutingDecision | null;
+};
+
 export type ShiftPlan = {
   kind: ShiftKind;
   label: "Día" | "Noche";
@@ -32,6 +67,7 @@ export type DemoState = {
   screen: Screen;
   handoffStatus: HandoffStatus;
   activationMode: ActivationMode;
+  simulation: SimulationState;
 };
 
 export type DemoAction =
@@ -41,5 +77,8 @@ export type DemoAction =
   | { type: "respond_handoff"; response: "accepted" | "declined" }
   | { type: "activate_protected" }
   | { type: "activate_filtered" }
+  | { type: "toggle_simulation" }
+  | { type: "inject_incident"; incident: Incident }
+  | { type: "resolve_security_test"; outcome: "acknowledged" | "timed_out" }
   | { type: "hydrate"; state: DemoState }
   | { type: "reset" };

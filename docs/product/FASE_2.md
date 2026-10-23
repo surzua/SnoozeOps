@@ -1,6 +1,6 @@
 # SnoozeOps — Fase 2: Motor de incidentes
 
-**Estado**: Especificación cerrada para implementación en Antigravity IDE.
+**Estado**: Implementada localmente y verificada con pruebas de dominio, tipos, lint y build.
 
 ## 1. Propósito
 Construir el núcleo de valor de SnoozeOps: el motor de enrutamiento de incidentes y el simulador para la "escena estrella" de la demo. Esta fase demuestra empíricamente al jurado que Rodrigo puede dormir tranquilo porque el sistema diferencia una interrupción evitable de una crítica, fallando siempre hacia la seguridad.
@@ -71,14 +71,14 @@ src/
 - Si el modo activo es `Guardia filtrada`, adaptar la explicación y el destino de enrutamiento: toda alerta crítica o ambigua llega directamente a Rodrigo; no mostrar que Andrea está cubriendo.
 
 ## 6. Criterios de Aceptación (DoD Fase 2)
-- [ ] El botón `[ Ver actividad ]` abre el simulador sin salir de la pantalla de "Sueño Protegido".
-- [ ] El incidente P3 (Contraseña) se muestra como pendiente de revisión a las 06:30; queda explícito que está agrupado, no resuelto, y Rodrigo no es interrumpido.
-- [ ] Un P2/P3 con impacto creciente no se agrupa; se escala conservadoramente.
-- [ ] Un P1 con relevo aceptado entra en `escalated_waiting_for_ack` y muestra que Andrea debe confirmar.
-- [ ] `[ Simular que Andrea confirma ]` cambia el estado a `acknowledged_by_backup`; Andrea asume el incidente y Rodrigo no recibe alerta.
-- [ ] `[ Simular que Andrea no responde ]` cambia el estado a `alerted_to_primary` y comunica que Rodrigo recibe una alerta crítica ahora.
-- [ ] Un P1 sin relevo aceptado, o un incidente desconocido/ambiguo, nunca se silencia y se enruta de forma conservadora; sin relevo aceptado, llega directamente a Rodrigo.
-- [ ] La prueba P1 está rotulada como escenario sintético separado y no altera el escenario habitual ni su resultado matinal.
-- [ ] Todo el flujo funciona offline y las decisiones son deterministas para los mismos datos de entrada.
-- [ ] La UI no promete cobertura absoluta (por ejemplo, no afirma "100% cubierta"); comunica el relevo confirmado y la regla de escalamiento sin garantías ilimitadas.
-- [ ] El código mantiene la separación: reglas de negocio en `domain`, visualización en `components`.
+- [x] El botón `[ Ver actividad ]` abre el simulador sin salir de la pantalla de "Sueño Protegido".
+- [x] El incidente P3 (Contraseña) se muestra como pendiente de revisión a las 06:30; queda explícito que está agrupado, no resuelto, y Rodrigo no es interrumpido.
+- [x] Un P2/P3 con impacto creciente no se agrupa; se escala conservadoramente.
+- [x] Un P1 con relevo aceptado entra en `escalated_waiting_for_ack` y muestra que Andrea debe confirmar.
+- [x] `[ Simular que Andrea confirma ]` cambia el estado a `acknowledged_by_backup`; Andrea asume el incidente y Rodrigo no recibe alerta.
+- [x] `[ Simular que Andrea no responde ]` cambia el estado a `alerted_to_primary` y comunica que Rodrigo recibe una alerta crítica ahora.
+- [x] Un P1 sin relevo aceptado, o un incidente desconocido/ambiguo, nunca se silencia y se enruta de forma conservadora; sin relevo aceptado, llega directamente a Rodrigo.
+- [x] La prueba P1 está rotulada como escenario sintético separado y no altera el escenario habitual ni su resultado matinal.
+- [x] Todo el flujo funciona offline y las decisiones son deterministas para los mismos datos de entrada.
+- [x] La UI no promete cobertura absoluta (por ejemplo, no afirma "100% cubierta"); comunica el relevo confirmado y la regla de escalamiento sin garantías ilimitadas.
+- [x] El código mantiene la separación: reglas de negocio en `domain`, visualización en `components`.

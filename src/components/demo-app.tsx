@@ -1,6 +1,7 @@
 "use client";
 
 import { andrea, rodrigo, tickets } from "@/data/fixtures";
+import { SimulationPanel } from "@/components/simulation-panel";
 import { handoffSummary, getShiftPlan } from "@/domain/shifts";
 import type { DemoAction, DemoState, HandoffStatus, ShiftPlan } from "@/domain/types";
 import { useDemoState } from "@/hooks/use-demo-state";
@@ -237,7 +238,17 @@ function ActivationScreen({ state, dispatch, shift }: { state: DemoState; dispat
         <p className="activation-copy">Las alertas menores esperarán. Las críticas o ambiguas llegarán directamente a ti.</p>
       )}
       <p className="measurement-note">Tiempo reservado para dormir. Sueño real no medido.</p>
+      <button className="button button--activity" type="button" onClick={() => dispatch({ type: "toggle_simulation" })}>
+        {state.simulation.isPanelOpen ? "Ocultar actividad" : "Ver actividad"} <span aria-hidden="true">↑</span>
+      </button>
       <button className="button button--secondary" type="button" onClick={() => dispatch({ type: "reset" })}>Preparar otro turno</button>
+      {state.simulation.isPanelOpen && (
+        <SimulationPanel
+          dispatch={dispatch}
+          isCovered={protectedMode && state.handoffStatus === "accepted"}
+          simulation={state.simulation}
+        />
+      )}
     </section>
   );
 }
