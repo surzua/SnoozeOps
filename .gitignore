@@ -1,0 +1,32 @@
+# Dependencies and package-manager caches
+node_modules/
+.pnp/
+.pnp.*
+.npm/
+.npm-cache/
+.yarn/
+.pnpm-store/
+
+# Next.js build and local exports
+.next/
+out/
+build/
+
+# Test and coverage outputs
+coverage/
+.nyc_output/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local tooling and operating-system files
+.DS_Store
+*.log
+*.tsbuildinfo
+.vercel/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

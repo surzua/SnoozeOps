@@ -453,14 +453,14 @@ La narración debe marcar claramente el cambio: `Ya vimos una noche habitual. Ah
 
 La Fase 0 queda aprobada si podemos responder `sí` a todo:
 
-- [ ] La promesa se entiende sin explicar la tecnología.
-- [ ] Está claro que `+60 min` es tiempo reservado para dormir y no sueño medido.
-- [ ] `Sueño protegido` solo aparece después de una aceptación bilateral.
-- [ ] La aplicación sigue ofreciendo valor cuando no hay relevo.
-- [ ] El incidente ambiguo o crítico nunca queda silenciado.
-- [ ] El turno nocturno reutiliza el mismo mecanismo sin abrir otro producto.
-- [ ] El recorrido principal y la prueba crítica separada caben en una demo de menos de cuatro minutos.
-- [ ] Todos los datos están marcados o entendidos como sintéticos.
+- [x] La promesa se entiende sin explicar la tecnología.
+- [x] Está claro que `+60 min` es tiempo reservado para dormir y no sueño medido.
+- [x] `Sueño protegido` solo aparece después de una aceptación bilateral.
+- [x] La aplicación sigue ofreciendo valor cuando no hay relevo.
+- [x] El incidente ambiguo o crítico nunca queda silenciado.
+- [x] El turno nocturno reutiliza el mismo mecanismo sin abrir otro producto.
+- [x] El recorrido principal y la prueba crítica separada caben en una demo de menos de cuatro minutos.
+- [x] Todos los datos están marcados o entendidos como sintéticos.
 
 ## 9. Decisiones confirmadas para construir
 

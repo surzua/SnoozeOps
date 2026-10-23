@@ -87,7 +87,7 @@ Consulta el [roadmap](docs/product/ROADMAP.md) para el alcance, las reglas de se
 
 ## Puesta en marcha
 
-La aplicación aún no ha sido inicializada. Cuando se cree el proyecto con Next.js, la ejecución local seguirá este flujo:
+El proyecto usa **Node.js 22** y `npm`. La versión mayor queda declarada en [`.nvmrc`](.nvmrc) y el lockfile fija las dependencias exactas. No se requieren credenciales, variables de entorno ni servicios externos.
 
 ```bash
 npm install
@@ -95,6 +95,17 @@ npm run dev
 ```
 
 Después, abre `http://localhost:3000` en tu navegador.
+
+Antes de integrar cambios, ejecuta:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Las convenciones de estructura, seguridad y colaboración están en el [acuerdo de ingeniería](docs/engineering/CONVENTIONS.md).
 
 ## Alcance deliberadamente fuera del MVP
 
