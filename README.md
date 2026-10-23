@@ -83,7 +83,7 @@ Fixtures sintéticos + localStorage
 
 El repositorio está en fase de inicio. El objetivo inmediato es construir un flujo navegable desde la selección de turno hasta la activación del sueño protegido, antes de integrar servicios externos.
 
-Consulta el [roadmap](ROADMAP.md) para el alcance, las reglas de seguridad y el plan de implementación completo.
+Consulta el [roadmap](docs/product/ROADMAP.md) para el alcance, las reglas de seguridad y el plan de implementación completo, y la [Fase 0](docs/product/FASE_0.md) para las decisiones, wireframes y datos sintéticos aprobados antes de programar.
 
 ## Puesta en marcha
 
