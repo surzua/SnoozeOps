@@ -1,6 +1,6 @@
-import type { NightSummary as NightSummaryData } from "@/domain/types";
+import type { ActivationMode, NightSummary as NightSummaryData } from "@/domain/types";
 
-export function NightSummary({ summary }: { summary: NightSummaryData }) {
+export function NightSummary({ summary, activationMode }: { summary: NightSummaryData; activationMode: ActivationMode }) {
   const groupedCount = summary.groupedIncidents.length;
 
   if (groupedCount === 0) {
@@ -22,7 +22,9 @@ export function NightSummary({ summary }: { summary: NightSummaryData }) {
       <span className="morning-icon morning-icon--safe" aria-hidden="true">✓</span>
       <div>
         <p className="section-label">Resultado operacional</p>
-        <h2 id="night-summary-title">Sin alertas durante tu ventana protegida</h2>
+        <h2 id="night-summary-title">
+          Sin alertas en el escenario habitual durante tu {activationMode === "protected" ? "ventana protegida" : "ventana planificada"}
+        </h2>
         <p>{incidentLabel} para revisión al cierre de tu ventana.</p>
         {summary.reviewAt && <p className="night-summary__pending">◷ Pendiente de revisión desde las {summary.reviewAt}</p>}
       </div>

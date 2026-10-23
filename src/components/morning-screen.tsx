@@ -14,9 +14,9 @@ export function MorningScreen({ state, shift, onReset }: { state: DemoState; shi
     <section className="screen screen--morning" aria-labelledby="morning-title">
       <p className="kicker">Mañana simulada</p>
       <h1 id="morning-title">Buenos días, {rodrigo.firstName}</h1>
-      <p className="morning-intro">Este es el resumen de tu ventana planificada.</p>
+      <p className="morning-intro">Resumen del escenario habitual y de tu ventana planificada.</p>
       <SleepComparison metrics={metrics} />
-      <NightSummary summary={summary} />
+      <NightSummary summary={summary} activationMode={state.activationMode} />
       <HealthDisclaimer suggestion={healthSuggestion} />
       <button className="button button--primary" type="button" onClick={onReset}>
         Preparar mi próximo turno <span aria-hidden="true">→</span>

@@ -1,6 +1,6 @@
 # SnoozeOps — Fase 3: Cerrar el ciclo de hábito
 
-**Estado**: Lista para implementación en Antigravity IDE.
+**Estado**: Implementada localmente y validada con pruebas de dominio, tipos, lint, build y recorrido manual.
 
 ## 1. Propósito
 
@@ -10,7 +10,7 @@ La fase debe diferenciar con precisión entre:
 
 - **Tiempo reservado para dormir**: la duración planificada de la ventana de descanso.
 - **Sueño real**: tiempo, calidad, fases o cualquier medición fisiológica del sueño. SnoozeOps no lo mide en esta demo.
-- **Sin alertas durante la ventana**: comportamiento observado del sistema para el escenario habitual simulado. No equivale a demostrar un contrafactual ni a contabilizar “interrupciones evitadas”.
+- **Sin alertas en el escenario habitual durante la ventana**: comportamiento observado del sistema para el escenario habitual simulado. No equivale a demostrar un contrafactual ni a contabilizar “interrupciones evitadas”.
 
 La pantalla también incluye una sugerencia de salud general y prudente. No diagnostica, no infiere condiciones médicas ni atribuye síntomas a Rodrigo.
 
@@ -20,7 +20,7 @@ La pantalla también incluye una sugerencia de salud general y prudente. No diag
 | --- | --- |
 | Transición a la mañana | El Bottom Sheet de demo incorpora `[ Simular la mañana ]`. El presentador controla el avance temporal; no se espera tiempo real. |
 | Beneficio mostrado | Se muestra `+60 min reservados para descansar`, calculado desde las ventanas del turno activo. No se muestra un contador de “interrupciones evitadas”. |
-| Resultado operacional | Para el escenario habitual, se comunica `Sin alertas durante tu ventana protegida`. El P3 no se resuelve ni se marca como revisado. |
+| Resultado operacional | Para el escenario habitual, se comunica `Sin alertas en el escenario habitual durante tu ventana protegida` cuando el modo es protegido. En guardia filtrada se habla de la ventana planificada. El P3 no se resuelve ni se marca como revisado. |
 | P3 al cierre de la ventana | Permanece como `grouped_pending_review` y se presenta como disponible para revisión al cierre de la ventana: 06:30 para Día y 14:30 para Noche. No se afirma que Rodrigo o Andrea hayan leído o resuelto el ticket. |
 | Prueba P1 | La prueba de seguridad sigue siendo un escenario sintético separado. Nunca alimenta los minutos reservados, el contador de alertas del escenario habitual ni el resumen de mañana. |
 | Sugerencia de salud | Texto condicional y general: no se presenta como una detección ni un dato personal de Rodrigo. Incluye recomendación de consulta profesional y advertencia sobre automedicación. |
@@ -74,7 +74,7 @@ Para el fixture habitual de la demo:
 
 La UI debe comunicarlo con una formulación factual:
 
-> **Sin alertas durante tu ventana protegida**  
+> **Sin alertas en el escenario habitual durante tu ventana protegida**
 > 1 alerta de baja prioridad quedó agrupada para revisión al cierre de tu ventana.
 
 Si el P3 no fue inyectado durante la demo, la pantalla no debe inventar una alerta ni mostrar un conteo de uno. En ese caso se puede mostrar:
@@ -96,7 +96,7 @@ Esto aplica tanto si Andrea confirma como si vence el plazo de 60 segundos y Rod
 
 > **Prueba de seguridad · escenario sintético**
 
-La mañana no debe afirmar que Rodrigo fue despertado durante la noche habitual a causa de esa prueba. Si la UI necesita conservar alguna referencia visible, solo puede hacerlo fuera del resumen habitual y con la etiqueta anterior; no es necesario para el alcance de esta fase.
+La mañana no debe afirmar que Rodrigo fue despertado durante la noche habitual a causa de esa prueba. Si la UI necesita conservar alguna referencia visible, solo puede hacerlo fuera del resumen habitual y con la etiqueta anterior; no es necesario para el alcance de esta fase. La Fase 3 no modela una P1 del escenario habitual; si se agrega en una fase posterior, la mañana deberá comunicar la alerta recibida y no podrá usar la formulación `Sin alertas`.
 
 ### 4.4 Sugerencia de salud
 
@@ -208,29 +208,29 @@ Responsabilidades:
 
 ### Flujo y presentación
 
-- [ ] `[ Simular la mañana ]` lleva a la Pantalla 6 sin usar un temporizador real.
-- [ ] La Pantalla 6 muestra la ventana habitual, la planificada y `+60 min reservados para descansar` para el turno Día.
-- [ ] El turno Noche muestra correctamente `09:00–14:00` versus `08:30–14:30`, también con `+60 min`.
-- [ ] El cálculo de `23:30–06:30` reconoce una duración de 7 horas; no genera duración negativa ni una fecha inválida.
-- [ ] La pantalla incluye: `SnoozeOps muestra tiempo reservado para dormir; no mide el sueño real.`
+- [x] `[ Simular la mañana ]` lleva a la Pantalla 6 sin usar un temporizador real.
+- [x] La Pantalla 6 muestra la ventana habitual, la planificada y `+60 min reservados para descansar` para el turno Día.
+- [x] El turno Noche muestra correctamente `09:00–14:00` versus `08:30–14:30`, también con `+60 min`.
+- [x] El cálculo de `23:30–06:30` reconoce una duración de 7 horas; no genera duración negativa ni una fecha inválida.
+- [x] La pantalla incluye: `SnoozeOps muestra tiempo reservado para dormir; no mide el sueño real.`
 
 ### Incidentes y seguridad
 
-- [ ] Después de inyectar el P3 habitual, la mañana comunica que no hubo alertas durante la ventana y que existe 1 P3 pendiente de revisión al cierre de la ventana activa.
-- [ ] El P3 se conserva como `grouped_pending_review`; no aparece como resuelto, revisado ni asignado a Rodrigo o Andrea.
-- [ ] Si no se inyectó el P3, la pantalla muestra un estado vacío y no inventa alertas agrupadas.
-- [ ] Inyectar el P3 más de una vez no duplica indebidamente el resumen ni cambia los minutos reservados.
-- [ ] Ejecutar una prueba P1, con confirmación o timeout, no modifica las métricas ni el contenido del resumen habitual de la mañana.
-- [ ] La prueba P1 conserva la etiqueta `Prueba de seguridad · escenario sintético` y no permite inferir que ocurrió durante la noche habitual.
+- [x] Después de inyectar el P3 habitual, la mañana comunica que no hubo alertas en el escenario habitual durante la ventana y que existe 1 P3 pendiente de revisión al cierre de la ventana activa.
+- [x] El P3 se conserva como `grouped_pending_review`; no aparece como resuelto, revisado ni asignado a Rodrigo o Andrea.
+- [x] Si no se inyectó el P3, la pantalla muestra un estado vacío y no inventa alertas agrupadas.
+- [x] Inyectar el P3 más de una vez no duplica indebidamente el resumen ni cambia los minutos reservados.
+- [x] Ejecutar una prueba P1, con confirmación o timeout, no modifica las métricas ni el contenido del resumen habitual de la mañana.
+- [x] La prueba P1 conserva la etiqueta `Prueba de seguridad · escenario sintético` y no permite inferir que ocurrió durante la noche habitual.
 
 ### Salud, accesibilidad y reinicio
 
-- [ ] La tarjeta de salud usa el texto condicional acordado, recomienda consultar a un profesional y advierte contra automedicarse.
-- [ ] La tarjeta no atribuye síntomas, detecciones ni diagnósticos a Rodrigo.
-- [ ] Estados de pendiente, ausencia de alertas y advertencia se entienden con texto e icono, además del color.
-- [ ] `[ Preparar mi próximo turno ]` restaura Día, Pantalla 1, relevo no solicitado, modo de activación vacío e historiales de incidentes vacíos.
-- [ ] El Hard Reset cierra el Bottom Sheet, elimina los datos persistidos anteriores y mantiene el estado inicial después de refrescar la página.
-- [ ] Tipos, lint, pruebas y build pasan antes de cerrar la fase.
+- [x] La tarjeta de salud usa el texto condicional acordado, recomienda consultar a un profesional y advierte contra automedicarse.
+- [x] La tarjeta no atribuye síntomas, detecciones ni diagnósticos a Rodrigo.
+- [x] Estados de pendiente, ausencia de alertas y advertencia se entienden con texto e icono, además del color.
+- [x] `[ Preparar mi próximo turno ]` restaura Día, Pantalla 1, relevo no solicitado, modo de activación vacío e historiales de incidentes vacíos.
+- [x] El Hard Reset cierra el Bottom Sheet, elimina los datos persistidos anteriores y mantiene el estado inicial después de refrescar la página.
+- [x] Tipos, lint, pruebas y build pasan antes de cerrar la fase.
 
 ## 10. Riesgos y límites
 

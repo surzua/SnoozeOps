@@ -81,7 +81,8 @@ Si no mejora esa respuesta o la demo, queda fuera.
 6. **Resultado de la mañana**
    - Ventana protegida.
    - Comparacion con línea base.
-   - Cantidad de interrupciones evitadas.
+   - Minutos reservados para descansar; no sueño medido ni contador de interrupciones evitadas.
+   - Resultado factual del escenario habitual y P3 pendiente para revisión al cierre.
    - Mensaje de seguridad que recomienda consulta profesional por ronquido fuerte y fatiga, sin diagnosticar.
 
 ### Escena estrella de la demo
@@ -91,7 +92,7 @@ El jurado elige o escribe dos incidentes:
 - `Solicitud de cambio de contraseña de un usuario` -> se guarda para la mañana.
 - `Base de datos de producción sin responder` -> se escala al respaldo.
 
-Despues se simula que el respaldo no confirma el segundo incidente y SnoozeOps despierta a Rodrigo. Esta escena debe ser lo más robusto y pulido del producto.
+Despues se simula que el respaldo no confirma el segundo incidente y SnoozeOps despierta a Rodrigo. Esta es una prueba de seguridad sintética separada del resumen de la noche habitual. Esta escena debe ser lo más robusto y pulido del producto.
 
 ### Fuera de alcance deliberadamente
 
@@ -241,7 +242,7 @@ Fixtures sintéticos + localStorage
 - Mostrar la hora limite dinamica para el café.
 - Implementar la pantalla de resultado matinal.
 - Comparar línea base sintetica y ventana protegida.
-- Mostrar interrupciones evitadas y minutos recuperados.
+- Mostrar minutos reservados para descansar y el resultado factual del escenario habitual.
 - Incorporar una derivacion profesional prudente por ronquido fuerte y fatiga.
 - Incluir una advertencia contra medicamentos prestados, sin prescribir ni diagnosticar.
 
@@ -249,12 +250,12 @@ Fixtures sintéticos + localStorage
 
 - **Principal:** minutos adicionales de sueño o de ventana protegida.
 - **De mecanismo:** activacion del relevo antes de acostarse.
-- **Operacionales:** alertas no críticas agrupadas, alertas críticas confirmadas por respaldo e interrupciones a Rodrigo.
+- **Operacionales:** alertas no críticas agrupadas, alertas críticas confirmadas por respaldo y alertas críticas entregadas a Rodrigo en la prueba de seguridad.
 - **Secundaria:** cumplimiento del limite de café.
 
 ### Terminado cuando
 
-- El final de la demo responde visualmente `¿durmio una hora más?`.
+- El final de la demo responde visualmente cuánto tiempo quedó reservado, sin afirmar que se midió sueño real.
 - Se entiende la diferencia entre oportunidad de sueño y sueño efectivamente medido.
 - No se hace ninguna afirmación medica no sustentada.
 
@@ -481,7 +482,7 @@ SnoozeOps no activa una promesa falsa. Muestra que la cobertura no está confirm
 
 ### ¿Como saben que dormira una hora más?
 
-En el evento demostramos que se protege una hora adicional y se eliminan interrupciones evitables. Una validación real compararía minutos dormidos contra la línea base por tipo de turno, junto con activación del relevo e interrupciones.
+En el evento demostramos que se reserva una hora adicional y que las alertas siguen rutas explícitas de seguridad. No afirmamos haber eliminado interrupciones ni haber medido sueño real. Una validación posterior compararía minutos dormidos contra la línea base por tipo de turno, junto con activación del relevo e interrupciones observadas.
 
 ### ¿Dónde está la inteligencia artificial?
 

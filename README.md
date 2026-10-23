@@ -12,7 +12,7 @@ Rodrigo, un profesional de soporte TI con turnos rotativos, no duerme poco por f
 
 SnoozeOps transforma esa incertidumbre en un plan de relevo explícito y comprobable, con una meta clara: proteger hasta **60 minutos adicionales** de su ventana de sueño.
 
-## Qué incluyen las Fases 1 y 2
+## Qué incluye el MVP actual (Fases 1–3)
 
 - Seleccionar un turno de `Día` o `Noche` y recalcular una propuesta de descanso.
 - Mostrar la comparación entre la ventana habitual y la ventana propuesta de `+60 min`.
@@ -25,8 +25,11 @@ SnoozeOps transforma esa incertidumbre en un plan de relevo explícito y comprob
 - Abrir un simulador inferior desde `Ver actividad`, sin salir de `Sueño protegido` ni `Guardia filtrada`.
 - Aplicar un motor de enrutamiento determinístico y offline: los P2/P3 estables se agrupan para revisión y lo crítico, ambiguo o de baja confianza se escala de forma conservadora.
 - Demostrar por separado un cambio de contraseña P3 y una caída P1 de base de datos, incluyendo confirmación y timeout simulado de Andrea.
-
-La pantalla de mañana y las notificaciones pertenecen a fases posteriores.
+- Avanzar manualmente a la pantalla de mañana sin esperar tiempo real.
+- Mostrar la diferencia entre la ventana habitual y la planificada, con `+60 min reservados para descansar`.
+- Presentar el resultado factual del escenario habitual: el P3 agrupado queda pendiente para revisión al cierre.
+- Mantener la prueba P1 sintética fuera del resumen habitual, incluso si vence el timeout y Rodrigo recibe una alerta.
+- Reiniciar la demostración y limpiar el estado persistido para preparar otro turno.
 
 ## Principio de seguridad
 
@@ -51,6 +54,7 @@ Próximo turno
   → Sueño protegido o guardia filtrada
       → Ver actividad
       → Simular incidentes y observar su ruta
+      → Simular la mañana y revisar el escenario habitual
 ```
 
 La prueba P1 se rotula como escenario sintético y mantiene su historial separado de la noche habitual. Los atajos de confirmación representan explícitamente el plazo de 60 segundos; no hay segunda pestaña, sincronización entre ventanas ni backend.
@@ -75,7 +79,8 @@ Máquina de estados de la demo
   ├── turno y ventana de sueño
   ├── cierre y relevo
   ├── modo protegido
-  └── guardia filtrada
+  ├── guardia filtrada
+  └── resultado matinal del escenario habitual
   │
   ▼
 Motor de incidentes determinístico
@@ -88,9 +93,9 @@ Fixtures sintéticos + localStorage
 
 ## Estado del proyecto
 
-Las Fases 1 y 2 están implementadas como una demo local navegable. El recorrido y el motor de enrutamiento funcionan sin conexión, cuenta, credenciales ni servicios externos. Las reglas de seguridad están modeladas fuera de la UI para poder reemplazar el simulador por una integración posterior sin cambiar las decisiones de enrutamiento.
+Las Fases 1, 2 y 3 están implementadas como una demo local navegable. El recorrido, el motor de enrutamiento y el cierre matinal funcionan sin conexión, cuenta, credenciales ni servicios externos. Las reglas de seguridad están modeladas fuera de la UI para poder reemplazar el simulador por una integración posterior sin cambiar las decisiones de enrutamiento.
 
-Consulta la [Fase 1](docs/product/FASE_1.md) y la [Fase 2](docs/product/FASE_2.md) para los criterios de aceptación, el [roadmap](docs/product/ROADMAP.md) para las fases siguientes y la [Fase 0](docs/product/FASE_0.md) para las decisiones, wireframes y datos sintéticos congelados.
+Consulta la [Fase 1](docs/product/FASE_1.md), la [Fase 2](docs/product/FASE_2.md) y la [Fase 3](docs/product/FASE_3.md) para los criterios de aceptación, el [roadmap](docs/product/ROADMAP.md) para las fases siguientes y la [Fase 0](docs/product/FASE_0.md) para las decisiones, wireframes y datos sintéticos congelados.
 
 ## Puesta en marcha
 
@@ -103,7 +108,7 @@ npm run dev
 
 Después, abre `http://localhost:3000` en tu navegador.
 
-Para probar el recorrido manualmente, pulsa `Reiniciar demo` y verifica primero el camino de `Día`: plan, solicitud de relevo, aceptación de Andrea y activación de sueño protegido. Pulsa `Ver actividad`, inyecta el P3 y confirma que queda pendiente para las 06:30; luego inyecta el P1 y prueba las dos respuestas de Andrea. Después repite el camino de rechazo para comprobar que `Guardia filtrada` envía el P1 directamente a Rodrigo.
+Para probar el recorrido manualmente, pulsa `Reiniciar demo` y verifica primero el camino de `Día`: plan, solicitud de relevo, aceptación de Andrea y activación de sueño protegido. Pulsa `Ver actividad`, inyecta el P3 y confirma que queda pendiente para las 06:30; luego inyecta el P1 sintético y prueba tanto la confirmación como el timeout de Andrea. Avanza con `Simular la mañana` y verifica que el resumen solo habla del escenario habitual. Después repite el camino de rechazo para comprobar que `Guardia filtrada` envía el P1 directamente a Rodrigo y que la mañana usa una formulación de ventana planificada. Repite la comparación con el turno `Noche` y finalmente pulsa `Preparar mi próximo turno` y refresca la página.
 
 Antes de integrar cambios, ejecuta:
 
@@ -119,7 +124,7 @@ Las convenciones de estructura, seguridad y colaboración están en el [acuerdo 
 ## Alcance deliberadamente fuera del MVP
 
 - Integraciones reales con mensajería o notificaciones push.
-- Pantalla de mañana y métricas de interrupciones evitadas.
+- Métricas de interrupciones evitadas o afirmaciones de sueño efectivamente medido.
 - IA, backend, autenticación y sincronización entre pestañas.
 - Datos personales, datos de salud reales y autenticación empresarial.
 - Facturación, roles avanzados y dashboards complejos.
