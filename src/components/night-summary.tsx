@@ -9,7 +9,7 @@ export function NightSummary({ summary, activationMode }: { summary: NightSummar
         <span className="morning-icon" aria-hidden="true">○</span>
         <div>
           <p className="section-label">Resultado operacional</p>
-          <h2 id="night-summary-title">Sin incidentes agrupados</h2>
+          <h2 id="night-summary-title">No hubo incidentes agrupados</h2>
           <p>No se registraron incidentes agrupados en este escenario de demo.</p>
         </div>
       </section>
@@ -23,9 +23,9 @@ export function NightSummary({ summary, activationMode }: { summary: NightSummar
       <div>
         <p className="section-label">Resultado operacional</p>
         <h2 id="night-summary-title">
-          Sin alertas en el escenario habitual durante tu {activationMode === "protected" ? "ventana protegida" : "ventana planificada"}
+          {incidentLabel} en el escenario habitual durante tu {activationMode === "protected" ? "ventana protegida" : "ventana planificada"}
         </h2>
-        <p>{incidentLabel} para revisión al cierre de tu ventana.</p>
+        <p>Quedó pendiente de revisión al cierre de tu ventana; agrupado no significa resuelto o descartado.</p>
         {summary.reviewAt && <p className="night-summary__pending">◷ Pendiente de revisión desde las {summary.reviewAt}</p>}
       </div>
     </section>

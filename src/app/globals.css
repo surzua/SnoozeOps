@@ -96,6 +96,24 @@ button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset:
 .summary-card { display: grid; gap: 0.7rem; }
 .summary-card > p:not(.section-label) { margin: 0; line-height: 1.5; }
 .summary-card__deadline { color: var(--amber); font-size: 0.86rem; font-weight: 700; }
+.handoff-passport { display: grid; gap: 0.9rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 1rem; background: rgba(16, 35, 58, 0.88); text-align: left; }
+.handoff-passport--prominent { border-color: #367e77; background: linear-gradient(135deg, rgba(17, 65, 64, 0.72), rgba(16, 35, 58, 0.94)); }
+.handoff-passport--historical { border-color: #526b85; }
+.handoff-passport__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+.handoff-passport h2 { margin: 0.3rem 0 0; font-size: 1.15rem; letter-spacing: -0.03em; }
+.handoff-passport__detail, .handoff-passport__reason, .handoff-passport__rule p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.48; }
+.coverage-badge { max-width: 12rem; padding: 0.35rem 0.5rem; border: 1px solid #58718b; border-radius: 0.45rem; color: var(--text); font-size: 0.74rem; font-weight: 800; line-height: 1.25; text-align: right; }
+.coverage-badge--complete { border-color: #3d817b; color: var(--teal); }
+.coverage-badge--pending, .coverage-badge--accepted_pending_activation { border-color: #9b7742; color: var(--amber); }
+.coverage-badge--filtered_uncovered, .coverage-badge--invalid { border-color: #9d514c; color: #f08a7e; }
+.handoff-passport__grid { display: grid; gap: 0.7rem; margin: 0; }
+.handoff-passport__grid > div { display: grid; grid-template-columns: 9rem 1fr; gap: 0.7rem; }
+.handoff-passport dt { color: var(--muted); font-size: 0.78rem; }
+.handoff-passport dd { margin: 0; font-size: 0.86rem; font-weight: 800; }
+.handoff-passport__rule { display: grid; gap: 0.35rem; padding: 0.8rem; border: 1px solid var(--line); border-radius: 0.75rem; background: rgba(8, 20, 38, 0.44); }
+.handoff-passport__rule p:not(.section-label) { color: var(--text); }
+.handoff-passport__rule p:last-child { color: var(--teal); font-weight: 800; }
+.passport-demo-label { margin: 0; color: #93a6bb; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.06em; }
 .simulator { display: grid; gap: 0.7rem; padding: 1rem; border: 1px dashed #c59448; border-radius: 1rem; background: rgba(76, 56, 32, 0.42); }
 .simulator__label { margin: 0; color: var(--amber); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; }
 .simulator h2, .simulator p { margin: 0; }
@@ -156,6 +174,8 @@ button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset:
 .incident-confidence { color: var(--muted); font-size: 1rem; }
 .incident-card h3, .incident-card p { margin: 0; }
 .incident-card h3 { font-size: 1.1rem; line-height: 1.35; }
+.incident-scenario { color: var(--amber) !important; font-size: 0.74rem !important; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.incident-metadata { color: var(--muted); font-size: 0.82rem !important; }
 .incident-card__rule, .incident-card__next { color: var(--muted); font-size: 1rem; line-height: 1.42; }
 .incident-card__rule strong { color: var(--text); }
 .incident-status { display: flex; gap: 0.55rem; align-items: flex-start; padding: 0.7rem; border-radius: 0.55rem; background: rgba(8, 20, 38, 0.54); }
@@ -194,5 +214,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset:
 .health-disclaimer__warning { color: var(--text) !important; font-weight: 800; }
 .synthetic-note { margin: 1.5rem 0 0; color: #8096af; font-size: 0.72rem; text-align: center; }
 @media (max-width: 22rem) { .simulation-section__title { flex-direction: column; } .scenario-label { max-width: none; text-align: left; } .incident-card__heading { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 22rem) { .handoff-passport__heading { flex-direction: column; } .coverage-badge { max-width: none; text-align: left; } .handoff-passport__grid > div { grid-template-columns: 1fr; gap: 0.15rem; } }
 @media (min-width: 38rem) { .app-shell { padding-top: 1.5rem; } .screen { gap: 1.3rem; } .simulator__actions { grid-template-columns: 1fr 1fr; } .simulation-outcomes { grid-template-columns: 1fr 1fr; } .simulation-outcomes > p { grid-column: 1 / -1; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

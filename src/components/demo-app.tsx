@@ -1,60 +1,22 @@
 "use client";
 
+import { useCallback, useRef } from "react";
 import { andrea, rodrigo, tickets } from "@/data/fixtures";
+import { HandoffPassport } from "@/components/handoff-passport";
 import { MorningScreen } from "@/components/morning-screen";
 import { SimulationPanel } from "@/components/simulation-panel";
+import { getCoverageSummary } from "@/domain/coverage-summary";
 import { handoffSummary, getShiftPlan } from "@/domain/shifts";
 import type { DemoAction, DemoState, HandoffStatus, ShiftPlan } from "@/domain/types";
 import { useDemoState } from "@/hooks/use-demo-state";
 
 type Dispatch = (action: DemoAction) => void;
 
-const statusCopy: Record<HandoffStatus, { icon: string; title: string; detail: string; tone: string }> = {
-  not_requested: {
-    icon: "○",
-    title: "Relevo pendiente de solicitar",
-    detail: "Andrea aún no recibió esta ventana.",
-    tone: "neutral",
-  },
-  pending: {
-    icon: "◷",
-    title: "Esperando confirmación de Andrea",
-    detail: "La cobertura todavía no está confirmada.",
-    tone: "waiting",
-  },
-  accepted: {
-    icon: "✓",
-    title: "Andrea confirmó el relevo",
-    detail: "La cobertura está lista para esta ventana.",
-    tone: "covered",
-  },
-  declined: {
-    icon: "!",
-    title: "El relevo no está cubierto",
-    detail: "Las alertas críticas o ambiguas llegarán directamente a ti.",
-    tone: "risk",
-  },
-};
-
 function BackButton({ onClick, label = "Volver" }: { onClick: () => void; label?: string }) {
   return (
     <button className="back-button" type="button" onClick={onClick}>
       <span aria-hidden="true">←</span> {label}
     </button>
-  );
-}
-
-function StatusCard({ status, shift }: { status: HandoffStatus; shift: ShiftPlan }) {
-  const copy = statusCopy[status];
-  const acceptedDetail = `Andrea confirmó el relevo hasta las ${shift.endsAt}.`;
-  return (
-    <section className={`status-card status-card--${copy.tone}`} aria-live="polite">
-      <span className="status-icon" aria-hidden="true">{copy.icon}</span>
-      <div>
-        <p className="status-title">{status === "accepted" ? acceptedDetail : copy.title}</p>
-        <p className="status-detail">{copy.detail}</p>
-      </div>
-    </section>
   );
 }
 
@@ -108,7 +70,8 @@ function ShiftScreen({ state, dispatch, shift }: { state: DemoState; dispatch: D
   );
 }
 
-function PlanScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift: ShiftPlan; status: HandoffStatus }) {
+function PlanScreen({ state, dispatch, shift }: { state: DemoState; dispatch: Dispatch; shift: ShiftPlan }) {
+  const coverage = getCoverageSummary(state, shift);
   return (
     <section className="screen" aria-labelledby="plan-title">
       <BackButton onClick={() => dispatch({ type: "navigate", screen: "shift" })} />
@@ -132,7 +95,7 @@ function PlanScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift: Sh
         <p className="section-label">Relevo propuesto</p>
         <p className="detail-card__value">{andrea.name}</p>
         <p className="detail-card__context">{shift.proposedWindow}</p>
-        <StatusCard status={status} shift={shift} />
+        <HandoffPassport summary={coverage} shift={shift} />
       </section>
       <button className="button button--primary" type="button" onClick={() => dispatch({ type: "navigate", screen: "handoff" })}>
         Revisar y cerrar mi guardia <span aria-hidden="true">→</span>
@@ -191,7 +154,8 @@ function HandoffActions({ dispatch, status, shift }: { dispatch: Dispatch; statu
   );
 }
 
-function HandoffScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift: ShiftPlan; status: HandoffStatus }) {
+function HandoffScreen({ state, dispatch, shift }: { state: DemoState; dispatch: Dispatch; shift: ShiftPlan }) {
+  const coverage = getCoverageSummary(state, shift);
   return (
     <section className="screen" aria-labelledby="handoff-title">
       <BackButton onClick={() => dispatch({ type: "navigate", screen: "plan" })} />
@@ -202,11 +166,11 @@ function HandoffScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift:
       <section className="summary-card">
         <p className="section-label">Resumen para Andrea</p>
         <p>{handoffSummary(shift)}</p>
-        <p className="summary-card__deadline">Andrea debe aceptar antes de las {shift.startsAt}.</p>
+        <p className="summary-card__deadline">La ventana comienza a las {shift.startsAt}; esta demo no modela vencimiento de la solicitud.</p>
       </section>
-      <StatusCard status={status} shift={shift} />
-      <HandoffActions dispatch={dispatch} status={status} shift={shift} />
-      {status !== "accepted" && status !== "declined" && (
+      <HandoffPassport summary={coverage} shift={shift} />
+      <HandoffActions dispatch={dispatch} status={state.handoffStatus} shift={shift} />
+      {state.handoffStatus !== "accepted" && state.handoffStatus !== "declined" && (
         <>
           <button className="button button--primary" disabled type="button">Activar sueño protegido</button>
           <p className="disabled-note">Sueño protegido se habilita solo después de una aceptación válida.</p>
@@ -218,6 +182,12 @@ function HandoffScreen({ dispatch, shift, status }: { dispatch: Dispatch; shift:
 
 function ActivationScreen({ state, dispatch, shift, onReset }: { state: DemoState; dispatch: Dispatch; shift: ShiftPlan; onReset: () => void }) {
   const protectedMode = state.activationMode === "protected";
+  const coverage = getCoverageSummary(state, shift);
+  const activityButtonRef = useRef<HTMLButtonElement>(null);
+  const closeSimulation = useCallback(() => {
+    dispatch({ type: "toggle_simulation" });
+    requestAnimationFrame(() => activityButtonRef.current?.focus());
+  }, [dispatch]);
   const title = protectedMode ? "Sueño protegido" : "Guardia filtrada";
   return (
     <section className="screen screen--activation" aria-labelledby="activation-title">
@@ -232,19 +202,19 @@ function ActivationScreen({ state, dispatch, shift, onReset }: { state: DemoStat
       </div>
       {protectedMode ? (
         <>
-          <p className="activation-copy">{andrea.firstName} está de relevo. Las alertas menores esperarán. Solo te despertaremos si ocurre un incidente crítico y Andrea no responde.</p>
+          <p className="activation-copy">{andrea.firstName} está de relevo para esta ventana. Los casos agrupables esperan revisión; las rutas conservadoras pueden escalar a Andrea y, según el atajo de demo, a Rodrigo.</p>
           <section className="activation-rule activation-rule--protected" aria-label="Regla de interrupción">
             <span className="activation-rule__icon" aria-hidden="true">!</span>
             <div>
               <p className="activation-rule__label">Regla de interrupción</p>
-              <p className="activation-rule__value">Solo un incidente crítico sin respuesta de Andrea puede despertarte.</p>
+              <p className="activation-rule__value">P1, ambiguos, de baja confianza o con impacto creciente escalan primero a Andrea; el fallback de 60 s simulados puede llegar a Rodrigo.</p>
             </div>
           </section>
           <p className="activation-gain">+60 min frente a tu ventana habitual</p>
         </>
       ) : (
         <>
-          <p className="activation-copy">Las alertas menores esperarán. Las críticas o ambiguas llegarán directamente a ti.</p>
+          <p className="activation-copy">La guardia filtrada no tiene relevo aceptado. Los casos permitidos se agrupan y las rutas conservadoras llegan a Rodrigo.</p>
           <section className="activation-rule activation-rule--filtered" aria-label="Regla de interrupción">
             <span className="activation-rule__icon" aria-hidden="true">!</span>
             <div>
@@ -254,16 +224,18 @@ function ActivationScreen({ state, dispatch, shift, onReset }: { state: DemoStat
           </section>
         </>
       )}
+      <HandoffPassport summary={coverage} shift={shift} variant="prominent" title="Pasaporte activo" />
       <p className="measurement-note">Tiempo reservado para dormir. Sueño real no medido.</p>
-      <button className="button button--activity" type="button" onClick={() => dispatch({ type: "toggle_simulation" })}>
+      <button ref={activityButtonRef} className="button button--activity" type="button" onClick={() => dispatch({ type: "toggle_simulation" })}>
         {state.simulation.isPanelOpen ? "Ocultar actividad" : "Ver actividad"} <span aria-hidden="true">↑</span>
       </button>
       <button className="button button--secondary" type="button" onClick={onReset}>Preparar otro turno</button>
       {state.simulation.isPanelOpen && (
         <SimulationPanel
           dispatch={dispatch}
-          isCovered={protectedMode && state.handoffStatus === "accepted"}
+          isCovered={coverage.status === "complete"}
           simulation={state.simulation}
+          onClose={closeSimulation}
         />
       )}
     </section>
@@ -286,8 +258,8 @@ export function DemoApp() {
       {!isHydrated && <p className="loading-state" role="status">Cargando demo…</p>}
       <div id="main-content" className={isHydrated ? "app-shell__content" : "app-shell__content app-shell__content--loading"}>
         {state.screen === "shift" && <ShiftScreen state={state} dispatch={dispatch} shift={shift} />}
-        {state.screen === "plan" && <PlanScreen dispatch={dispatch} shift={shift} status={state.handoffStatus} />}
-        {state.screen === "handoff" && <HandoffScreen dispatch={dispatch} shift={shift} status={state.handoffStatus} />}
+        {state.screen === "plan" && <PlanScreen state={state} dispatch={dispatch} shift={shift} />}
+        {state.screen === "handoff" && <HandoffScreen state={state} dispatch={dispatch} shift={shift} />}
         {state.screen === "activation" && <ActivationScreen state={state} dispatch={dispatch} shift={shift} onReset={resetDemo} />}
         {state.screen === "morning" && <MorningScreen state={state} shift={shift} onReset={resetDemo} />}
       </div>

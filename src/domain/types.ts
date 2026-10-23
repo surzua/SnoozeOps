@@ -6,6 +6,29 @@ export type HandoffStatus = "not_requested" | "pending" | "accepted" | "declined
 
 export type ActivationMode = "none" | "protected" | "filtered";
 
+export type CoverageStatus =
+  | "unavailable"
+  | "pending"
+  | "accepted_pending_activation"
+  | "complete"
+  | "filtered_uncovered"
+  | "invalid";
+
+export type CoverageSummary = {
+  status: CoverageStatus;
+  mode: ActivationMode;
+  label: string;
+  detail: string;
+  currentOwner: "Rodrigo" | "Andrea";
+  groupedReviewOwner: "Revisión al cierre";
+  windowStart: string;
+  windowEnd: string;
+  reviewAt: string;
+  interruptionRule: string;
+  nextAction: string;
+  reason: string;
+};
+
 export type SeverityLevel = "P1" | "P2" | "P3" | "Unknown";
 
 export type RoutingStatus =
