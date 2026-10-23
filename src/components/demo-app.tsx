@@ -232,10 +232,26 @@ function ActivationScreen({ state, dispatch, shift }: { state: DemoState; dispat
       {protectedMode ? (
         <>
           <p className="activation-copy">{andrea.firstName} está de relevo. Las alertas menores esperarán. Solo te despertaremos si ocurre un incidente crítico y Andrea no responde.</p>
+          <section className="activation-rule activation-rule--protected" aria-label="Regla de interrupción">
+            <span className="activation-rule__icon" aria-hidden="true">!</span>
+            <div>
+              <p className="activation-rule__label">Regla de interrupción</p>
+              <p className="activation-rule__value">Solo un incidente crítico sin respuesta de Andrea puede despertarte.</p>
+            </div>
+          </section>
           <p className="activation-gain">+60 min frente a tu ventana habitual</p>
         </>
       ) : (
-        <p className="activation-copy">Las alertas menores esperarán. Las críticas o ambiguas llegarán directamente a ti.</p>
+        <>
+          <p className="activation-copy">Las alertas menores esperarán. Las críticas o ambiguas llegarán directamente a ti.</p>
+          <section className="activation-rule activation-rule--filtered" aria-label="Regla de interrupción">
+            <span className="activation-rule__icon" aria-hidden="true">!</span>
+            <div>
+              <p className="activation-rule__label">Regla de interrupción</p>
+              <p className="activation-rule__value">Un incidente crítico o ambiguo llega directamente a Rodrigo.</p>
+            </div>
+          </section>
+        </>
       )}
       <p className="measurement-note">Tiempo reservado para dormir. Sueño real no medido.</p>
       <button className="button button--activity" type="button" onClick={() => dispatch({ type: "toggle_simulation" })}>
