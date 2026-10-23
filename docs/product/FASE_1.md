@@ -1,6 +1,6 @@
 # SnoozeOps — Fase 1: esqueleto navegable
 
-> Estado: **decisiones confirmadas; listo para implementar**.
+> Estado: **implementada y validada; lista para cerrar la fase**.
 
 ## Decisiones confirmadas
 
@@ -156,16 +156,16 @@ Tras cada bloque, la aplicación debe mantenerse navegable. No se inicia Fase 2 
 
 ## 9. Criterios de aceptación
 
-- [ ] `npm run dev` abre una experiencia funcional sin configurar variables de entorno.
-- [ ] `Día` inicia seleccionado y muestra `00:30–06:30` habitual frente a `23:30–06:30` propuesta.
-- [ ] Cambiar a `Noche` muestra `09:00–14:00` habitual frente a `08:30–14:30` propuesta.
-- [ ] Las tres pantallas respetan los textos y datos sintéticos congelados en `FASE_0.md`.
-- [ ] Los tres tickets y el resumen de relevo son legibles sin scroll horizontal en una vista móvil.
-- [ ] `Activar sueño protegido` está deshabilitado mientras Andrea no acepte.
-- [ ] Una aceptación permite activar la confirmación de protección; un rechazo ofrece solamente `Guardia filtrada`.
-- [ ] El reinicio restaura el estado inicial aunque se haya actualizado la página.
-- [ ] No se usa rojo salvo para un estado de riesgo real; cobertura y espera tienen texto, icono y color.
-- [ ] Tipos, lint, pruebas y build pasan antes de dar la fase por cerrada.
+- [x] `npm run dev` abre una experiencia funcional sin configurar variables de entorno.
+- [x] `Día` inicia seleccionado y muestra `00:30–06:30` habitual frente a `23:30–06:30` propuesta.
+- [x] Cambiar a `Noche` muestra `09:00–14:00` habitual frente a `08:30–14:30` propuesta.
+- [x] Las tres pantallas respetan los textos y datos sintéticos congelados en `FASE_0.md`.
+- [x] Los tres tickets y el resumen de relevo son legibles sin scroll horizontal en una vista móvil.
+- [x] `Activar sueño protegido` está deshabilitado mientras Andrea no acepte.
+- [x] Una aceptación permite activar la confirmación de protección; un rechazo ofrece solamente `Guardia filtrada`.
+- [x] El reinicio restaura el estado inicial aunque se haya actualizado la página.
+- [x] No se usa rojo salvo para un estado de riesgo real; cobertura y espera tienen texto, icono y color.
+- [x] Tipos, lint, pruebas y build pasan antes de dar la fase por cerrada.
 
 ## 10. Riesgos de Fase 1 y límites
 
