@@ -89,8 +89,8 @@ Los tracks están ordenados por riesgo que reducen, no por deseo de tener más t
 | Orden | Track | Riesgo que elimina primero | Entregable memorable | Puerta para avanzar |
 | --- | --- | --- | --- | --- |
 | 0 | Base protegida | Romper la demo o perder la trazabilidad. | Release congelado y reproducible. | Build limpio, tag, runbook y baseline de métricas. |
-| 1 | Descubrimiento y validación | Estar resolviendo una ansiedad inventada o mal formulada. | Mapa de “últimos 20 minutos antes de dormir” validado con operadores. | Problema, ritual y métricas confirmados por entrevistas/pruebas. |
-| 2 | Superficie de confianza | Que la persona no entienda quién cubre ni por qué. | Pasaporte de relevo y decisiones legibles en menos de cinco segundos. | Pruebas de comprensión y de recorrido sin ayuda. |
+| 1 | Descubrimiento documental | Apoyar la tesis en evidencia débil o confundir inferencia con validación. | Síntesis trazable de fuentes públicas, límites y una hipótesis de diseño priorizada. | Fuentes verificadas; avanzar sólo como hipótesis, sin declarar validación de usuarios. |
+| 2 | Superficie de confianza | Que el producto muestre una cobertura o una decisión que sus reglas no respaldan. | Pasaporte de relevo y decisiones trazables en la demo aislada. | Invariantes de estado, pruebas automatizadas y revisión interna; comprensión y aceptación de usuarios quedan sin evaluar. |
 | 3 | Piloto operacional | Que el flujo sea bonito pero no sobreviva a personas, turnos y datos reales. | Cobertura real con bitácora, políticas y sandbox de integración. | Piloto sin brechas críticas ni deuda ética relevante. |
 | 4 | Copiloto responsable | Que la IA parezca magia, agregue ruido o aumente riesgo. | IA en modo sombra con tarjeta de evidencia y revisión humana. | Calidad, abstención y seguridad superiores a umbrales definidos. |
 | 5 | Resultado y escalamiento | Confundir adopción puntual con impacto sustentable. | Informe de piloto: mecanismo, resultados, límites y decisión de escala. | Señal de valor repetible y operación lista para ampliar. |
@@ -111,42 +111,44 @@ Los tracks están ordenados por riesgo que reducen, no por deseo de tener más t
 
 **Puerta:** la demo sigue idéntica desde el tag; cada métrica tiene propósito, dueño y política de retención; nadie puede confundir telemetría de prueba con vigilancia laboral.
 
-### Track 1 — Descubrimiento que vuelve la tesis defendible
+### Track 1 — Discovery documental
 
-**Propósito:** reemplazar la persona sintética por evidencia cualitativa suficiente antes de automatizar una hipótesis equivocada.
+**Propósito:** contrastar la tesis de SnoozeOps con fuentes públicas, revisar la coherencia de la solución existente y priorizar una hipótesis de diseño sin atribuir hallazgos a usuarios.
 
-**Guía de ejecución:** [`TRACK_1_DESCUBRIMIENTO.md`](TRACK_1_DESCUBRIMIENTO.md) define el plan de investigación, los guiones, las tareas de prototipo, el resguardo de participantes, los criterios de decisión y los entregables. Este track no requiere cambios al código del MVP.
+**Límite explícito:** no se harán entrevistas, encuestas, pruebas de usabilidad, diarios, reclutamiento ni observación de personas. La guía [`TRACK_1_DESCUBRIMIENTO.md`](TRACK_1_DESCUBRIMIENTO.md) define el alcance documental, evaluación de fuentes, niveles de afirmación, puertas y entregables. No se modifica el código del MVP congelado.
 
-**Preguntas que deben responderse**
+**Preguntas documentales**
 
-- ¿Qué ocurre exactamente desde que termina el turno hasta que la persona intenta dormir?
-- ¿Qué le impide delegar: falta de contexto, falta de capacidad, cultura, culpa, experiencias previas o un protocolo inexistente?
-- ¿Qué haría que Andrea acepte/rechace un relevo con tranquilidad?
-- ¿Cuándo un aviso puede esperar y cuándo sería irresponsable agruparlo?
-- ¿Qué canales y políticas ya existen y quién tiene autoridad para modificarlos?
+- ¿Qué evidencia publicada existe sobre recuperación del trabajo y desapego psicológico?
+- ¿Qué señales públicas describen presión operacional, on-call o fatiga de alertas, y qué limitaciones tienen?
+- ¿Qué otras explicaciones —carga, dotación, políticas, herramientas— podrían influir en el problema?
+- ¿Qué implicaciones de transparencia y seguridad son coherentes con el producto actual?
+- ¿Qué oportunidad puede explorarse como hipótesis de diseño y qué queda sin evaluar?
 
-**Método mínimo defendible**
+**Método**
 
-1. Entrevistas semiestructuradas con 5–8 personas: operadores on-call, posibles relevos y un líder de guardia. No pedir tickets sensibles; usar relatos anonimizados o escenarios.
-2. Prueba de prototipo con tareas: interpretar cobertura, aceptar/rechazar, explicar la ruta de un P3/P1 y decir qué puede despertarlos.
-3. Diario ligero de 5–7 días, voluntario: hora aproximada de cierre, cantidad de chequeos posteriores, confianza para desconectar (1–5) y si ocurrió una interrupción. No se recopilan diagnósticos ni datos biométricos.
-4. Síntesis con mapa de viaje, oportunidades priorizadas y frases textuales anonimizadas; separar con precisión hallazgo, hipótesis e inferencia.
+1. Revisar literatura académica, encuestas sectoriales y guías técnicas; registrar población, método, fecha, patrocinio y límites.
+2. Verificar cada cifra en su fuente y distinguir evidencia científica, encuesta de proveedor, orientación práctica e inferencia del equipo.
+3. Inspeccionar documentalmente estados, reglas y promesas del MVP; no llamar a esta revisión una prueba de usabilidad.
+4. Sintetizar evidencia y contraevidencia, marcar explícitamente como “no evaluadas” las preguntas que requieren usuarios u operación real, y priorizar el siguiente paso.
 
 **Momentos de producto a diseñar**
 
-| Momento | Necesidad psicológica | Respuesta de SnoozeOps |
+| Momento | Pregunta/objetivo de diseño (no hallazgo de usuarios) | Respuesta que SnoozeOps puede explorar |
 | --- | --- | --- |
-| Antes de cerrar | “No quiero olvidar algo importante.” | Checklist breve, pendiente con dueño y resumen que Rodrigo puede corregir. |
-| Pedir relevo | “Delegar no puede sentirse como abandonar.” | Solicitud explícita, derecho a rechazar y alcance limitado de la cobertura. |
-| Activar la ventana | “Necesito dejar de negociar conmigo mismo.” | Ritual de cierre: evidencia de cobertura + frase factual + una sola acción para salir. |
-| Durante la noche | “¿Y si pasa algo?” | Regla visible de qué escala y qué espera; nunca una promesa de cero alertas. |
-| Mañana | “¿Qué ocurrió mientras descansaba?” | Resumen factual, pendientes y aprendizaje del plan; no culpabilización ni score de sueño. |
+| Antes de cerrar | ¿Cómo evitar pendientes sin dueño o contexto? | Checklist breve, pendiente con dueño y resumen editable. |
+| Pedir relevo | ¿Se delimitan aceptación, rechazo y alcance de cobertura? | Solicitud explícita, derecho a rechazar y alcance limitado. |
+| Activar la ventana | ¿El estado de cobertura deriva de confirmaciones verificables? | Estado visible, condición de escalamiento y acción primaria coherente. |
+| Durante la noche | ¿Qué ocurre con una alerta crítica, ambigua o sin acuse? | Regla visible de qué escala y qué espera; nunca una promesa de cero alertas. |
+| Mañana | ¿Qué quedó pendiente y qué ocurrió en la ventana? | Resumen factual y pendientes; no culpabilización ni score de sueño. |
 
-**Puerta:** al menos 70% de participantes entiende sin ayuda quién cubre, hasta cuándo y qué los vuelve a alertar; hay evidencia de que el ritual reduce incertidumbre declarada o se redefine la tesis antes de seguir.
+**Puerta:** las fuentes y afirmaciones son trazables, la inspección interna confirma coherencia entre estados y reglas, y cualquier avance se describe como hipótesis de diseño. No se reporta comprensión, aceptación, frecuencia ni impacto en usuarios.
 
 ### Track 2 — Pasaporte de relevo: confianza visible y comprobable
 
-**Propósito:** transformar el concepto de relevo en un objeto operacional que ambas personas pueden leer, corregir y auditar.
+La especificación ejecutable está en [`TRACK_2_PASAPORTE_RELEVO.md`](TRACK_2_PASAPORTE_RELEVO.md). Durante la hackatón no se hará investigación primaria con personas: no habrá entrevistas, encuestas propias, pruebas de usabilidad/comprensión, diarios, observación ni reclutamiento. Sí se permite revisar estudios y datos publicados en la web, partiendo de Track 1 y registrando método, población y límites. La comprobación del artefacto se limita a reglas, pruebas automatizadas y revisión interna. No se reportará que usuarios entienden o aceptan el mecanismo.
+
+**Propósito:** transformar el concepto de relevo en un objeto operacional que ambas personas pueden consultar y auditar.
 
 Este track absorbe lo valioso de la antigua Fase 6, pero añade el producto que le da sentido: no sólo una tarjeta bonita, sino un contrato de responsabilidad humano y verificable.
 
@@ -163,14 +165,14 @@ Este track absorbe lo valioso de la antigua Fase 6, pero añade el producto que 
 
 En menos de 30 segundos, un jurado ve el pasaporte de relevo, la aceptación de Andrea y una alerta con su evidencia/regla. Entiende qué se entregó, quién responde y por qué el sistema no escondió un P1. No hay que confiar en una caja negra.
 
-**Pruebas obligatorias**
+**Verificaciones obligatorias**
 
 - Matriz completa de cobertura y pruebas puras de la política.
-- Pruebas de transición: rechazo, cancelación, vencimiento, conflicto de ventana, relevo que se revoca y vuelta a guardia filtrada.
-- Test de comprensión con usuarios: explicar el estado y anticipar la ruta de cinco escenarios, incluidos ambiguo y baja confianza.
+- Pruebas de transición soportadas por el MVP: solicitud, pendiente, aceptación/rechazo, activación protegida/filtrada, cambio de turno y reset. El MVP no simula vencimiento, revocación ni conflicto de ventana; no presentar esos casos como implementados.
+- Revisión interna de contenido y recorrido para comprobar que estado, responsable, límite y ruta se mantienen consistentes en cinco escenarios, incluidos ambiguo y baja confianza. No se interpreta como test de comprensión de usuarios.
 - Revisión de contenido para que “protegido” nunca signifique “no serás interrumpido”.
 
-**Puerta:** 8 de cada 10 participantes interpretan correctamente la cobertura y la ruta P1/P3; no hay estado que diga cobertura completa sin aceptación verificable; las rutas de fallo siguen siendo conservadoras.
+**Puerta:** todas las invariantes de cobertura y rutas conservadoras pasan sus pruebas; la revisión interna no encuentra contradicciones entre estado, responsable y copy; no hay estado que declare cobertura completa sin aceptación verificable. La comprensión y aceptación de usuarios siguen sin evaluar.
 
 ### Track 3 — Piloto operacional: de simulación a coordinación segura
 
@@ -320,10 +322,10 @@ La diapositiva asociada debe mostrar los seis tracks, sus puertas de evidencia y
 
 ## 9. Decisión inmediata recomendada
 
-Después del Checkpoint 2, no se comienza implementando todo el Track 2. Se realiza el corte de rama y el Track 1 durante un ciclo corto. Con esos hallazgos se eligen exactamente dos entregables para la siguiente rama:
+Después del Checkpoint 2, no se comienza implementando todo el Track 2. Se realiza el corte de rama y el Track 1 documental durante un ciclo corto. Con la evidencia pública, los límites identificados y la coherencia del MVP se priorizan entregables de exploración para la siguiente rama, sin presentarlos como necesidades validadas con usuarios:
 
-1. **Pasaporte de relevo + cobertura derivada**, si el problema dominante es no saber quién responde y bajo qué condición.
-2. **Checklist/recibo de cierre**, si el problema dominante es rumiación por pendientes no externalizados.
-3. **Política/replay de incidentes**, si el principal reparo es confianza operacional.
+1. **Pasaporte de relevo + cobertura derivada**, como hipótesis alineada con la necesidad de mostrar responsabilidad, ventana y escalamiento.
+2. **Explicabilidad/replay de incidentes**, para hacer inspeccionables las reglas y rutas conservadoras.
+3. **Checklist/recibo de cierre**, como hipótesis de diseño posterior; no se asumirá que reduce rumiación hasta contar con evidencia apropiada.
 
 La IA, integraciones reales y datos de descanso esperan esa evidencia. Esa disciplina es lo que hace que el roadmap sea más ambicioso que una lista de funcionalidades: convierte cada etapa en una demostración de criterio de producto.

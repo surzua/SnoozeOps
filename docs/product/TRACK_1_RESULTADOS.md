@@ -1,139 +1,154 @@
-# SnoozeOps — Track 1: Síntesis de Investigación y Validación de Descubrimiento
+# SnoozeOps — Track 1: Síntesis de investigación documental
 
-**Estado:** Completado / Listo para Puerta de Decisión (Avanzar a Track 2)  
-**Documento de referencia:** `post-mvp/foundation-validation`  
-**Muestra:** 8 participantes (4 Titulares de guardia / "Rodrigo", 3 Relevos / "Andrea", 1 Líder Operacional) + Análisis de Datos Públicos de la Industria TI.
-
----
-
-## 1. Resumen Ejecutivo y Decisión de Puerta
-
-El presente documento consolida los hallazgos del **Track 1: Descubrimiento y validación** de SnoozeOps. Mediante la combinación de entrevistas cualitativas anonimizadas, pruebas de usabilidad del prototipo congelado y la integración de evidencia pública sobre psicología ocupacional y salud operacional en TI, se ha logrado responder a las preguntas fundamentales del negocio y del comportamiento del usuario.
-
-### Decisión de Puerta (Puerta C): **CONTINUAR A TRACK 2**
-* **Fundamento:** Se confirma que la hipervigilancia nocturna y la incapacidad de lograr un "desapego psicológico" provienen primordialmente de la **incertidumbre en la responsabilidad**, la **fatiga de alertas** y la **falta de un contrato explícito y bilateral de relevo**. 
-* **Próximo Paso:** Iniciar el desarrollo de la rama `post-mvp/trust-surface` enfocada en dos entregables prioritarios:
-  1. **Pasaporte de Relevo + Cobertura Derivada** (visibilidad de responsabilidad en <5 segundos).
-  2. **Checklist y Recibo de Cierre Cognitivo** (externalización de pendientes antes de dormir).
+**Estado:** investigación secundaria sintetizada; puerta de diseño recomendada.
+**Alcance cubierto:** fuentes públicas; la auditoría interna de pantallas y transiciones queda pendiente.
+**Investigación con personas:** no realizada y fuera del alcance de Track 1. No hubo entrevistas, encuestas, pruebas de usabilidad, diarios ni participantes `n=8`.
+**Decisión recomendada:** avanzar a Track 2 como exploración de una hipótesis de diseño, sin declarar validación de usuarios ni impacto demostrado.
 
 ---
 
-## 2. Respuestas a las 5 Preguntas Clave del Track 1
+## 1. Resumen ejecutivo
 
-### ¿Ocurre la dificultad para desconectarse de manera real y frecuente?
-**Sí, de forma sistemática.** 7 de 8 entrevistados (87.5%) reportaron revisar herramientas de mensajería (Slack/Teams), plataformas de tickets (Jira/PagerDuty) o métricas de infraestructura entre 1 y 4 veces durante los 30 minutos previos a intentar dormir, y hasta 2 veces a mitad de la noche al despertarse de forma espontánea.
-* *Patrón observado:* La persona no vuelve al trabajo por una tarea activa, sino por la necesidad compulsiva de verificar que "nada se ha caído" en ausencia de una confirmación explícita de relevo.
+Las fuentes revisadas hacen razonable que SnoozeOps explore cómo la recuperación del trabajo, el estrés de TI/on-call y la gestión de alertas se relacionan con la desconexión al terminar una guardia. Sin embargo, la evidencia encontrada es indirecta para el caso específico de SnoozeOps: no demuestra con qué frecuencia un operador revisa sistemas antes de dormir, que la incertidumbre de cobertura sea la causa principal, ni que un relevo bilateral reduzca la rumiación o mejore el sueño.
 
-### ¿La causa principal es la falta de un relevo verificable o existen otras barreras?
-**La causa raíz es la incertidumbre bilateral sobre la responsabilidad.** Si bien existen factores culturales (temor al reproche si un sistema cae) y operacionales (falta de documentación o runbooks desactualizados), el detonante inmediato de la rumiación nocturna es el *pendiente sin dueño*. La falta de un relevo explícito y acordado impide que el cerebro marque la tarea de la guardia como "cerrada".
+Las encuestas sectoriales aportan contexto sobre estrés y carga de alertas, pero difieren en población y propósito. El estudio de Object First aborda estrés relacionado con riesgos de seguridad en trabajadores de TI y seguridad de EE. UU.; el estudio de NeuBird aborda fiabilidad de producción, incidentes y alertas. Ninguno mide el problema de SnoozeOps directamente. Las guías de SRE sirven como orientación práctica y no como evidencia experimental del producto.
 
-### ¿Consideran aceptable y útil el mecanismo propuesto el Titular y el Relevo?
-**Sí, ambos roles encuentran valor pero con necesidades distintas:**
-* **Para el Titular (Rodrigo):** Ofrece "cierre cognitivo", alivia la culpa de delegar y transforma una entrega informal en un contrato con fronteras claras.
-* **Para el Relevo (Andrea):** Protege contra la sobrecarga injusta. Andrea acepta el relevo con tranquilidad únicamente cuando el traspaso especifica el alcance, los pendientes concretos y garantiza que un evento crítico no resuelto volverá a escalar al titular si ella no responde.
+### Decisión de puerta
 
-### ¿Entienden las personas, sin ayuda, la cobertura y la ruta de alertas?
-**Sí (87.5% de éxito global sin ayuda previa):**
-* **Comprensión de cobertura:** 7 de 8 participantes identificaron correctamente quién cubre, hasta qué hora exacta y qué condición cambia el estado.
-* **Comprensión de rutas (P3 vs P1):** 8 de 8 entendieron que un P3 (cambio de contraseña) se agrupa para la mañana, mientras que un P1 (caída de BD) escala inmediatamente al relevo y, de no haber acuse en el plazo simulado, escala conservadoramente de vuelta al titular.
+**Continuar a Track 2 como hipótesis de diseño, con alcance acotado.** Explorar primero cómo hacer explícitos y coherentes el estado de cobertura, la persona responsable, la ventana y la ruta de escalamiento. Mantener las reglas determinísticas y conservadoras del MVP.
 
-### ¿Qué cambio de producto es el de mayor valor y menor riesgo para continuar?
-El cambio prioritario es el **Pasaporte de Relevo con Cobertura Derivada (Track 2)**. Los usuarios solicitaron que el contrato de cobertura no sea un estado estático "declarado", sino un estado derivado de la aceptación explícita de ambas partes, legible en menos de 5 segundos.
+Esta decisión se apoya en la coherencia entre la tesis y el producto existente, además de la pertinencia general de las fuentes. **No significa** que el problema esté validado con usuarios, que la interfaz se entienda sin ayuda, que el mecanismo sea aceptado por titulares y relevos, ni que el producto produzca más sueño.
 
 ---
 
-## 3. Síntesis de Data Pública de la Industria TI y Evidencia Científica
+## 2. Respuestas reformuladas a las preguntas de Track 1
 
-Para complementar las entrevistas sin incurrir en recopilación de datos sensibles ni evaluaciones clínicas, se cruzó el comportamiento de los participantes con datos de la industria TI y psicología organizacional pública:
+### ¿La dificultad para desconectarse después de una guardia es frecuente en el público objetivo?
 
-| Fenómeno Registrado | Evidencia de Data Pública / Industria TI | Referencia / Enlace | Impacto en el Diseño de SnoozeOps |
-| :--- | :--- | :--- | :--- |
-| **Imposibilidad del Desapego Psicológico** | Estudios de psicología organizacional (*Sonnentag & Fritz*) demuestran que la rumiación nocturna se activa por "metas inacabadas". Encuestas del sector (*Object First*) indican que el 84% de los ingenieros TI sufren estrés crónico y el 78% teme ser culpado si un sistema cae. | [Psykholoh - Detachment](https://www.psykholoh.com/en/post/psychological-detachment-from-work-rest-and-recovery) \| [Object First Survey](https://objectfirst.com/newsroom/press-releases/object-first-survey-84-of-it-pros-feel-uncomfortably-stressed-at-work-amid-rising-cybersecurity-threats/) | SnoozeOps no promete "higiene de sueño", sino un **cierre cognitivo**. La aceptación bilateral actúa como la finalización formal de la meta. |
-| **Fatiga de Alertas (*Alert Fatigue*)** | Investigaciones de SRE (*IBM / FireHydrant / NeuBird*) muestran que el 70%+ de las alertas nocturnas son falsos positivos o P3/P4. Esto genera insensibilización y constante hipervigilancia por miedo a ignorar un P1 real. | [BusinessWire - NeuBird Study](https://www.businesswire.com/news/home/20260406439955/en/New-Study-Finds-Alert-Fatigue-Has-Become-a-Production-Reliability-Risk-and-Incident-Response-Alone-Is-No-Longer-Enough) \| [FireHydrant SRE Guide](https://firehydrant.com/blog/alert-fatigue/) | Justifica agrupar los incidentes P3 para revisión matutina sin silenciar los P1 críticos. Demuestra que el sistema **falla hacia la seguridad**. |
-| **Sesgo del Peor Escenario (*Worst-Case Bias*)** | Los operadores de TI están entrenados para asumir fallas. Si un sistema promete "cero interrupciones" o "silencio total", el usuario desconfía y sigue revisando manualmente. | [Vectra AI - Alert Fatigue](https://www.vectra.ai/topics/alert-fatigue) | Se prohíbe prometer "cero alertas". SnoozeOps explicita la ruta conservadora de escalamiento (si Andrea no responde en la ventana, el P1 vuelve a Rodrigo). |
-| **Aversión a la IA Autónoma "Caja Negra"** | Reportes de adopción tecnológica muestran desconfianza en modelos de IA que toman decisiones de producción sin supervisión o reglas explicables. | Reportes SRE & DevOps 2025/2026 | Mantiene el **motor determinístico local** como autoridad dura de seguridad. La IA actúa solo como copiloto explicativo con revisión humana. |
+**No se puede determinar con la evidencia de este track.** La literatura sobre recuperación del trabajo incluye el desapego psicológico como una dimensión relevante, y estudios de estrés en TI muestran presiones laborales relacionadas con seguridad y operación. Pero las fuentes revisadas no miden la frecuencia con que operadores on-call revisan Slack, tickets o métricas antes de dormir, ni permiten estimar prevalencia para Chile.
 
----
+**Conclusión:** la relevancia general del tema es plausible; la frecuencia específica para Rodrigo y el mercado objetivo queda **no evaluada**.
 
-## 4. Mapa del Recorrido Actual (5 Momentos del Cierre de Guardia)
+### ¿La causa principal es la falta de un relevo verificable?
 
-```
-[1. Antes de cerrar] ──> [2. Pedir Relevo] ──> [3. Activar Ventana] ──> [4. Durante la Noche] ──> [5. Mañana]
-   Checklist de         Solicitud explicit        Ritual de Cierre         Escalamiento         Resumen Factual
-   Pendientes           y Bilateral               y Evidencia              Conservador          y Aprendizaje
-```
+**No está establecida.** La incertidumbre sobre responsable, pendientes y escalamiento es una hipótesis de producto plausible, pero las fuentes también muestran factores alternativos como carga de trabajo, equipos insuficientes, presión por disponibilidad, complejidad de herramientas y volumen de alertas.
 
-| Momento | Conducta / Necesidad Observada | Riesgo o Fricción Actual | Respuesta Diseñada en SnoozeOps |
-| :--- | :--- | :--- | :--- |
-| **1. Antes de cerrar** | *"No quiero olvidar un detalle crítico antes de acostarme."* | Reorganizar notas mentales; temor a dejar algo ambiguo. | Checklist sintético, asignación de dueño a pendientes y resumen estructurado editable. |
-| **2. Pedir Relevo** | *"Delegar no puede sentirse como abandonar al equipo."* | Andrea teme heredar "incendios sin contexto"; Rodrigo siente culpa. | Solicitud explícita con alcance limitado, contexto del turno y derecho de rechazo sin penalización. |
-| **3. Activar Ventana** | *"Necesito dejar de negociar conmigo mismo si abro o no la laptop."* | Chequeos compulsivos de Slack/tickets antes de cerrar la pantalla. | **Ritual de Cierre:** Confirmación de cobertura + regla explícita de escalamiento + una sola acción para salir (`Activar Sueño Protegido`). |
-| **4. Durante la Noche** | *"¿Y si ocurrió algo grave y nadie se enteró?"* | Despertar espontáneo e hipervigilancia. | Regla visible de enrutamiento: P3 agrupado a las 06:30, P1 a Andrea, fallo a Rodrigo. **Cero promesas falsas de silencio**. |
-| **5. Mañana** | *"¿Qué pasó mientras dormía? ¿Tengo que apagar incendios de inmediato?"* | Ansiedad matutina al abrir herramientas de trabajo. | Resumen factual de la ventana, pendientes agrupados listos para revisar y métrica de tiempo reservado (+60 min). |
+**Conclusión:** SnoozeOps puede explorar la claridad de responsabilidad como una palanca, sin presentarla como causa raíz confirmada ni como explicación única.
 
----
+### ¿El titular y el relevo consideran aceptable y útil el mecanismo propuesto?
 
-## 5. Pruebas de Comprensión del Prototipo (Muestra $n=8$)
+**No evaluado.** Ninguna fuente pública revisada valida la aceptación del flujo específico de SnoozeOps ni la justicia de transferir una ventana de guardia. El pasaporte de relevo, el derecho a rechazar y la delimitación del alcance son decisiones de diseño que deberán seguir siendo explícitas y conservadoras.
 
-Se evaluó la capacidad de los participantes para interpretar la interfaz del prototipo sin explicación previa por parte del facilitador:
+**Conclusión:** la aceptabilidad del mecanismo permanece como hipótesis, no como hallazgo.
 
-| Tarea de Prototipo | Resultado ($n=8$) | Interpretación / Puntos de Fricción | Clasificación de Riesgo |
-| :--- | :---: | :--- | :--- |
-| **Tarea 1: Interpretar Cobertura** | **8 / 8 (100%)** | Entendieron quién cubre (Andrea), la hora límite (06:30) y si la solicitud estaba aceptada o pendiente. | Resuelto |
-| **Tarea 2: Decidir antes de Activar** | **7 / 8 (87.5%)** | 1 participante dudó sobre qué sucedería si Andrea rechazaba. Pidió ver la opción de *Guardia Filtrada* antes de presionar. | Menor / Usabilidad |
-| **Tarea 3: Interpretar Incidente P3** | **8 / 8 (100%)** | Reconocieron que el cambio de contraseña quedó agrupado para las 06:30 y que **no está resuelto ni borrado**. | Resuelto |
-| **Tarea 4: Escenario P1 Sintético** | **7 / 8 (87.5%)** | Entendieron el escalamiento inicial a Andrea. 1 participante preguntó si los 60s eran reales o simulados para la demo. | Menor / Copy de Demo |
-| **Tarea 5: Explicar Límites** | **8 / 8 (100%)** | **Cero interpretaciones peligrosas.** Ningún participante creyó que el sistema garantizaba un 100% de silencio o que silenciaba emergencias reales. | **Crítico / Aprobado** |
+### ¿Las personas entienden sin ayuda la cobertura y las rutas de alertas?
+
+**No evaluado con personas.** Se puede inspeccionar que las reglas y el copy del producto sean coherentes entre pantallas y que no prometan silencio total. Esa revisión documental no demuestra que un usuario entienda la cobertura, el límite horario o la escalación sin explicación.
+
+**Conclusión:** no reportar tasas de comprensión ni resultados de tareas en este Track 1.
+
+### ¿Qué cambio de producto conviene explorar después?
+
+Como decisión de diseño de bajo riesgo y alineada con el MVP, priorizar una **superficie de confianza** que derive el estado de cobertura desde hechos verificables y exponga responsable, ventana y condición de escalamiento. Una tarjeta de decisión puede explicar qué regla determinística se aplicó.
+
+El checklist/recibo de cierre cognitivo puede mantenerse como hipótesis posterior. Las fuentes revisadas no prueban que externalizar pendientes o confirmar el relevo reduzca rumiación. Por ello, el orden recomendado es primero hacer auditable la responsabilidad y sus fallos; luego decidir si corresponde incorporar un ritual de cierre.
 
 ---
 
-## 6. Matriz de Validación de Hipótesis
+## 3. Síntesis de evidencia pública
 
-| Cód. | Hipótesis Evaluada | Estado | Evidencia Cualitativa / Observada |
-| :--- | :--- | :--- | :--- |
-| **H1** | Los operadores de guardia sufren hipervigilancia nocturna debido a la incertidumbre sobre la cobertura. | **Confirmada** | 87.5% de la muestra revisa sistemas antes de dormir por falta de confirmación explícita. |
-| **H2** | Un ritual de relevo bilateral reduce la rumiación y la necesidad de chequeo compulsivo. | **Confirmada** | Los participantes declararon que la aceptación explícita de Andrea actúa como un "cierre de responsabilidad". |
-| **H3** | Los usuarios confiarán en un sistema que promete agrupar el 100% de las alertas sin interrupción. | **DEBILITADA (Rechazada)** | Los usuarios **desconfían** de promesas absolutas. Exigen saber qué reglas escalan un P1 y cómo se maneja la falla del relevo. |
-| **H4** | El relevo (Andrea) aceptará solicitudes si el alcance y los pendientes están claramente acotados. | **Confirmada** | Andrea acepta solo cuando ve que los P3 quedan ordenados y que ella no es responsable de fallas estructurales previas. |
-| **H5** | La medición explícita de horas de sueño clínico es necesaria para validar el valor del producto. | **DEBILITADA (Rechazada)** | Los usuarios prefieren la métrica de **"Tiempo reservado para descansar" (+60 min)** sobre trackers invasivos o biometría. |
+| Tema | Qué respalda la fuente | Aplicabilidad a SnoozeOps | Límite que debe conservarse |
+| --- | --- | --- | --- |
+| **Recuperación y desapego psicológico** | Sonnentag y Fritz desarrollan y evalúan el *Recovery Experience Questionnaire*, distinguiendo desapego psicológico, relajación, experiencias de dominio y control del tiempo libre. El trabajo estudia asociaciones entre estas experiencias y medidas de bienestar, incluidas dificultades de sueño. | Da fundamento para tratar la desconexión del trabajo como un tema de recuperación que merece atención. | No estudia SnoozeOps, relevos de guardia ni prueba que un ritual bilateral mejore el sueño. Evitar la afirmación de que “metas inacabadas” son la causa probada en este caso. |
+| **Estrés en TI y seguridad** | Object First reporta una encuesta encargada a Dynata de 500 trabajadores de TI y seguridad en EE. UU. En ese grupo, 84% declaró estrés incómodo asociado a riesgos de seguridad y 78% temor a ser culpado por incidentes. | Sugiere que algunos trabajadores de TI reportan presión y temor a la culpa en contextos de seguridad. | Es una encuesta encargada por un proveedor, en EE. UU. y centrada en seguridad/ransomware. No mide turnos nocturnos, chequeos antes de dormir ni el mercado chileno. |
+| **Carga y fatiga de alertas** | El comunicado sobre el estudio 2026 de NeuBird informa una encuesta de 1.039 profesionales SRE, DevOps e IT Ops. Reporta que 77% de equipos on-call recibe al menos diez alertas diarias, 57% indica que menos de 30% de esas alertas son accionables y 83% ignora o descarta alertas al menos ocasionalmente. | Sirve como señal sectorial de ruido de alertas y riesgos para la atención. Apoya diseñar rutas explícitas y evitar silenciar eventos críticos. | Es un estudio sectorial publicado por NeuBird; no informa que “70%+ de las alertas nocturnas son falsos positivos o P3/P4”. No usar esa cifra ni atribuirle medición de sueño o conducta pre-sueño. |
+| **Prácticas SRE para alertamiento** | La guía de FireHydrant describe fatiga de alertas, clasificación por severidad, ownership de servicios, runbooks y ajuste continuo de reglas. | Orientación para revisar cómo SnoozeOps muestra clasificación, reglas y próximos pasos. | Es una guía práctica de un proveedor, no un estudio que pruebe la eficacia de la solución SnoozeOps. No sustenta por sí sola un porcentaje de alertas no accionables. |
 
----
+### Referencias
 
-## 7. Oportunidades Priorizadas e Impacto en el Backlog
-
-| Oportunidad Identificada | Evidencia Cualitativa | Beneficiario | Cambio Candidato para Track 2 |
-| :--- | :--- | :--- | :--- |
-| **Pasaporte de Relevo Exportable / Visible** | *"Necesito mostrarle a mi líder quién tenía la guardia si algo falla a las 3 AM."* | Titular, Relevo y Operación | Crear el **Pasaporte de Relevo** como objeto explícito con ventana, pendientes, política y contrato bilateral. |
-| **Explicabilidad Transparente del Enrutamiento** | *"Quiero saber exactamente por qué este ticket no me despertó y quién decidió que era P3."* | Operación / Titular | Tarjeta de decisión estructurada con señales consideradas, regla determinística aplicada y estado actual. |
-| **Manejo de Relevo No Disponible / Rechazado** | *"Si Andrea rechaza, no puedo quedar en un limbo; necesito saber que sigo en guardia filtrada."* | Titular (Rodrigo) | Transición clara a **Guardia Filtrada**: indicar que los P1/ambiguos van directo a Rodrigo y los P3 se agrupan. |
-| **Checklist de Cierre Cognitivo** | *"Si no anoto lo que quedó a medias, me despierto pensando en eso."* | Titular (Rodrigo) | Componente de traspaso antes de solicitar relevo con resumen corregible. |
+1. Sonnentag, S. y Fritz, C. (2007). *The Recovery Experience Questionnaire: Development and Validation of a Measure for Assessing Recuperation and Unwinding From Work.* Journal of Occupational Health Psychology, 12(3), 204–221. [PubMed](https://pubmed.ncbi.nlm.nih.gov/17638488/) · [Texto completo alojado por Universität Konstanz](https://kops.uni-konstanz.de/bitstreams/98ac710b-0e57-4fb7-a281-e7a2aa0618ef/download).
+2. Object First. *The Human Impact of Ransomware: IT Professionals Are Being Pushed to the Limit.* [Artículo y metodología de la encuesta](https://objectfirst.com/blog/the-human-impact-of-ransomware-it-professionals-are-being-pushed-to-the-limit/).
+3. NeuBird AI / Business Wire (6 de abril de 2026). *New Study Finds Alert Fatigue Has Become a Production Reliability Risk and Incident Response Alone Is No Longer Enough.* [Comunicado y metodología](https://www.businesswire.com/news/home/20260406439955/en/New-Study-Finds-Alert-Fatigue-Has-Become-a-Production-Reliability-Risk-and-Incident-Response-Alone-Is-No-Longer-Enough).
+4. FireHydrant (1 de marzo de 2022). *Alert Fatigue in SRE: What It Is & How To Avoid It.* [Guía](https://firehydrant.com/blog/alert-fatigue/).
 
 ---
 
-## 8. Verificación de Puertas de Decisión
+## 4. Lectura de producto: implicaciones y límites
 
-* **Puerta A (Integridad de la Investigación):** **APROBADA**. Consentimientos otorgados, resguardo anonimizado de datos, representación equilibrada de roles (Titular, Relevo, Operación).
-* **Puerta B (Comprensión Segura del Prototipo):** **APROBADA**. 87.5% de comprensión general (superior al umbral del 70%). Cero malentendidos de seguridad crítica o promesas falsas de cero alertas.
-* **Puerta C (Relevancia y Mecanismo):** **APROBADA**. Problema altamente frecuente y doloroso; mecanismo de relevo bilateral validado como solución efectiva.
+### Implicaciones que sí se pueden derivar
+
+- Mostrar quién tiene la responsabilidad, qué ventana cubre y qué condición reactiva una escalación.
+- Mantener visible el estado de aceptación; no representar la cobertura como completa si falta una confirmación requerida.
+- No describir una alerta agrupada como resuelta, descartada o atendida.
+- Mantener una ruta explícita para incidentes críticos, ambiguos o sin confirmación.
+- Presentar la IA, si aparece en fases futuras, como apoyo explicable sujeto a reglas y control humano; no como autoridad para silenciar alertas.
+- Describir `+60 min` como tiempo reservado en ventanas planificadas, no como sueño observado ni beneficio de salud medido.
+
+Estas son implicaciones de diseño y seguridad coherentes con el producto; no son preferencias declaradas por usuarios de SnoozeOps.
+
+### Afirmaciones que este informe no sostiene
+
+- Que 7 de 8 operadores revisan sistemas antes de dormir.
+- Que titulares y relevos aceptaron el pasaporte o el ritual de cierre.
+- Que 87,5% o 100% entendió la interfaz o las rutas P1/P3.
+- Que se probaron tareas de prototipo con participantes.
+- Que el relevo bilateral reduce rumiación, evita interrupciones o aumenta el sueño.
+- Que el 70% o más de las alertas nocturnas son falsos positivos o incidentes P3/P4.
 
 ---
 
-## 9. Referencias y Fuentes Públicas de la Industria TI
+## 5. Hipótesis y estado de evidencia
 
-1. **Sonnentag, S., & Fritz, C. (2007).** *The Recovery Experience Questionnaire: Development and validation of a measure for assessing recuperation and unwinding at work.* Journal of Occupational Health Psychology. [Ver análisis en Psykholoh](https://www.psykholoh.com/en/post/psychological-detachment-from-work-rest-and-recovery)
-2. **Object First (2025/2026).** *IT Security & Workplace Stress Survey.* [Ver reporte en Object First](https://objectfirst.com/newsroom/press-releases/object-first-survey-84-of-it-pros-feel-uncomfortably-stressed-at-work-amid-rising-cybersecurity-threats/)
-3. **NeuBird / BusinessWire (2026).** *New Study Finds Alert Fatigue Has Become a Production Reliability Risk.* [Ver artículo en BusinessWire](https://www.businesswire.com/news/home/20260406439955/en/New-Study-Finds-Alert-Fatigue-Has-Become-a-Production-Reliability-Risk-and-Incident-Response-Alone-Is-No-Longer-Enough)
-4. **FireHydrant (2026).** *Alert Fatigue in SRE: What It Is & How To Avoid It.* [Ver guía en FireHydrant](https://firehydrant.com/blog/alert-fatigue/)
-5. **Vectra AI (2026).** *What Is Alert Fatigue? Causes & Impact.* [Ver informe en Vectra AI](https://www.vectra.ai/topics/alert-fatigue)
+| ID | Hipótesis | Estado tras investigación documental | Evidencia/limitación |
+| --- | --- | --- | --- |
+| H1 | Las personas de guardia tienen dificultad frecuente para desconectarse por la noche debido a incertidumbre de cobertura. | **No evaluada para el público objetivo; plausibilidad general.** | Literatura sobre recuperación y encuestas de presión TI aportan contexto, pero no miden frecuencia ni causa en operadores on-call de Chile. |
+| H2 | Un relevo explícito reduce rumiación y chequeos posteriores. | **Hipótesis de mecanismo, no probada.** | Ninguna fuente revisada evalúa el flujo de relevo de SnoozeOps ni su efecto conductual. |
+| H3 | La gente confiará si el sistema agrupa alertas con reglas explicables y promete una noche silenciosa. | **Reformular; la promesa absoluta no es aceptable como principio de diseño.** | Fatiga de alertas es un riesgo reconocido en fuentes sectoriales, pero no se evaluó confianza de usuarios. El producto debe evitar prometer silencio total por seguridad y honestidad. |
+| H4 | Los relevos aceptarán si el alcance está delimitado y pueden rechazar. | **No evaluada.** | No hay evidencia directa de aceptación ni de justicia de carga. Mantener derecho a rechazar como resguardo de diseño, sin llamarlo preferencia validada. |
+| H5 | Medir sueño clínico es necesario para demostrar valor. | **No evaluada como preferencia de usuarios; innecesaria para el MVP actual.** | El MVP puede reportar tiempo reservado según ventanas planificadas y declarar claramente que no mide sueño. No afirmar que participantes prefirieron esa métrica. |
 
 ---
 
-## 10. Plan de Acción Inmediato para Track 2 (Rama `post-mvp/trust-surface`)
+## 6. Recorrido de producto como hipótesis
 
-Con la evidencia recopilada en este Track 1, se autoriza la creación de la rama `post-mvp/trust-surface` para implementar las siguientes dos capacidades centrales en la siguiente iteración:
+Este recorrido expresa una **respuesta de diseño propuesta**, no necesidades observadas en entrevistas:
 
-1. **Pasaporte de Relevo y Estado de Cobertura Derivado:**
-   * Calcular el estado de cobertura (`unavailable`, `pending`, `complete`) derivado directamente de la matriz `(handoffStatus, activationMode)`.
-   * Renderizar la `CoverageCard` accesible en las pantallas de Plan, Cerrar Guardia y Sueño Protegido.
-2. **Decisión Explicable de Enrutamiento:**
-   * Rediseñar la `IncidentCard` para exponer: *Identidad*, *Señales Sintéticas*, *Clasificación de Entrada*, *Regla Determinística Aplicada* y *Siguiente Condición de Escalamiento*.
+| Momento | Riesgo o pregunta de diseño | Respuesta que SnoozeOps podría ofrecer |
+| --- | --- | --- |
+| Antes de cerrar | ¿Quedaron pendientes sin dueño o contexto? | Checklist y resumen editable, con responsable explícito. |
+| Pedir relevo | ¿Está claro qué se transfiere y quién puede aceptar? | Solicitud acotada, con aceptación o rechazo explícitos. |
+| Activar ventana | ¿Está derivado el estado de cobertura de confirmaciones reales? | Estado visible, condición de escalamiento y acción primaria coherente. |
+| Durante la ventana | ¿Qué ocurre con alerta crítica, ambigua o sin acuse? | Regla determinística y ruta conservadora explicada; no promesa de cero interrupciones. |
+| Revisión posterior | ¿Qué quedó pendiente y qué ocurrió en la simulación? | Resumen factual que distingue pendiente, escalado, resuelto y escenario simulado. |
+
+---
+
+## 7. Oportunidades priorizadas para Track 2
+
+| Prioridad | Oportunidad | Razón documental/de producto | Límite de la afirmación |
+| --- | --- | --- | --- |
+| 1 | **Estado de cobertura derivado y pasaporte de relevo** | Hace visible la responsabilidad, ventana, aceptación y condición de escalamiento; se alinea directamente con el mecanismo ya presente en el MVP. | Es la hipótesis de diseño mejor alineada, no la necesidad de mayor valor validada con usuarios. |
+| 2 | **Decisión explicable de enrutamiento** | La evidencia sectorial sobre ruido de alertas refuerza la conveniencia de mostrar clasificación, regla aplicada y próximo paso. | La explicación no demuestra que una alerta se haya clasificado correctamente en un entorno real. |
+| 3 | **Checklist/recibo de cierre cognitivo** | Puede estructurar pendientes y dejar constancia de la cobertura antes de cerrar. | El supuesto de que reduce rumiación es teórico y no está probado para SnoozeOps; mantenerlo acotado y no clínico. |
+
+---
+
+## 8. Verificación de puertas
+
+- **Puerta A — Integridad documental:** **Aprobada para las fuentes incluidas.** Las cifras y afirmaciones se limitan a su población y tipo de fuente; no se atribuyen resultados a participantes. El registro completo de fuentes y afirmaciones sigue siendo entregable del track.
+- **Puerta B — Coherencia del producto:** **Pendiente de completar la inspección documental prevista en `TRACK_1_DESCUBRIMIENTO.md`.** Los principios de revisión están definidos, pero este informe no declara que todas las pantallas y transiciones del MVP hayan sido auditadas. Aun aprobada, esta puerta no demostraría comprensión de usuarios.
+- **Puerta C — Relevancia documental:** **Aprobada para avanzar como hipótesis.** La evidencia pública justifica explorar recuperación, carga de alertas y claridad de cobertura; no confirma que SnoozeOps resuelva un problema frecuente ni que el mecanismo sea aceptado o efectivo.
+
+---
+
+## 9. Plan inmediato recomendado
+
+1. Mantener el MVP congelado y el trabajo posterior aislado en `post-mvp/trust-surface`.
+2. En Track 2, definir estados derivados de cobertura y su tabla de transiciones antes de modificar pantallas.
+3. Implementar primero el pasaporte de relevo y la explicación de enrutamiento, con casos de rechazo, pendiente, falta de acuse, alerta ambigua y fallo de conexión.
+4. Revisar internamente que cada mensaje se derive de un estado verificable y no prometa resultados no medidos.
+5. Mantener checklist/recibo cognitivo como hipótesis opcional; no presentarlo como intervención psicológicamente probada.
+
+### Lenguaje recomendado para presentar el resultado
+
+> “La investigación documental encontró evidencia general sobre recuperación del trabajo y sobre presiones relacionadas con TI y la fatiga de alertas. Esa evidencia hace plausible que la claridad de responsabilidad sea una línea de diseño útil, pero no valida la frecuencia del problema ni el efecto de SnoozeOps. Por eso el siguiente paso es fortalecer la trazabilidad del relevo y su ruta de escalamiento, manteniendo explícito qué falta comprobar.”

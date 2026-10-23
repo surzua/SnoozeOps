@@ -1,383 +1,183 @@
-# SnoozeOps — Track 1: Descubrimiento y validación
+# SnoozeOps — Track 1: Discovery documental
 
-**Estado:** plan de investigación ejecutable para la rama `post-mvp/foundation-validation`.  
-**Propósito:** decidir con evidencia de personas si el problema y el mecanismo central de SnoozeOps merecen evolucionar, qué debe cambiar y qué riesgos hay que resolver antes de construir más producto.  
-**Límite:** este track no modifica el código ni amplía el MVP congelado.
+**Estado:** alcance ajustado para investigación secundaria.
+**Rama de trabajo:** `post-mvp/foundation-validation`.
+**Propósito:** contrastar la tesis de SnoozeOps con fuentes públicas, revisar la coherencia del MVP congelado frente a esa evidencia y decidir qué hipótesis de diseño merece explorarse después.
+**Límite central:** Track 1 no incluye investigación con personas. No se harán entrevistas, pruebas de usabilidad, diarios, encuestas, reclutamiento ni observación de operadores. Tampoco se afirmará que una persona usuaria validó una necesidad o comprendió una pantalla.
 
----
+## 1. Decisión que debe habilitar
 
-## 1. Qué decisión debe habilitar este track
+Al cerrar este track se podrá decidir si la tesis tiene suficiente **respaldo documental y coherencia de producto** para continuar como hipótesis de diseño, qué riesgos debe atender la siguiente iteración y qué preguntas siguen sin respuesta.
 
-Al cerrar Track 1, el equipo debe poder responder:
+La investigación documental puede responder:
 
-1. ¿La dificultad para desconectarse después de una guardia ocurre de manera real y suficientemente frecuente en las personas objetivo?
-2. ¿La causa principal es falta de un relevo verificable, o hay barreras más importantes que SnoozeOps no resuelve?
-3. ¿El titular y quien recibe el relevo consideran aceptable y útil el mecanismo propuesto?
-4. ¿Las personas entienden, sin ayuda, qué cubre el relevo, hasta cuándo y qué podría volver a alertar al titular?
-5. ¿Qué cambio de producto sería el siguiente de mayor valor y menor riesgo?
+1. ¿Qué dice la evidencia pública sobre recuperación del trabajo, desapego psicológico, estrés en TI/on-call y fatiga de alertas?
+2. ¿Qué tan directamente aplica esa evidencia a una persona de guardia que intenta desconectarse después del turno?
+3. ¿Qué factores alternativos aparecen en las fuentes y podrían explicar el problema?
+4. ¿Qué principios de seguridad y transparencia debería cumplir SnoozeOps, según la evidencia disponible y el diseño actual?
+5. ¿Qué cambio de producto es una hipótesis razonable de bajo riesgo para explorar después?
 
-La salida no es “validar SnoozeOps” en abstracto. La salida es una decisión concreta: **continuar con Track 2, ajustar la tesis/experiencia, investigar una pregunta pendiente o detener esta dirección**.
+Este track **no puede determinar** la frecuencia del problema en el público objetivo, establecer una causa raíz para Rodrigo o Andrea, probar aceptación del relevo, medir comprensión de la interfaz ni demostrar efectos sobre conducta, descanso o sueño.
 
-## 2. Tesis e hipótesis que vamos a poner a prueba
+La salida es una decisión acotada: **avanzar con una hipótesis de diseño, ajustar la tesis, buscar mejor evidencia secundaria o detener esta línea**. “Avanzar” no equivale a “validar con usuarios”.
 
-### Tesis actual
+## 2. Tesis e hipótesis documentales
 
-> Una persona de soporte TI que está de guardia puede tener dificultad para desconectarse al terminar su jornada porque no confía en que la responsabilidad quedó cubierta. Un relevo explícito y verificable, con dueño, ventana y ruta de escalamiento visibles, podría reducir esa incertidumbre y facilitar que deje de revisar la operación antes de dormir.
+### Tesis de producto
 
-La tesis contiene una relación plausible, no un resultado demostrado. No afirmaremos que SnoozeOps aumenta sueño ni evita interrupciones hasta contar con evidencia apropiada.
+> Un traspaso explícito que muestre responsable, ventana, pendientes y ruta de escalamiento podría hacer más visible la distribución de responsabilidad al cerrar una guardia. Esa claridad podría ayudar a reducir incertidumbre, pero su efecto en la desconexión de una persona aún no está comprobado.
 
-### Hipótesis de investigación
+La tesis es una explicación de diseño, no un hallazgo empírico de SnoozeOps. La evidencia publicada puede aportar plausibilidad y límites; no prueba que el producto produzca el resultado esperado.
 
-| ID | Hipótesis | Qué la apoyaría | Qué la debilitaría |
+### Preguntas de evidencia
+
+| ID | Pregunta | Qué puede aportar la investigación secundaria | Qué queda sin demostrar |
 | --- | --- | --- | --- |
-| H1 | Parte de las personas de guardia revisa o rumia sobre la operación fuera de su turno, especialmente antes de dormir. | Relatos concretos y recientes de chequeos, demora en acostarse o dificultad para dejar de pensar en incidentes. | La conducta es rara, no les preocupa o se explica principalmente por otro problema. |
-| H2 | La incertidumbre sobre pendientes, cobertura o escalamiento contribuye a esa conducta. | La persona describe información o responsabilidad sin dueño claro, y explica cómo eso cambia sus chequeos o descanso. | Los chequeos obedecen a políticas, carga de incidentes u otras causas que un relevo visible no modificaría. |
-| H3 | Un relevo explícito puede resultar aceptable para titular y relevo si delimita alcance, plazo y autoridad. | Ambos roles pueden describir condiciones concretas para aceptar el traspaso; el relevo siente que puede rechazarlo. | El mecanismo se vive como presión, transferencia injusta de carga o falsa garantía. |
-| H4 | Las personas interpretan correctamente los límites y rutas de SnoozeOps. | Explican de forma independiente quién cubre, hasta cuándo y qué situaciones escalan. | Creen que la cobertura garantiza cero alertas o que una alerta crítica puede quedar silenciada. |
+| D1 | ¿Hay base para considerar relevante la recuperación y el desapego psicológico del trabajo? | Investigación revisada por pares sobre dimensiones de recuperación y asociaciones con bienestar/sueño. | Cuán frecuente es la dificultad en operadores on-call y qué la causa en SnoozeOps. |
+| D2 | ¿Existen señales públicas de presión, estrés o ruido de alertas en TI/on-call? | Encuestas sectoriales y guías operacionales, con sus muestras y sesgos declarados. | Que esos datos describan a Rodrigo, a equipos chilenos o al momento previo a dormir. |
+| D3 | ¿Un relevo bilateral resuelve el problema? | La literatura puede sugerir mecanismos relacionados con control, límites y responsabilidad. | Aceptación del mecanismo, justicia de la carga y efecto causal del relevo. |
+| D4 | ¿La interfaz explica cobertura y escalamiento? | Inspección heurística del contenido, estados y reglas ya documentados. | Comprensión real sin ayuda por parte de usuarios. |
+| D5 | ¿Qué se explora después? | Priorización por alineamiento con la tesis, reversibilidad y seguridad. | “Mayor valor para usuarios” hasta contar con evidencia directa de ellos. |
 
-No es necesario que todas las hipótesis se confirmen. Un hallazgo contrario es un resultado útil si cambia una decisión.
+## 3. Alcance y exclusiones
 
-## 3. Alcance, método y tamaño de muestra
+### Incluye
 
-### Participantes
+- Búsqueda y revisión de fuentes públicas sobre recuperación del trabajo, desapego psicológico, on-call/SRE, estrés operacional y fatiga de alertas.
+- Evaluación de calidad, fecha, población, metodología, patrocinio y aplicabilidad de cada fuente.
+- Separación explícita entre evidencia científica, encuestas de proveedores, guías prácticas e inferencias del equipo.
+- Revisión documental del MVP congelado y sus especificaciones para detectar promesas, estados o reglas que excedan lo que puede sostener la evidencia.
+- Síntesis de hallazgos, límites, hipótesis de diseño y decisión de puerta.
 
-Entrevistar a **5–8 personas** con experiencia reciente en guardias o soporte operacional. Buscar voces de:
+### Fuera de alcance
 
-- **Titulares de guardia:** quienes deben estar disponibles o sienten responsabilidad fuera de turno.
-- **Personas de relevo:** quienes reciben o podrían recibir la responsabilidad.
-- **Responsable operacional:** quien define políticas, rotaciones o escalamiento.
+- Entrevistas, encuestas, grupos focales, sesiones con psicólogos u otros expertos, observación contextual y pruebas moderadas o no moderadas con personas.
+- Diarios de guardia, registros de comportamiento, métricas de sueño, biometría o seguimiento de hábitos.
+- Uso de datos privados, tickets, logs, conversaciones, incidentes internos o información de una empresa.
+- Afirmar que se validó la frecuencia, el lenguaje, la aceptación, la comprensión o el impacto de SnoozeOps en personas.
+- Cambiar el código o las reglas del MVP congelado.
 
-Intentar incluir al menos dos perspectivas por rol cuando la disponibilidad lo permita. Una persona puede haber ejercido más de un rol. No presentar este grupo como representativo de toda la industria: es una muestra formativa para encontrar problemas, lenguaje y riesgos.
+La exclusión de investigación con personas es una decisión de alcance, no una brecha que deba compensarse inventando resultados. Las preguntas que sólo podrían resolverse con usuarios quedarán registradas como **no evaluadas**.
 
-**Entrevista experta complementaria:** una psicóloga o especialista en factores humanos puede revisar el ritual de cierre, la sensación de presión y la agencia de las personas. Esa opinión complementa, pero no sustituye, a operadores, relevos ni responsables de guardia.
+## 4. Método de investigación documental
 
-### Actividades
+### 4.1 Búsqueda y selección
 
-1. Entrevista semiestructurada: 30–40 minutos por persona.
-2. Prueba moderada del prototipo congelado: 15–20 minutos, en la misma sesión o en una sesión separada.
-3. Diario voluntario y ligero: 5–7 días, sólo si la persona tiene una guardia o ventana relevante durante ese período. Si no ocurre una oportunidad real, no pedirle que invente registros.
+Priorizar en este orden:
 
-El diario explora patrones declarados; no mide sueño ni prueba causalidad. Si el esfuerzo, la sensibilidad del contexto o el riesgo de privacidad resultan mayores que el valor esperado, se omite y se documenta por qué.
+1. Artículos revisados por pares y publicaciones académicas originales.
+2. Revisiones sistemáticas o metaanálisis, cuando existan para la pregunta concreta.
+3. Encuestas sectoriales que publiquen tamaño de muestra, población y fecha.
+4. Guías técnicas de organizaciones SRE/on-call, usadas como orientación práctica, no como prueba científica.
 
-### No es parte del track
+Registrar por fuente: referencia completa, enlace, fecha de publicación, tipo de fuente, patrocinador, población/muestra, método conocido, hallazgo literal relevante, limitaciones, aplicabilidad a SnoozeOps y fecha de consulta.
 
-- Integrar fuentes reales, enviar alertas o probar el producto en producción.
-- Recopilar tickets, nombres de clientes, pantallazos, logs, incidentes identificables ni credenciales.
-- Pedir datos biométricos, diagnósticos, tratamientos o acceso a aplicaciones de salud.
-- Clasificar o evaluar el desempeño de empleados o de quienes aceptan relevos.
-- Cambiar reglas de seguridad del MVP a partir de una opinión aislada sin documentar la decisión.
+Excluir o marcar como débiles las fuentes sin metodología verificable, sin población definida, basadas sólo en marketing, o que repitan cifras sin enlazar al estudio original. No inferir que “noche”, “guardia” o “sueño” fueron medidos cuando el estudio sólo pregunta por estrés o alertas en general.
 
-## 4. Preparación antes de hablar con participantes
+### 4.2 Niveles de afirmación
 
-### 4.1 Definir equipo y materiales
+Etiquetar cada conclusión de la síntesis como una de estas categorías:
 
-Una persona facilita y otra toma notas si hay un segundo colaborador disponible. Si sólo hay una, facilitar y registrar notas inmediatamente después. Preparar:
+- **Hallazgo de fuente:** resultado expresado por una fuente identificada, limitado a su población y método.
+- **Aplicabilidad parcial:** posible relación con SnoozeOps, indicando la distancia entre la población estudiada y el caso objetivo.
+- **Inferencia de diseño:** decisión propuesta por el equipo a partir de hallazgos y del funcionamiento del MVP.
+- **No evaluado:** pregunta que requiere datos directos de usuarios u operación y que este track excluye.
 
-- Este plan y una hoja de consentimiento breve.
-- Guion de entrevista y hoja de notas por participante.
-- Prototipo/demostración en su estado inicial limpio, sin información real.
-- Tareas de comprensión y escenarios de prueba definidos en la sección 7.
-- Registro de decisiones e hipótesis.
-- Invitación con duración, propósito, voluntariedad y límites de privacidad.
+No convertir porcentajes de encuestas comerciales en tasas de mercado para Chile ni en prevalencia de hipervigilancia nocturna.
 
-No grabar audio/video por defecto. Si se propone grabar, explicar motivo, acceso, plazo de borrado y pedir consentimiento separado antes de empezar. La persona puede participar sin ser grabada. No usar grabaciones para entrenamiento de modelos.
+### 4.3 Inspección documental del producto
 
-### 4.2 Reclutamiento y relación de poder
+Revisar las pantallas y reglas ya definidas en las Fases 0–5, sin modificar el MVP. Para cada estado o mensaje anotar:
 
-- Invitar de forma voluntaria y explícita; no pedir a un supervisor que informe quién aceptó participar.
-- Siempre que sea posible, no entrevistar a una persona a quien el facilitador supervise o evalúe.
-- Si una organización recluta, dejar claro que participar, rechazar o retirarse no tiene efecto laboral.
-- No compartir respuestas individuales con jefaturas ni sponsors. Entregar sólo síntesis agregada y anonimizadas.
-- La persona puede saltarse preguntas, detener la sesión o retirar sus datos antes de la síntesis.
+- Qué hecho observable afirma.
+- Qué regla determinística lo produce.
+- Qué podría interpretar una persona, sin afirmar que esa interpretación fue probada.
+- Si el texto promete más que la cobertura realmente modelada.
+- Qué caso ambiguo o fallo mantiene una ruta conservadora.
 
-### 4.3 Consentimiento en lenguaje simple
+Esta inspección es una revisión interna de consistencia, no una prueba de usabilidad.
 
-Leer antes de empezar:
-
-> “Estamos explorando cómo se vive el cierre de una guardia y probando una demo conceptual. Esto no es una evaluación de tu desempeño ni de tu sueño. Participar es voluntario; puedes saltarte cualquier pregunta o terminar cuando quieras. No necesitamos nombres de clientes, tickets, datos de producción ni información médica. Tomaremos notas anonimizadas y no compartiremos respuestas individuales con tu jefatura. ¿Te parece participar? ¿Aceptas que tome notas? La grabación, si se considera, se consulta aparte.”
-
-Registrar sólo que el consentimiento fue otorgado, sin guardar más datos personales de los necesarios. Si no acepta notas, ofrecer conversación sin registro; no presionar.
-
-### 4.4 Identificadores y resguardo
-
-- Usar códigos `P01`, `P02`, etc.; guardar la llave de contacto separada de las notas, si es indispensable conservarla.
-- En notas, omitir empresa, servicio, nombres, ubicación precisa y detalles que hagan identificable a una persona o incidente.
-- Reformular o eliminar citas que puedan revelar identidad; no inventar citas textuales. Si la frase se parafrasea, etiquetarla como paráfrasis.
-- Limitar el acceso a quienes preparan la síntesis. Definir antes de iniciar quién conserva los archivos y cuándo se borrarán; como valor inicial, borrar contactos y notas crudas a los 30 días de cerrar Track 1, salvo que la persona haya consentido un período distinto.
-- No subir notas identificables a herramientas externas ni a un LLM. La síntesis se puede hacer con extractos anonimizados y revisados.
-
-## 5. Plan de trabajo sugerido
-
-El calendario depende de reclutamiento. Una ejecución compacta puede tomar dos semanas; no sacrificar consentimiento, diversidad de roles o síntesis por cumplir una fecha.
+## 5. Plan de trabajo
 
 | Paso | Actividad | Resultado |
 | --- | --- | --- |
-| 0 | Acordar hipótesis, roles, privacidad y preguntas de decisión. | Brief de investigación listo. |
-| 1 | Reclutar y agendar 5–8 personas. | Cobertura razonable de titular, relevo y operación. |
-| 2 | Realizar primeras 2 entrevistas y revisar el guion. | Preguntas comprensibles; corregir sesgos obvios antes de seguir. |
-| 3 | Completar entrevistas individuales. | Notas anonimizadas y evidencia por hipótesis. |
-| 4 | Probar prototipo con cada participante o con una submuestra equilibrada de al menos 5 personas. | Resultados de tareas sin ayuda, errores y lenguaje usado. |
-| 5 | Invitar al diario de 5–7 días a quienes tengan una oportunidad pertinente. | Registros voluntarios; también documentar no participación o ausencia de oportunidad. |
-| 6 | Codificar, comparar roles y mapear el recorrido. | Hallazgos, tensiones y oportunidades priorizadas. |
-| 7 | Tomar una decisión de puerta y registrar razones. | Continuar, ajustar, investigar o detener con próximos pasos. |
+| 0 | Congelar preguntas, tesis y exclusiones del track. | Brief documental sin tareas con participantes. |
+| 1 | Buscar fuentes académicas y sectoriales pertinentes. | Registro de fuentes con calidad y aplicabilidad. |
+| 2 | Verificar afirmaciones y cifras contra las fuentes originales. | Libro de afirmaciones con enlace y límites. |
+| 3 | Sintetizar evidencia y explicaciones alternativas. | Matriz de evidencia, incertidumbre y vacíos. |
+| 4 | Inspeccionar consistencia del producto y de sus promesas. | Lista de decisiones de diseño y riesgos; sin cambios al MVP. |
+| 5 | Priorizar una hipótesis de siguiente paso y decidir la puerta. | Síntesis final y alcance recomendado para Track 2. |
 
-Si la prueba de prototipo se hace con menos personas que las entrevistas, se reportan denominadores separados. No combinar entrevistas, tareas y diario como si fueran una única muestra.
+## 6. Plantilla del registro de fuentes y afirmaciones
 
-## 6. Guion de entrevista semiestructurada
+| Campo | Contenido requerido |
+| --- | --- |
+| ID | Código estable, por ejemplo `SRC-01`. |
+| Referencia y URL | Autor/organización, título, año y enlace directo. |
+| Tipo y patrocinio | Artículo científico, encuesta comercial, guía técnica, etc. Indicar quién financia/publica. |
+| Población y método | País, perfil, tamaño de muestra, fecha y método si están disponibles. |
+| Hallazgo que se usa | Paráfrasis específica; no ampliar el alcance del resultado. |
+| Limitaciones | Sesgo, población distinta, falta de metodología u otros límites. |
+| Aplicabilidad | Alta, parcial o baja, con justificación. |
+| Afirmación del producto | Qué decisión podría informar. |
+| Nivel | Hallazgo de fuente, aplicabilidad parcial, inferencia de diseño o no evaluado. |
 
-### Apertura (2 minutos)
+## 7. Principios de síntesis
 
-- Leer consentimiento.
-- Confirmar rol o experiencia general, sin pedir información de empleador si no es necesaria.
-- Aclarar: “Me interesa cómo ocurrió la última vez, no una respuesta ideal.”
+- No reportar porcentajes de participantes porque no se reclutan participantes.
+- Conservar denominadores y población exacta en cifras tomadas de encuestas.
+- Diferenciar estrés laboral general, fatiga de alertas, dificultad para desconectarse y sueño; son constructos relacionados, no equivalentes.
+- No tratar “desapego psicológico” como diagnóstico clínico ni como sinónimo de dormir bien.
+- No afirmar que una aceptación bilateral “cierra” una meta mental o reduce rumiación: describirlo como mecanismo hipotético.
+- Incluir evidencia que limite o contradiga la tesis, además de la que la haga plausible.
+- No usar una fuente promocional para justificar por sí sola una regla de seguridad.
 
-### A. Reconstruir un episodio reciente (8–10 minutos)
+## 8. Puertas de decisión
 
-1. “Cuéntame la última ocasión en que terminaste una guardia o jornada y luego intentaste desconectarte.”
-2. “¿Qué pasó desde que terminó tu responsabilidad formal hasta que intentaste dormir o dejar el trabajo?”
-3. “¿Qué hiciste concretamente? ¿Abriste alguna herramienta, revisaste mensajes o pediste confirmación?”
-4. “¿Qué fue lo último que te hizo volver a pensar en la operación?”
-5. “¿Qué ocurrió al final?”
+### Puerta A — Integridad documental
 
-**Sondeos neutrales:** “¿Me puedes dar un ejemplo?”, “¿Qué pasó después?”, “¿Cómo lo supiste?”, “¿Qué hiciste tú?”. Evitar completar la respuesta o sugerir una emoción.
+**Aprobada** si las cifras importantes se pueden rastrear a su fuente, la metodología se describe con honestidad y las afirmaciones no exceden la población ni la pregunta estudiada. Si no, corregir o retirar la afirmación.
 
-### B. Responsabilidad y traspaso (8 minutos; adaptar a rol)
+### Puerta B — Coherencia de producto
 
-Para titular:
+**Aprobada para exploración interna** si la inspección documental confirma que los estados y mensajes del MVP describen reglas presentes, hacen visible la ruta conservadora y no prometen silencio total ni sueño medido. Esta puerta no mide comprensión de usuarios.
 
-- “¿Qué necesitas dejar resuelto o explicado antes de desconectarte?”
-- “¿Qué te da confianza de que otra persona puede continuar?”
-- “¿Qué te hace revisar de nuevo aunque el turno haya terminado?”
-- “¿Qué riesgo te preocuparía al pasar la responsabilidad?”
+### Puerta C — Relevancia documental
 
-Para relevo:
+Se puede avanzar a una siguiente iteración de diseño si:
 
-- “Cuéntame sobre la última vez que recibiste una guardia o un pendiente.”
-- “¿Qué información te faltó para decidir si podías tomarlo?”
-- “¿Qué te haría aceptar, pedir más contexto o rechazarlo?”
-- “¿Has sentido presión para aceptar algo que no podías cubrir? ¿Qué debería permitir el proceso?”
+- La literatura hace razonable considerar recuperación/desapego como un problema relevante, sin afirmar prevalencia específica para on-call.
+- Las fuentes sectoriales dan contexto a las presiones de incidentes o alertas y se reportan con sus límites.
+- El relevo verificable es una hipótesis de diseño coherente con la tesis y con el MVP, no una solución validada.
+- La siguiente etapa mantiene conservador el enrutamiento y evita promesas clínicas u operacionales absolutas.
 
-Para responsable de operación:
+Si la evidencia es demasiado indirecta, se avanza sólo con mejoras de trazabilidad interna o se deja la decisión como inconclusa; no se presenta como validación de usuarios.
 
-- “¿Cómo se asigna hoy la responsabilidad fuera de horario?”
-- “¿Quién puede cambiar el alcance o el canal de escalamiento?”
-- “¿Qué ambigüedad actual representa más riesgo?”
-- “¿Qué evidencia exigirías antes de probar un nuevo flujo?”
+## 9. Entregables de cierre
 
-### C. Frecuencia, impacto y alternativas (5–7 minutos)
+Guardar en `docs/product/` o ubicación acordada:
 
-- “En las últimas cuatro semanas, ¿cuántas veces ocurrió algo parecido?”
-- “¿Qué costo tuvo para ti o para el equipo, si tuvo alguno?”
-- “¿Qué haces actualmente para manejarlo? ¿Qué parte sí funciona?”
-- “¿Qué solución intentaste y por qué la mantuviste o dejaste de usarla?”
-- “¿Hay ocasiones en que revisar fuera de turno es necesario o preferible?”
+1. **Registro de fuentes:** enlaces, método, población, patrocinio y limitaciones.
+2. **Libro de afirmaciones:** texto del resultado, respaldo directo y nivel de inferencia.
+3. **Matriz de evidencia:** qué apoya, qué limita y qué queda no evaluado.
+4. **Revisión documental del MVP:** promesas y reglas verificadas contra las fases existentes.
+5. **Decisión de puerta:** continuar como hipótesis, ajustar, ampliar búsqueda o detener.
+6. **Brief de Track 2:** objetivo, exclusiones, estados, criterios de aceptación y riesgos derivados de la evidencia disponible.
 
-No presuponer que revisar es siempre compulsivo ni que una herramienta debe eliminarlo. Un chequeo puede ser apropiado según política y contexto.
+No crear archivos de participantes ni datos crudos, porque no forman parte del método.
 
-### D. Cierre de entrevista (2 minutos)
+## 10. Definition of Done
 
-- “¿Qué no te pregunté y debería entender?”
-- “Si pudieras cambiar una sola parte del cierre de guardia, ¿cuál sería?”
-- “¿Te interesaría probar un diario breve o revisar un resumen de hallazgos anonimizados?”
+- [ ] El alcance declara explícitamente que no hay investigación con personas.
+- [ ] Cada cifra tiene enlace directo, fecha, población y denominador cuando estén disponibles.
+- [ ] Las fuentes están clasificadas por tipo, patrocinio y calidad metodológica.
+- [ ] Se distingue evidencia sobre recuperación, estrés TI, fatiga de alertas y sueño.
+- [ ] Ninguna conclusión atribuye frecuencia, causa, aceptación o comprensión a usuarios de SnoozeOps.
+- [ ] Se documentan explicaciones alternativas y límites de transferencia al contexto chileno/on-call.
+- [ ] La inspección de producto se identifica como revisión interna, no como usabilidad validada.
+- [ ] El MVP congelado no se modifica durante este track.
+- [ ] La decisión indica qué permite hacer la evidencia y qué sigue sin respuesta.
 
-Agradecer sin prometer que el producto resolverá el problema. Ofrecer una forma de contacto sólo si la persona desea recibir seguimiento y consiente conservar ese contacto.
+## 11. Primer paso
 
-## 7. Prueba moderada del prototipo
-
-### Reglas de moderación
-
-- Usar el MVP congelado desde su inicio limpio; etiquetar todo escenario como ficticio/sintético.
-- Pedir a la persona que piense en voz alta, pero no ayudarla a completar la tarea.
-- No explicar la tarjeta antes de pedir interpretación.
-- Si se atasca, anotar el punto y permitir que continúe; al final preguntar qué esperaba.
-- No tratar una respuesta incorrecta como fallo de la persona: es evidencia de diseño o lenguaje.
-- No confundir familiaridad con el prototipo con comprensión espontánea.
-
-### Introducción
-
-> “Te mostraré una demo conceptual. No estamos probando tu capacidad; estamos viendo si la interfaz explica bien un relevo. Los incidentes son inventados y nada se envía a sistemas reales.”
-
-### Tareas y preguntas
-
-**Tarea 1 — Entender la cobertura**
-
-“Sin que yo te explique la pantalla, cuéntame qué significa el estado actual.”
-
-Registrar si identifica:
-
-- Quién aceptó o no aceptó el relevo.
-- Si la cobertura está activa, pendiente o no disponible.
-- Hora/límite de la ventana, cuando se muestra.
-- Qué debe ocurrir para que el titular vuelva a ser alertado.
-
-**Tarea 2 — Decidir antes de activar**
-
-“¿Qué tendría que ocurrir para que tú, en el rol de titular, activaras o no esta ventana? ¿Qué información revisarías?”
-
-Observar dudas, señales que busca, sentido de control, señales de presión y cualquier promesa percibida.
-
-**Tarea 3 — Interpretar el incidente P3 habitual**
-
-“¿Qué pasó con este incidente? ¿Está resuelto? ¿Quién debe revisarlo y cuándo?”
-
-Respuesta esperada: queda pendiente/agrupado para revisión al cierre; no está resuelto ni marcado como leído.
-
-**Tarea 4 — Interpretar el escenario P1 sintético**
-
-“¿A quién llega primero? ¿Qué pasa si esa persona no confirma?”
-
-Respuesta esperada: se escala primero a Andrea y, en la simulación de falta de respuesta, a Rodrigo. Aclarar que los 60 segundos son un atajo de demo si la interfaz no deja claro que el plazo es simulado.
-
-**Tarea 5 — Explicar límites**
-
-“¿La pantalla promete que nadie te despertará? ¿Qué información te hace pensar eso?”
-
-Respuesta esperada: no; casos críticos, ambiguos o sin confirmación pueden escalar. Si la persona cree que hay garantía de cero interrupciones, registrar como fallo crítico de comprensión.
-
-### Registro mínimo por tarea
-
-- Completó sin ayuda: sí / parcial / no.
-- Respuesta en palabras de la persona (anonimizada).
-- Tiempo aproximado si es útil, sin presentarlo como métrica laboral.
-- Punto de duda o interpretación alternativa.
-- Severidad del problema: bloquea confianza/seguridad, confunde, menor.
-- Observación separada de la interpretación del facilitador.
-
-No usar datos de rapidez para comparar personas o juzgar desempeño.
-
-## 8. Diario voluntario de 5–7 días
-
-Invitar sólo a quien tenga un período relevante durante esos días. La persona registra como máximo una vez por cierre de guardia o intento de desconexión. Omitir fechas exactas si elevan la posibilidad de identificar su turno.
-
-### Entrada diaria
-
-- Código participante:
-- Día relativo: 1–7 (no fecha exacta, salvo consentimiento y necesidad):
-- ¿Terminó una guardia/jornada hoy? Sí / no.
-- ¿Intentó desconectarse o dormir después? Sí / no / prefiero no responder.
-- Después del cierre, ¿volvió a revisar algo relacionado con la operación? 0 / 1 / 2 o más veces / no recuerda.
-- ¿Qué lo motivó principalmente? Pendiente sin dueño / duda sobre cobertura / hábito / alerta o política / preocupación distinta / otro (opcional, sin detalles sensibles).
-- Confianza para desconectarse en ese momento: 1–5 / no aplica.
-- ¿Hubo una interrupción relacionada con la operación? Sí / no / no sabe / prefiero no responder.
-- Comentario opcional, sin nombres, tickets, clientes ni detalles de producción.
-
-El diario no pide horas precisas de sueño, calidad de sueño, síntomas, diagnósticos ni biometría. La escala 1–5 es percepción declarada, no instrumento clínico.
-
-### Cuidado del participante
-
-- Recordar que puede saltarse una entrada o dejar el diario en cualquier momento.
-- No enviar recordatorios insistentes; máximo un recordatorio neutral si fue acordado.
-- No pedir que cambie su conducta o ignore alertas por el bien de la investigación.
-- Si no aparece una situación relevante, registrar “sin oportunidad durante el período”; no tratarlo como falta de adherencia.
-
-## 9. Cómo analizar sin exagerar la evidencia
-
-### 9.1 Codificación
-
-Después de cada sesión, separar las notas en:
-
-- **Observación:** lo que la persona hizo o dijo, con cita anonimizada o paráfrasis claramente marcada.
-- **Interpretación:** explicación posible del equipo.
-- **Hipótesis actualizada:** afirmación que aún requiere prueba.
-- **Implicación de producto:** cambio potencial; todavía no es decisión.
-- **Riesgo/contraejemplo:** evidencia que contradice la tesis o señala daño.
-
-Usar etiquetas iniciales: cierre de turno, chequeo posterior, cobertura, dueño del pendiente, escalamiento, confianza, presión para aceptar, política, canal, carga de relevo, excepción, privacidad.
-
-### 9.2 Comparar por rol y por excepción
-
-No combinar enseguida titulares y relevos. Revisar dónde sus incentivos chocan. Buscar casos que contradigan el patrón: turnos en que revisar tranquiliza, relevos que prefieren el canal actual, situaciones en que dormir o no dormir no depende de la guardia.
-
-Mapear el recorrido observado en cinco momentos:
-
-1. Antes de cerrar.
-2. Solicitud/aceptación del relevo.
-3. Activación o salida del turno.
-4. Noche o período de disponibilidad.
-5. Revisión posterior.
-
-Para cada momento, registrar conducta actual, incertidumbre, workaround, actor afectado, riesgo, oportunidad y evidencia.
-
-### 9.3 Conteos
-
-Con 5–8 participantes, contar sirve para transparencia (“4 de 6 entrevistados mencionaron...”), no para estimar prevalencias de una población ni probar causalidad. Mantener siempre denominador y rol. No convertir “70%” en afirmación de mercado.
-
-## 10. Puertas de decisión
-
-### Puerta A — Integridad de la investigación
-
-No avanzar a una decisión de producto si:
-
-- No se obtuvo consentimiento claro.
-- La muestra sólo representa a un rol y se pretende hablar por los demás.
-- Se recopilaron datos sensibles o identificables sin necesidad.
-- Las sesiones se convirtieron en una demostración persuasiva, en vez de una prueba abierta.
-
-En esos casos, corregir el método o limitar la conclusión.
-
-### Puerta B — Comprensión segura del prototipo
-
-Medir en participantes que completan las tareas, con denominador explícito. Criterio inicial del roadmap: **al menos 70% entiende sin ayuda quién cubre, hasta cuándo y qué puede volver a alertar al titular**. Para muestras pequeñas, reportar el conteo exacto; por ejemplo, 4/5, 5/7 o 6/8. Es una señal formativa, no una prueba estadística.
-
-Además:
-
-- **Cero interpretaciones peligrosas sin resolver:** nadie debe salir creyendo que SnoozeOps garantiza una noche sin alertas o que el P1 puede quedar silenciado.
-- Si una sola persona interpreta una garantía de seguridad, detener la progresión de esa pantalla/idea, revisar copy y volver a probar. No promediar un malentendido de alto riesgo con respuestas correctas.
-
-### Puerta C — Relevancia del problema y del mecanismo
-
-**Continuar con Track 2** si:
-
-- Hay relatos recientes y concretos de dificultad de cierre en más de un rol relevante.
-- La incertidumbre sobre responsabilidad/cobertura aparece como contribuyente plausible, no sólo como una idea sugerida por el entrevistador.
-- Titular y relevo pueden describir condiciones que harían justo y aceptable el traspaso.
-- No aparece una barrera operacional, cultural o de seguridad que invalide el mecanismo propuesto.
-- La prueba de comprensión supera la señal inicial o deja cambios acotados que Track 2 puede abordar.
-
-**Ajustar la tesis o el alcance** si:
-
-- El problema existe, pero la causa principal es otra (por ejemplo, falta de personal, política de escalamiento o volumen de alertas).
-- El relevo beneficia al titular trasladando carga injustamente.
-- Hay valor sólo en un tipo de turno, equipo o ventana.
-- “Sueño protegido” provoca una promesa más fuerte de lo que el proceso puede cumplir.
-
-**Investigar antes de programar más** si:
-
-- Faltan voces de un rol clave.
-- La política real de guardia sigue siendo desconocida.
-- Las personas no han vivido una oportunidad pertinente en el período del diario.
-- Hay señales contradictorias que pueden cambiar la seguridad o el valor.
-
-**Detener esta dirección** si la necesidad es poco frecuente o no se relaciona con el mecanismo; si no hay forma justa de asignar cobertura; o si el producto crea falsa seguridad sin una mitigación viable.
-
-## 11. Entregables de cierre
-
-Guardar en `docs/research/track-1/` o ubicación acordada (sólo artefactos anonimizados):
-
-1. **Brief final:** pregunta, alcance, fechas, método, número y rol de participantes.
-2. **Mapa del recorrido actual:** los cinco momentos y evidencia por rol.
-3. **Matriz de hipótesis:** apoyada / debilitada / inconclusa, con observaciones y contraejemplos.
-4. **Resultados de tareas:** conteo por tarea y rol; lista de interpretaciones peligrosas o confusas.
-5. **Síntesis del diario:** sólo si se ejecutó, con límites y datos agregados.
-6. **Oportunidades priorizadas:** necesidad, evidencia, beneficiario, riesgo, cambio candidato.
-7. **Decisión de puerta:** continuar, ajustar, investigar o detener; quién decide y por qué.
-8. **Preguntas para Track 2:** alcance recomendado, exclusiones y criterios de aceptación derivados de evidencia.
-
-No guardar datos crudos de participantes junto a documentos del producto o en el repositorio. El repositorio recibe guías, plantillas vacías y la síntesis anonimizadas; los datos crudos se resguardan aparte según el consentimiento y el plazo definido.
-
-## 12. Definition of Done
-
-- [ ] Se entrevistó a 5–8 personas o se documentó por qué la muestra fue menor.
-- [ ] Se escuchó a titulares y relevos; se incluyó perspectiva operacional o se declaró como brecha.
-- [ ] Cada participante pudo aceptar, saltar preguntas o retirarse sin presión.
-- [ ] Las notas están anonimizadas y no contienen datos de producción, salud ni evaluación laboral.
-- [ ] Se probaron las tareas de comprensión sin explicar primero la interfaz.
-- [ ] Se reportaron conteos con denominadores y roles; no se hicieron generalizaciones estadísticas.
-- [ ] Se revisaron hallazgos contrarios y riesgos de transferencia injusta de carga.
-- [ ] La comprensión de cobertura y rutas cumple la puerta o hay un plan de corrección y nueva prueba.
-- [ ] La decisión final indica qué evidencia la respalda y qué sigue abierto.
-- [ ] No se cambió el código del MVP congelado durante la investigación.
-
-## 13. Primer paso para empezar
-
-Preparar una hoja de invitación y una hoja de consentimiento usando este plan; después, reclutar primero a dos personas con roles distintos (un titular y un relevo). Hacer esas dos sesiones piloto, corregir preguntas sesgadas o confusas y recién entonces completar el resto de la muestra. La primera conversación no debe comenzar con el pitch de SnoozeOps: primero hay que entender cómo ocurre hoy el cierre de guardia.
+Completar el registro de afirmaciones y fuentes del documento `TRACK_1_RESULTADOS.md`: retirar resultados no observados, corregir estadísticas que no correspondan a sus fuentes y reformular la decisión como avance de una hipótesis de diseño. Después, revisar la consistencia entre esa síntesis, el roadmap post-checkpoint y el alcance inicial de Track 2.
