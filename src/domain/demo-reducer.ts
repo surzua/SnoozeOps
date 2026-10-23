@@ -9,6 +9,7 @@ export function createInitialDemoState(): DemoState {
     activationMode: "none",
     simulation: {
       isPanelOpen: false,
+      isNetworkMocked: false,
       nightHistory: [],
       securityTest: null,
     },
@@ -31,7 +32,7 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
         selectedShift: action.shift,
         handoffStatus: "not_requested",
         activationMode: "none",
-        simulation: initialDemoState.simulation,
+        simulation: createInitialDemoState().simulation,
       };
     case "navigate":
       return { ...state, screen: action.screen };
@@ -54,6 +55,10 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     case "toggle_simulation":
       return state.screen === "activation"
         ? { ...state, simulation: { ...state.simulation, isPanelOpen: !state.simulation.isPanelOpen } }
+        : state;
+    case "toggle_network_mock":
+      return state.screen === "activation"
+        ? { ...state, simulation: { ...state.simulation, isNetworkMocked: !state.simulation.isNetworkMocked } }
         : state;
     case "simulate_morning":
       return state.screen === "activation" && (state.activationMode === "protected" || state.activationMode === "filtered")

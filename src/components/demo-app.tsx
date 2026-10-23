@@ -278,8 +278,9 @@ export function DemoApp() {
   return (
     <main className="app-shell">
       <div className="app-shell__topbar">
-        <a className="wordmark" href="#main-content" aria-label="SnoozeOps, ir al contenido principal">Snooze<span>Ops</span></a>
-        <button className="reset-button" type="button" onClick={resetDemo}>Reiniciar demo</button>
+        <button className="wordmark" type="button" onClick={resetDemo} aria-label="Reiniciar demo y volver al inicio">
+          Snooze<span>Ops</span>
+        </button>
       </div>
       <div className="progress" aria-label={`Paso ${step} de 5`}><span style={{ width: `${step * 20}%` }} /></div>
       {!isHydrated && <p className="loading-state" role="status">Cargando demo…</p>}

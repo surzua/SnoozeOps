@@ -12,11 +12,15 @@ const activations = new Set(["none", "protected", "filtered"]);
 
 const initialSimulationState: SimulationState = {
   isPanelOpen: false,
+  isNetworkMocked: false,
   nightHistory: [],
   securityTest: null,
 };
 
-function isDemoState(value: unknown): value is Omit<DemoState, "simulation"> & { simulation?: SimulationState } {
+function isDemoState(value: unknown): value is Omit<DemoState, "simulation" | "morning"> & {
+  simulation?: Partial<SimulationState>;
+  morning?: DemoState["morning"];
+} {
   if (!value || typeof value !== "object") return false;
   const state = value as DemoState;
   return (
@@ -25,6 +29,29 @@ function isDemoState(value: unknown): value is Omit<DemoState, "simulation"> & {
     handoffs.has(state.handoffStatus) &&
     activations.has(state.activationMode)
   );
+}
+
+export function hydrateDemoState(value: unknown): DemoState | null {
+  if (!isDemoState(value)) return null;
+
+  const simulation = value.simulation;
+  const morning = value.morning;
+
+  return {
+    selectedShift: value.selectedShift,
+    screen: value.screen,
+    handoffStatus: value.handoffStatus,
+    activationMode: value.activationMode,
+    simulation: {
+      isPanelOpen: simulation?.isPanelOpen === true,
+      isNetworkMocked: simulation?.isNetworkMocked === true,
+      nightHistory: Array.isArray(simulation?.nightHistory) ? simulation.nightHistory : initialSimulationState.nightHistory,
+      securityTest: simulation?.securityTest ?? initialSimulationState.securityTest,
+    },
+    morning: {
+      isSimulated: morning?.isSimulated === true || value.screen === "morning",
+    },
+  };
 }
 
 export function useDemoState() {
@@ -36,16 +63,8 @@ export function useDemoState() {
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
         const parsed: unknown = JSON.parse(stored);
-        if (isDemoState(parsed)) {
-          dispatch({
-            type: "hydrate",
-            state: {
-              ...parsed,
-              simulation: parsed.simulation ?? initialSimulationState,
-              morning: parsed.morning ?? { isSimulated: parsed.screen === "morning" },
-            },
-          });
-        }
+        const hydrated = hydrateDemoState(parsed);
+        if (hydrated) dispatch({ type: "hydrate", state: hydrated });
       }
     } catch {
       try {

@@ -48,6 +48,24 @@ export function SimulationPanel({
         Rutas determinísticas y offline. {isCovered ? "Andrea es el relevo confirmado." : "No hay relevo confirmado: lo crítico llega a Rodrigo."}
       </p>
 
+      <section className={simulation.isNetworkMocked ? "network-status network-status--offline" : "network-status"} aria-label="Estado de conectividad simulada">
+        <div className="network-status__message" aria-live="polite">
+          <span aria-hidden="true" className="network-status__icon">{simulation.isNetworkMocked ? "!" : "✓"}</span>
+          <div>
+            <strong>{simulation.isNetworkMocked ? "Conexión simulada no disponible · Motor local activo" : "Conexión simulada disponible · Motor local listo"}</strong>
+            <p>Rutas determinísticas y offline.</p>
+          </div>
+        </div>
+        <label className="network-switch">
+          <input
+            checked={simulation.isNetworkMocked}
+            onChange={() => dispatch({ type: "toggle_network_mock" })}
+            type="checkbox"
+          />
+          <span>Simular caída de internet</span>
+        </label>
+      </section>
+
       <section className="simulation-section" aria-labelledby="night-scenario-title">
         <div className="simulation-section__title">
           <div>

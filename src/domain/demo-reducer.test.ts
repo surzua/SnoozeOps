@@ -105,6 +105,21 @@ describe("demoReducer", () => {
     expect(morning.simulation.securityTest).toEqual(withSecurityTest.simulation.securityTest);
   });
 
+  it("mantiene las decisiones idénticas con la caída de red simulada", () => {
+    const pending = demoReducer(initialDemoState, { type: "request_handoff" });
+    const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });
+    const active = demoReducer(accepted, { type: "activate_protected" });
+    const offline = demoReducer(active, { type: "toggle_network_mock" });
+    const normalP3 = demoReducer(active, { type: "inject_incident", incident: passwordIncident });
+    const offlineP3 = demoReducer(offline, { type: "inject_incident", incident: passwordIncident });
+    const normalP1 = demoReducer(normalP3, { type: "inject_incident", incident: databaseIncident });
+    const offlineP1 = demoReducer(offlineP3, { type: "inject_incident", incident: databaseIncident });
+
+    expect(offline.simulation.isNetworkMocked).toBe(true);
+    expect(offlineP3.simulation.nightHistory).toEqual(normalP3.simulation.nightHistory);
+    expect(offlineP1.simulation.securityTest).toEqual(normalP1.simulation.securityTest);
+  });
+
   it("no permite simular la mañana fuera de una ventana activa", () => {
     expect(demoReducer(initialDemoState, { type: "simulate_morning" })).toEqual(initialDemoState);
   });
@@ -113,10 +128,21 @@ describe("demoReducer", () => {
     const pending = demoReducer(initialDemoState, { type: "request_handoff" });
     const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });
     const active = demoReducer(accepted, { type: "activate_protected" });
-    const withIncident = demoReducer(active, { type: "inject_incident", incident: passwordIncident });
-    const reset = demoReducer(withIncident, { type: "reset" });
+    const withPanelOpen = demoReducer(active, { type: "toggle_simulation" });
+    const offline = demoReducer(withPanelOpen, { type: "toggle_network_mock" });
+    const withNightIncident = demoReducer(offline, { type: "inject_incident", incident: passwordIncident });
+    const withSecurityTest = demoReducer(withNightIncident, { type: "inject_incident", incident: databaseIncident });
+    const morning = demoReducer(withSecurityTest, { type: "simulate_morning" });
+    const reset = demoReducer(morning, { type: "reset" });
 
     expect(reset).toEqual(initialDemoState);
     expect(reset).not.toBe(initialDemoState);
+    expect(reset.simulation).toEqual({
+      isPanelOpen: false,
+      isNetworkMocked: false,
+      nightHistory: [],
+      securityTest: null,
+    });
+    expect(reset.morning.isSimulated).toBe(false);
   });
 });

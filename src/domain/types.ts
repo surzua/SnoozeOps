@@ -37,6 +37,7 @@ export type RoutingDecision = {
 
 export type SimulationState = {
   isPanelOpen: boolean;
+  isNetworkMocked: boolean;
   nightHistory: RoutingDecision[];
   securityTest: RoutingDecision | null;
 };
@@ -100,6 +101,7 @@ export type DemoAction =
   | { type: "activate_protected" }
   | { type: "activate_filtered" }
   | { type: "toggle_simulation" }
+  | { type: "toggle_network_mock" }
   | { type: "simulate_morning" }
   | { type: "inject_incident"; incident: Incident }
   | { type: "resolve_security_test"; outcome: "acknowledged" | "timed_out" }
