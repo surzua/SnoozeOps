@@ -115,6 +115,8 @@ Los tracks están ordenados por riesgo que reducen, no por deseo de tener más t
 
 **Propósito:** reemplazar la persona sintética por evidencia cualitativa suficiente antes de automatizar una hipótesis equivocada.
 
+**Guía de ejecución:** [`TRACK_1_DESCUBRIMIENTO.md`](TRACK_1_DESCUBRIMIENTO.md) define el plan de investigación, los guiones, las tareas de prototipo, el resguardo de participantes, los criterios de decisión y los entregables. Este track no requiere cambios al código del MVP.
+
 **Preguntas que deben responderse**
 
 - ¿Qué ocurre exactamente desde que termina el turno hasta que la persona intenta dormir?
