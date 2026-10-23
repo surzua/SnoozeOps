@@ -67,6 +67,17 @@ describe("demoReducer", () => {
     expect(withSecurityTest.simulation.securityTest?.status).toBe("escalated_waiting_for_ack");
   });
 
+  it("no duplica una misma simulación nocturna al pulsarla otra vez", () => {
+    const pending = demoReducer(initialDemoState, { type: "request_handoff" });
+    const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });
+    const active = demoReducer(accepted, { type: "activate_protected" });
+    const first = demoReducer(active, { type: "inject_incident", incident: passwordIncident });
+    const second = demoReducer(first, { type: "inject_incident", incident: passwordIncident });
+
+    expect(second).toEqual(first);
+    expect(second.simulation.nightHistory).toHaveLength(1);
+  });
+
   it("solo permite resolver la prueba P1 cuando está esperando a Andrea", () => {
     const pending = demoReducer(initialDemoState, { type: "request_handoff" });
     const accepted = demoReducer(pending, { type: "respond_handoff", response: "accepted" });

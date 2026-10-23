@@ -51,6 +51,13 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     case "inject_incident": {
       if (state.screen !== "activation") return state;
 
+      if (
+        action.incident.scenario === "night_simulation" &&
+        state.simulation.nightHistory.some((decision) => decision.incident.id === action.incident.id)
+      ) {
+        return state;
+      }
+
       const decision = evaluateIncident(action.incident, {
         hasAcceptedHandoff: state.handoffStatus === "accepted" && state.activationMode === "protected",
         reviewAt: state.selectedShift === "day" ? "06:30" : "14:30",

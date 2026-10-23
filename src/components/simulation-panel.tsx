@@ -32,6 +32,7 @@ export function SimulationPanel({
 }) {
   const securityTest = simulation.securityTest;
   const waitingForAck = securityTest?.status === "escalated_waiting_for_ack";
+  const passwordAlreadySimulated = simulation.nightHistory.some((decision) => decision.incident.id === passwordIncident.id);
 
   return (
     <section aria-labelledby="simulation-title" className="simulation-panel" role="dialog" aria-modal="true">
@@ -55,8 +56,13 @@ export function SimulationPanel({
           </div>
           <span className="scenario-label">No modifica la prueba P1</span>
         </div>
-        <button className="button button--secondary" onClick={() => dispatch({ type: "inject_incident", incident: passwordIncident })} type="button">
-          Simular cambio de contraseña · P3
+        <button
+          className="button button--secondary"
+          disabled={passwordAlreadySimulated}
+          onClick={() => dispatch({ type: "inject_incident", incident: passwordIncident })}
+          type="button"
+        >
+          {passwordAlreadySimulated ? "Cambio de contraseña ya simulado" : "Simular cambio de contraseña · P3"}
         </button>
         {simulation.nightHistory.length > 0 && (
           <div className="incident-stack">
@@ -85,6 +91,9 @@ export function SimulationPanel({
           </div>
         )}
       </section>
+      <button className="button button--quiet simulation-panel__close" onClick={() => dispatch({ type: "toggle_simulation" })} type="button">
+        Cerrar simulador
+      </button>
     </section>
   );
 }
