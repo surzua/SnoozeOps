@@ -1,5 +1,7 @@
 # SnoozeOps - Roadmap para ganar Hackatón Señales
 
+> **Alcance de este roadmap:** las Fases 0–5 describen el MVP y su preparación para la hackatón. El bloque de entrega que aparece más abajo es un checklist operativo, no una fase de producto. `FASE_6.md` es una ampliación posterior del producto: se ejecuta sólo después de congelar y presentar el MVP, y no cambia lo que se afirma que funciona en esta versión.
+
 > **Tesis:** Rodrigo no duerme poco por falta de información. Duerme poco porque no confía en que puede dejar de vigilar la guardia. SnoozeOps crea un relevo verificable que protege una hora adicional de sueño sin dejar incidentes críticos sin atender.
 
 ## 1. Norte del producto
@@ -27,7 +29,7 @@
 
 ### Principio de seguridad
 
-La IA puede resumir, explicar y proponer una severidad, pero nunca debe ser el único mecanismo que silencie una alerta. Una alerta ambigua se escala. El sistema debe fallar hacia la seguridad.
+En una evolución futura, la IA podrá resumir, explicar y proponer una severidad, pero nunca será el mecanismo que silencie una alerta. El MVP actual usa reglas determinísticas; una alerta ambigua se escala y el sistema falla hacia la seguridad.
 
 ---
 
@@ -119,18 +121,9 @@ Despues se simula que el respaldo no confirma el segundo incidente y SnoozeOps d
 - Pruebas del motor de enrutamiento con Vitest o el runner ya incluido por la plantilla.
 - Despliegue en Vercel solo después de que la versión local sea estable.
 
-### IA con fallback
+### IA: fuera del MVP; visión posterior
 
-Crear una interfaz única, por ejemplo `classifyIncident()`, con dos implementaciones:
-
-1. **Proveedor real:** clasifica y explica el incidente mediante un modelo.
-2. **Fallback determinístico:** reglas y ejemplos precargados que mantienen la demo funcionando sin red ni API.
-
-El flujo de seguridad no depende del texto libre del modelo:
-
-- Etiquetas operacionales conocidas y reglas duras tienen prioridad.
-- Baja confianza o severidad desconocida implica escalar.
-- La IA nunca descarta silenciosamente un incidente.
+El MVP no ejecuta un LLM, una API de IA ni un proveedor real. `evaluateIncident()` es un motor local determinístico, no un fallback de IA. La Fase 6 de producto describe una posible evolución donde la IA resume, identifica información faltante o propone severidad con revisión humana. No puede silenciar alertas ni sustituir las reglas de seguridad.
 
 ### Arquitectura minima
 
@@ -147,8 +140,7 @@ Maquina de estados de la demo
    v
 Motor de incidentes
    |-- reglas de seguridad
-   |-- clasificador IA opcional
-   `-- fallback determinístico
+   `-- decisiones determinísticas locales
    |
    v
 Fixtures sintéticos + localStorage
@@ -211,7 +203,7 @@ Fixtures sintéticos + localStorage
 ### Tareas
 
 - Definir tipos de incidentes y estados del relevo.
-- Implementar reglas de seguridad antes de conectar IA.
+- Implementar y validar reglas de seguridad determinísticas. La IA queda fuera del MVP; consultar Fase 6 de producto para la propuesta futura.
 - Crear una vista de simulación para inyectar incidentes.
 - Mostrar en pantalla:
   - severidad propuesta;
@@ -220,8 +212,7 @@ Fixtures sintéticos + localStorage
   - destinatario;
   - estado de confirmación.
 - Implementar temporizador acelerado para simular falta de respuesta del respaldo.
-- Agregar el proveedor de IA detras de una interfaz, si hay tiempo y credenciales.
-- Mantener el fallback determinístico probado y listo.
+- Mantener el motor local y determinístico como única implementación del MVP; no agregar proveedor ni credenciales aunque haya tiempo.
 
 ### Terminado cuando
 
@@ -281,7 +272,7 @@ Fixtures sintéticos + localStorage
 - Sin pasos de login.
 - Sin dependencia obligatoria de red.
 - Sin secretos expuestos en el cliente.
-- Manejo visible de errores del proveedor de IA.
+- Manejo visible de errores de interacción local; no hay proveedor de IA en el MVP.
 - Una ruta manual para avanzar el reloj hasta la mañana.
 
 ### Terminado cuando
@@ -339,7 +330,9 @@ Debe contener solamente:
 
 ---
 
-## Fase 6 - Entrega y contingencia
+## Checklist de entrega y contingencia (cierre del MVP)
+
+Este checklist no es una fase numerada de producto ni debe confundirse con `docs/product/FASE_6.md`. Corresponde al cierre y entrega del MVP de Fases 0–5. La Fase 6 de producto es posterior a la presentación y está especificada por separado.
 
 **Objetivo:** no perder por un problema operativo.
 
@@ -416,7 +409,7 @@ Trabajar en unidades pequenas y verificables. Para cada tarea:
 2. Construir las primeras tres pantallas con fixtures.
 3. Implementar y probar el motor de reglas.
 4. Construir el simulador de incidentes.
-5. Conectar el clasificador IA con fallback.
+5. Verificar las rutas ambiguas y de baja confianza del motor determinístico; no conectar IA en el MVP.
 6. Construir la pantalla matinal y las métricas.
 7. Revisar accesibilidad y experiencia movil.
 8. Endurecer el build y preparar despliegue.
@@ -451,9 +444,9 @@ Al terminar, ejecuta las verificaciones pertinentes y resume los archivos modifi
 
 | Riesgo | Mitigacion |
 |---|---|
-| La API de IA falla durante la demo | Fallback determinístico automático y datos precargados |
+| El jurado pregunta por IA | Explicar que el MVP no ejecuta un LLM ni una API: las decisiones actuales son determinísticas. La propuesta futura se limita a resumir, señalar datos faltantes o sugerir severidad con revisión humana; nunca silencia una alerta. |
 | El jurado pregunta por WhatsApp | Explicar que el MVP demuestra el mecanismo; una versión empresarial se integraria con canales administrados o sistemas de incidentes |
-| La IA clasifica mal un P1 | Reglas duras, umbral de confianza y escalamiento de cualquier caso ambiguo |
+| El jurado pregunta si la IA podría clasificar mal un P1 | Aclarar que no hay IA activa en el MVP. En la propuesta futura, las reglas duras, la revisión humana y el escalamiento conservador prevalecen sobre cualquier sugerencia. |
 | No existe una persona de respaldo | El producto hace visible esa brecha; ningun software puede inventar cobertura. Sin respaldo confirmado no promete sueño protegido |
 | Parece otro tracker | Abrir el pitch con la ansiedad de guardia y demostrar una acción antes de dormir |
 | No se puede probar una hora real en dos días | Mostrar una hipótesis medible, una línea base sintética y un plan de validación; no afirmar evidencia causal inexistente |
@@ -470,7 +463,7 @@ Porque el reloj solo le mostraba el problema después de ocurrir. SnoozeOps actu
 
 ### ¿Como evitan silenciar una alerta crítica?
 
-La IA no tiene la última palabra. Hay reglas operacionales, umbral de confianza y escalamiento automático de todo caso ambiguo. El sistema falla hacia la seguridad.
+En el MVP no hay IA tomando decisiones: un motor determinístico aplica reglas operacionales y escala los casos críticos, ambiguos o de baja confianza. En una iteración futura, cualquier propuesta de IA quedaría subordinada a esas reglas y a revisión humana; nunca sería autoridad única para silenciar.
 
 ### ¿Por qué no integrar WhatsApp ahora?
 
@@ -486,7 +479,7 @@ En el evento demostramos que se reserva una hora adicional y que las alertas sig
 
 ### ¿Dónde está la inteligencia artificial?
 
-Resume el estado de la guardia, propone severidad y explica el enrutamiento de incidentes en lenguaje natural. El diseño mantiene controles deterministas para decisiones de seguridad.
+No está implementada en el MVP. La Fase 6 de producto propone explorar resumen de relevo, detección de información faltante y propuesta explicable de severidad, con aprobación humana y reglas determinísticas como autoridad de seguridad. Esa capacidad futura no debe presentarse como algo que esta demo ya hace.
 
 ---
 

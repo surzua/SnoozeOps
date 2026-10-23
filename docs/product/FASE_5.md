@@ -21,6 +21,7 @@ La demo en vivo es la evidencia principal. El README, guion, Q&A y plan de conti
 | Plazo de Andrea | La acción de la demo **simula el vencimiento** del plazo de 60 segundos; no espera 60 segundos reales. |
 | Lenguaje de seguridad | Se dice que los casos críticos, ambiguos o sin confirmación se **escalan de forma conservadora**. No se promete infalibilidad, cobertura absoluta ni que Rodrigo “nunca quedará a ciegas”. |
 | Estado actual de IA | El MVP entregado no ejecuta un LLM ni una API de IA. Su motor local es determinístico y funciona offline. No se debe presentar como una IA funcionando ni como un fallback de un proveedor inexistente. Una integración futura podrá resumir o proponer severidad, pero nunca tendrá autoridad única para silenciar alertas. |
+| Relación con Fase 6 | Esta fase cierra y prepara para entrega el MVP de la hackatón. La Fase 6 de producto, descrita en `docs/product/FASE_6.md`, es una evolución posterior y no forma parte de lo que se evalúa o afirma como implementado en esta entrega. |
 | Red | `Simular caída de internet` representa sólo un estado visual de la demo. No desconecta la red real ni modifica las decisiones del motor determinístico. |
 | Datos | Rodrigo, Andrea, turnos, tickets e incidentes son fixtures sintéticos. No se cargan ni se usan datos personales o de salud reales. |
 | Video de respaldo | El video es contingencia para recuperar la historia si falla el hardware; no reemplaza el requisito de demo en vivo. La ruta preferida de recuperación es abrir la demo local en un segundo dispositivo o navegador. |
@@ -140,7 +141,7 @@ Los tres recorridos se ejecutan desde Hard Reset y deben completarse tres veces 
 
 ## 6. Auditoría de entrega
 
-La auditoría se registra en `docs/pitch/SUBMISSION.md` antes de congelar la versión. No reemplaza la Fase 6: deja la evidencia preparada para que la entrega sea operativa y no una revisión de último minuto.
+La auditoría se registra en `docs/pitch/SUBMISSION.md` antes de congelar la versión. Es el checklist operativo de cierre del MVP; no es una fase de producto ni reemplaza la Fase 6 posterior. La implementación de Fase 6 sólo comienza después de congelar y presentar esta versión, si se decide continuar el producto.
 
 ### 6.1. Repositorio y atribución
 
@@ -198,4 +199,4 @@ Luego iniciar `npm run dev`, recorrer la demo y verificar que la versión desple
 
 ## 8. Regla de cierre
 
-Después de esta fase, sólo se acepta un cambio que mejore de forma directa la claridad de la demo, su estabilidad, la honestidad de una afirmación o una respuesta concreta del jurado. Si no cambia una de esas cuatro cosas, queda fuera de la entrega.
+Después de congelar esta fase, no se incorporan funcionalidades nuevas a la entrega de la hackatón. Sólo se aceptan correcciones que mejoren directamente la claridad de la demo, su estabilidad, la honestidad de una afirmación o una respuesta concreta del jurado. Las ideas de evolución posteriores pertenecen a `docs/product/FASE_6.md` y no deben mezclarse con el MVP entregado.
