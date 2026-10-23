@@ -1,6 +1,6 @@
-# SnoozeOps — Fase 6: Confianza visible, decisiones explicables e IA responsable
+# SnoozeOps — Diseño exploratorio: confianza visible, decisiones explicables e IA responsable
 
-**Estado:** Lista para implementación después de congelar la demo base de Fases 1–5.
+**Estado:** insumo de diseño, no fase secuencial ni compromiso de implementación. Después del Checkpoint 2, el orden canónico de evolución está en [`ROADMAP_POST_CHECKPOINT_2.md`](ROADMAP_POST_CHECKPOINT_2.md). Este documento aporta soluciones candidatas para el Track 2 (superficie de confianza) y Track 4 (copiloto responsable), sujetas a sus puertas de evidencia.
 
 ## 1. Propósito
 
@@ -10,7 +10,7 @@ Elevar la convicción de uso sin transformar SnoozeOps en un segundo sistema de 
 2. **¿Por qué una alerta siguió esa ruta y quién es responsable ahora?**
 3. **¿Cómo podría usar IA el producto sin permitir que una IA silencie una alerta crítica?**
 
-La tesis se mantiene intacta: Rodrigo no necesita más información sobre su sueño; necesita una condición verificable para dejar de vigilar la operación antes de dormir. La Fase 6 hace esa condición más clara, auditable y creíble.
+La tesis se mantiene intacta: Rodrigo no necesita más información sobre su sueño; necesita una condición verificable para dejar de vigilar la operación antes de dormir. Estas propuestas harían esa condición más clara, auditable y creíble si la investigación y el piloto las priorizan.
 
 > **Resultado esperado:** en menos de cinco segundos, Rodrigo puede responder “quién cubre, hasta cuándo, qué puede despertarme y por qué”. El jurado puede ver que la IA fue pensada como asistencia revisable, no como una caja negra con autoridad operacional.
 
@@ -335,7 +335,7 @@ Responsabilidades que no se deben mezclar:
 
 ## 10. Orden de implementación
 
-1. **Congelar la base:** ejecutar `npm run lint`, `npm run typecheck`, `npm test` y `npm run build`. Si algo falla antes de iniciar, corregirlo antes de agregar la Fase 6.
+1. **Congelar la base:** ejecutar `npm run lint`, `npm run typecheck`, `npm test` y `npm run build`. Si algo falla antes de probar cualquiera de estas propuestas, corregirlo antes de abrir una rama post-MVP.
 2. **Modelo puro de cobertura:** implementar `coverage.ts` y su matriz de pruebas. No tocar UI hasta que todos los casos de la tabla de decisión pasen.
 3. **Datos explícitos:** agregar `IncidentSignal` y completar todos los factories de test y fixtures. El compilador debe ayudar a localizar objetos `Incident` sin señales.
 4. **Tarjeta de cobertura:** crear el componente en aislamiento, luego instalar variante compacta en Plan y estándar en Cerrar guardia.
@@ -402,7 +402,7 @@ No cambiar `PITCH.md` ni `QA.md` antes de tener una versión estable. Cuando la 
 
 Evitar expresiones como “la IA decide”, “IA que detecta incidentes”, “IA offline”, “precisión del modelo” o “automatización autónoma”, porque ninguna corresponde al MVP entregado.
 
-## 14. Criterios de aceptación (DoD Fase 6)
+## 14. Criterios de aceptación si estas propuestas se seleccionan
 
 ### Cobertura verificable
 

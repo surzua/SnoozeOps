@@ -1,6 +1,6 @@
 # SnoozeOps - Roadmap para ganar Hackatón Señales
 
-> **Alcance de este roadmap:** las Fases 0–5 describen el MVP y su preparación para la hackatón. El bloque de entrega que aparece más abajo es un checklist operativo, no una fase de producto. `FASE_6.md` es una ampliación posterior del producto: se ejecuta sólo después de congelar y presentar el MVP, y no cambia lo que se afirma que funciona en esta versión.
+> **Alcance de este roadmap:** las Fases 0–5 describen el MVP y su preparación para la hackatón. El bloque de entrega que aparece más abajo es un checklist operativo, no una fase de producto. La evolución posterior canónica vive en [`ROADMAP_POST_CHECKPOINT_2.md`](ROADMAP_POST_CHECKPOINT_2.md) y no cambia lo que se afirma que funciona en esta versión.
 
 > **Tesis:** Rodrigo no duerme poco por falta de información. Duerme poco porque no confía en que puede dejar de vigilar la guardia. SnoozeOps crea un relevo verificable que protege una hora adicional de sueño sin dejar incidentes críticos sin atender.
 
@@ -123,7 +123,7 @@ Despues se simula que el respaldo no confirma el segundo incidente y SnoozeOps d
 
 ### IA: fuera del MVP; visión posterior
 
-El MVP no ejecuta un LLM, una API de IA ni un proveedor real. `evaluateIncident()` es un motor local determinístico, no un fallback de IA. La Fase 6 de producto describe una posible evolución donde la IA resume, identifica información faltante o propone severidad con revisión humana. No puede silenciar alertas ni sustituir las reglas de seguridad.
+El MVP no ejecuta un LLM, una API de IA ni un proveedor real. `evaluateIncident()` es un motor local determinístico, no un fallback de IA. El roadmap post-Checkpoint 2 propone explorar resumen, información faltante o severidad asistida sólo en modo sombra, con revisión humana y reglas determinísticas como autoridad. No puede silenciar alertas ni sustituir las reglas de seguridad.
 
 ### Arquitectura minima
 
@@ -203,7 +203,7 @@ Fixtures sintéticos + localStorage
 ### Tareas
 
 - Definir tipos de incidentes y estados del relevo.
-- Implementar y validar reglas de seguridad determinísticas. La IA queda fuera del MVP; consultar Fase 6 de producto para la propuesta futura.
+- Implementar y validar reglas de seguridad determinísticas. La IA queda fuera del MVP; consultar el roadmap post-Checkpoint 2 para la propuesta futura.
 - Crear una vista de simulación para inyectar incidentes.
 - Mostrar en pantalla:
   - severidad propuesta;
@@ -332,7 +332,7 @@ Debe contener solamente:
 
 ## Checklist de entrega y contingencia (cierre del MVP)
 
-Este checklist no es una fase numerada de producto ni debe confundirse con `docs/product/FASE_6.md`. Corresponde al cierre y entrega del MVP de Fases 0–5. La Fase 6 de producto es posterior a la presentación y está especificada por separado.
+Este checklist no es una fase numerada de producto. Corresponde al cierre y entrega del MVP de Fases 0–5. La evolución posterior a la presentación está especificada por separado en `docs/product/ROADMAP_POST_CHECKPOINT_2.md`.
 
 **Objetivo:** no perder por un problema operativo.
 
@@ -479,7 +479,7 @@ En el evento demostramos que se reserva una hora adicional y que las alertas sig
 
 ### ¿Dónde está la inteligencia artificial?
 
-No está implementada en el MVP. La Fase 6 de producto propone explorar resumen de relevo, detección de información faltante y propuesta explicable de severidad, con aprobación humana y reglas determinísticas como autoridad de seguridad. Esa capacidad futura no debe presentarse como algo que esta demo ya hace.
+No está implementada en el MVP. El roadmap post-Checkpoint 2 propone explorar resumen de relevo, detección de información faltante y propuesta explicable de severidad, sólo en modo sombra al principio, con aprobación humana y reglas determinísticas como autoridad de seguridad. Esa capacidad futura no debe presentarse como algo que esta demo ya hace.
 
 ---
 
