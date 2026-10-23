@@ -24,9 +24,9 @@ Documento de producto previo a programación. Define la historia, las seis panta
 
 ### Definición exacta de `+60 min`
 
-> Sesenta minutos adicionales de oportunidad de sueño protegida, comparados con la ventana habitual de Rodrigo para el mismo tipo de turno.
+> Sesenta minutos más de tiempo reservado para dormir, con las alertas no críticas en espera y un relevo confirmado para atender las críticas. Se compara con la ventana habitual de Rodrigo para el mismo tipo de turno.
 
-La aplicación siempre debe acompañar el resultado con la aclaración:
+Esto describe una ventana planificada y cubierta; no garantiza que Rodrigo se duerma ni que duerma sin interrupciones. La aplicación siempre debe acompañar el resultado con la aclaración:
 
 > **Sueño real no medido.**
 
@@ -263,7 +263,7 @@ Cuando no existe relevo, esta pantalla cambia explícitamente:
 
 ## Pantalla 5 - Simulador de incidentes
 
-**Objetivo:** demostrar en vivo que el sistema distingue una interrupción evitable de una crítica y que falla hacia la seguridad.
+**Objetivo:** demostrar en vivo que el sistema distingue una interrupción evitable de una crítica y que falla hacia la seguridad. El incidente crítico es una **prueba controlada de seguridad**, separada del resultado de la noche habitual.
 
 ```text
 +--------------------------------------+
@@ -276,15 +276,14 @@ Cuando no existe relevo, esta pantalla cambia explícitamente:
 |                                      |
 | [ Enviar incidente ]                 |
 |                                      |
-| ACTIVIDAD                            |
+| NOCHE DEMO · ESCENARIO HABITUAL      |
 |                                      |
 | 23:48  P3 · Cambio de contraseña     |
-|        Guardado para las 06:30       |
+|        Agrupado para las 06:30       |
 |        Rodrigo no fue interrumpido   |
 |                                      |
-| 02:13  P1 · Base de datos caída      |
-|        Escalado a Andrea             |
-|        Esperando confirmación        |
+| PRUEBA DE SEGURIDAD                  |
+| [ Probar incidente crítico ]         |
 |                                      |
 | [ Simular que Andrea no responde ]   |
 +--------------------------------------+
@@ -304,7 +303,9 @@ Cuando no existe relevo, esta pantalla cambia explícitamente:
 - Explicación: `Hay una caída activa de producción con impacto en pagos.`
 - Estado: `Esperando confirmación de Andrea`
 
-Después de seleccionar `Simular que Andrea no responde`:
+Al seleccionar `Probar incidente crítico`, se abre el escenario sintético alternativo. No se agrega al resumen de la noche habitual.
+
+Después de seleccionar `Simular que Andrea no responde` en esta prueba:
 
 - Estado: `Andrea no respondió en 60 segundos.`
 - Acción: `Rodrigo será alertado ahora.`
@@ -327,21 +328,20 @@ Después de seleccionar `Simular que Andrea no responde`:
 | Buenos días, Rodrigo                 |
 |                                      |
 |              +60 min                 |
-| de oportunidad de sueño protegida    |
+| de tiempo reservado para dormir      |
 |                                      |
 | Ventana habitual       6 h            |
 | Ventana planificada    7 h            |
 |                                      |
-| 1 interrupción evitable agrupada      |
-| 1 incidente crítico escalado          |
-| 1 alerta crítica enviada a Rodrigo    |
+| 1 alerta no crítica agrupada          |
+| Relevo confirmado para alertas P1     |
 |                                      |
 | Sueño real no medido.                 |
 |                                      |
-| SALUD                                |
-| Ronquidos fuertes y cansancio         |
-| sostenido merecen una consulta        |
-| profesional.                          |
+| SUGERENCIA                            |
+| Por los ronquidos fuertes y el        |
+| cansancio sostenido, considera        |
+| consultar a un profesional.           |
 |                                      |
 | [ Preparar mi próximo turno ]         |
 +--------------------------------------+
@@ -350,16 +350,16 @@ Después de seleccionar `Simular que Andrea no responde`:
 ### Textos exactos
 
 - Saludo: `Buenos días, Rodrigo`
-- Resultado: `+60 min de oportunidad de sueño protegida`
+- Resultado: `+60 min de tiempo reservado para dormir`
 - Comparación: `Ventana habitual: 6 h` / `Ventana planificada: 7 h`
-- Actividad: `1 interrupción evitable agrupada` / `1 incidente crítico escalado` / `1 alerta crítica enviada a Rodrigo`
+- Actividad: `1 alerta no crítica agrupada` / `Relevo confirmado para alertas P1`
 - Límite de medición: `Sueño real no medido.`
-- Seguridad: `Ronquidos fuertes y cansancio sostenido merecen una consulta profesional.`
+- Sugerencia: `Por los ronquidos fuertes y el cansancio sostenido, considera consultar a un profesional.`
 - CTA: `Preparar mi próximo turno`
 
 ### Nota sobre el resultado
 
-El `+60 min` compara ventanas planificadas. El incidente crítico puede haber interrumpido a Rodrigo; por eso no se muestran horas efectivamente dormidas ni calidad de sueño.
+El `+60 min` compara tiempo reservado en ventanas planificadas. La pantalla de mañana corresponde al escenario habitual, donde solo llegó la alerta no crítica. La prueba P1 es una simulación separada de seguridad. No se muestran horas efectivamente dormidas ni calidad de sueño.
 
 ---
 
@@ -432,7 +432,7 @@ Los apellidos, la compañera y todos los registros son inventados para la demo.
 
 ## 6. Relato de 30 segundos
 
-> Rodrigo trabaja en soporte con turnos rotativos. No duerme poco porque ignore los consejos: se acuesta tarde revisando tickets porque teme que algo crítico ocurra cuando se desconecte. SnoozeOps convierte esa incertidumbre en un relevo verificable. Las alertas menores esperan, las críticas van al relevo y Rodrigo solo despierta si nadie responde. Así protege una hora adicional de oportunidad de sueño, sin fingir que la guardia dejó de existir.
+> Rodrigo trabaja en soporte con turnos rotativos. Se acuesta tarde revisando tickets porque teme que algo crítico ocurra cuando se desconecte. SnoozeOps convierte esa incertidumbre en un relevo verificable: las alertas menores esperan, las críticas van al relevo y Rodrigo solo despierta si nadie responde. Así reserva una hora más para dormir, sin fingir que la guardia dejó de existir.
 
 ## 7. Secuencia exacta de la demo
 
@@ -442,27 +442,29 @@ Los apellidos, la compañera y todos los registros son inventados para la demo.
 4. Aceptar como Andrea desde la segunda pestaña.
 5. Activar `Sueño protegido`.
 6. Enviar el cambio de contraseña y mostrar que Rodrigo no fue interrumpido.
-7. Enviar la caída de base de datos y mostrar el escalamiento a Andrea.
-8. Simular que Andrea no responde y mostrar que Rodrigo es alertado.
-9. Avanzar a la mañana y mostrar `+60 min de oportunidad`, junto con `Sueño real no medido`.
+7. Avanzar a la mañana y mostrar `+60 min de tiempo reservado`, junto con `Sueño real no medido`.
+8. Volver al panel y abrir `Prueba de seguridad`.
+9. Enviar la caída de base de datos, mostrar el escalamiento a Andrea y simular que no responde; Rodrigo recibe la alerta.
 10. Cambiar brevemente a `Noche` para demostrar el recálculo del horario.
+
+La narración debe marcar claramente el cambio: `Ya vimos una noche habitual. Ahora probemos qué ocurre si aparece una caída crítica.` Así no se atribuye una interrupción de la prueba de seguridad al resultado matinal.
 
 ## 8. Criterio para aprobar la Fase 0
 
 La Fase 0 queda aprobada si podemos responder `sí` a todo:
 
 - [ ] La promesa se entiende sin explicar la tecnología.
-- [ ] Está claro que `+60 min` es oportunidad protegida y no sueño medido.
+- [ ] Está claro que `+60 min` es tiempo reservado para dormir y no sueño medido.
 - [ ] `Sueño protegido` solo aparece después de una aceptación bilateral.
 - [ ] La aplicación sigue ofreciendo valor cuando no hay relevo.
 - [ ] El incidente ambiguo o crítico nunca queda silenciado.
 - [ ] El turno nocturno reutiliza el mismo mecanismo sin abrir otro producto.
-- [ ] Los seis pasos caben cómodamente en una demo de menos de cuatro minutos.
+- [ ] El recorrido principal y la prueba crítica separada caben en una demo de menos de cuatro minutos.
 - [ ] Todos los datos están marcados o entendidos como sintéticos.
 
-## 9. Puntos para revisar juntos
+## 9. Decisiones confirmadas para construir
 
-1. ¿`Andrea Rojas` funciona como relevo ficticio o conviene un rol sin nombre, como `Relevo de turno`?
-2. ¿La frase `oportunidad de sueño protegida` es suficientemente clara para el jurado?
-3. ¿El resultado matinal debe mostrar que Rodrigo fue alertado por el P1 o conviene reiniciar el escenario antes de mostrar la mañana?
-4. ¿La recomendación profesional debe estar en la pantalla final o reservarse para preguntas del jurado?
+1. **Andrea Rojas** es el relevo ficticio y acepta desde una segunda pestaña.
+2. La métrica se llama **tiempo reservado para dormir**: `+60 min` frente a la ventana habitual del mismo turno, con relevo confirmado y alertas no críticas en espera. No equivale a sueño medido ni garantiza descanso ininterrumpido.
+3. El resultado matinal representa el escenario habitual con la alerta no crítica agrupada. El P1 y el fallo de confirmación se muestran en una prueba de seguridad separada, claramente rotulada.
+4. La pantalla de mañana incluye una sugerencia profesional breve por ronquidos fuertes y cansancio sostenido. Se muestra durante unos segundos como señal de cuidado, sin diagnóstico ni explicación clínica extensa.
