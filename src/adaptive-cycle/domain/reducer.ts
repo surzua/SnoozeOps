@@ -1,5 +1,6 @@
 import { getDeterministicAction } from "@/adaptive-cycle/domain/catalog";
 import { getSyntheticScenario } from "@/adaptive-cycle/fixtures/scenarios";
+import { historicalRecords } from "@/adaptive-cycle/fixtures/historical-records";
 import type {
   ActionCompletion,
   AdaptiveCycleState,
@@ -11,6 +12,8 @@ import type {
   ReviewDecision,
   ReviewPath,
   ShiftKind,
+  AdaptiveAnalysis,
+  AnalysisStatus,
 } from "@/adaptive-cycle/domain/types";
 
 const timestamp = "2026-10-26T18:02:00-03:00";
@@ -31,21 +34,29 @@ export type CycleAction =
     }
   | { type: "answer_clarification"; path: ReviewPath }
   | { type: "pause_review" }
+  | { type: "set_analysis_status"; status: AnalysisStatus; message?: string }
+  | { type: "receive_analysis"; analysis: AdaptiveAnalysis }
+  | { type: "update_observation"; observationId: string; completion: ActionCompletion; sleepEstimateMinutes: number | null; event: ObservationEvent }
+  | { type: "delete_observation"; observationId: string }
+  | { type: "open_history" }
+  | { type: "close_history" }
   | { type: "hydrate"; state: AdaptiveCycleState }
   | { type: "reset" };
 
 function createStore(shift: ShiftKind = "day"): AdaptiveCycleStore {
   const context = getSyntheticScenario(shift);
+  const history = historicalRecords();
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     source: "synthetic",
-    shifts: [context.shift],
-    rests: [context.rest],
-    constraints: [context.constraint],
-    barriers: [context.barrier],
-    experiments: [],
-    observations: [],
+    shifts: [...history.shifts, context.shift],
+    rests: [...history.rests, context.rest],
+    constraints: [...history.constraints, context.constraint],
+    barriers: [...history.barriers, context.barrier],
+    experiments: history.experiments,
+    observations: history.observations,
     reviews: [],
+    analyses: [],
   };
 }
 
@@ -61,6 +72,8 @@ export function createInitialAdaptiveState(shift: ShiftKind = "day"): AdaptiveCy
     screen: "prepare",
     clarificationCount: 0,
     lastMessage: null,
+    analysisStatus: "idle",
+    currentAnalysisId: null,
   };
 }
 
@@ -97,6 +110,8 @@ function addContext(state: AdaptiveCycleState, shift: ShiftKind): AdaptiveCycleS
     currentObservationId: null,
     screen: "prepare",
     clarificationCount: 0,
+    analysisStatus: "idle",
+    currentAnalysisId: null,
     lastMessage: paused
       ? "El experimento anterior quedó pausado: el turno cambió y el nuevo descanso requiere confirmación."
       : "El turno cambió. Confirma el contexto del próximo descanso antes de proponer una acción.",
@@ -148,6 +163,8 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         currentExperimentId: experiment.id,
         screen: "proposal",
         lastMessage: null,
+        analysisStatus: "idle",
+        currentAnalysisId: null,
         store: { ...state.store, experiments: [...state.store.experiments, experiment] },
       };
     }
@@ -171,6 +188,8 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         ...updateExperiment(state, { ...experiment, state: "agreed" }),
         screen: "agreed",
         lastMessage: "Acción acordada para este descanso sintético.",
+        analysisStatus: "idle",
+        currentAnalysisId: null,
       };
     }
     case "reject_proposal": {
@@ -208,6 +227,8 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         screen: "evolution",
         clarificationCount: 0,
         lastMessage: null,
+        analysisStatus: "idle",
+        currentAnalysisId: null,
         store: { ...reviewedState.store, observations: [...reviewedState.store.observations, observation] },
       };
     }
@@ -235,6 +256,57 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         lastMessage: "El avance quedó guardado sin una nueva propuesta.",
       };
     }
+    case "set_analysis_status":
+      return { ...state, analysisStatus: action.status, lastMessage: action.message ?? state.lastMessage };
+    case "receive_analysis": {
+      const experiment = currentExperiment(state);
+      const currentShift = state.store.rests.find((rest) => rest.id === state.currentRestId)?.shiftId;
+      const matchesCurrent = experiment && currentShift && action.analysis.context.experimentId === experiment.id && action.analysis.context.experimentVersion === experiment.currentVersion && action.analysis.context.restId === state.currentRestId && action.analysis.context.shiftId === currentShift;
+      if (!matchesCurrent) return { ...state, analysisStatus: "stale", lastMessage: "El análisis llegó para un contexto anterior y no reemplazó el plan vigente." };
+      return {
+        ...state,
+        analysisStatus: "ready",
+        currentAnalysisId: action.analysis.id,
+        lastMessage: action.analysis.decision === "clarification" ? action.analysis.question : action.analysis.rationale,
+        store: { ...state.store, analyses: [...state.store.analyses.filter((item) => item.id !== action.analysis.id), action.analysis] },
+      };
+    }
+    case "update_observation": {
+      const observation = state.store.observations.find((item) => item.id === action.observationId);
+      if (!observation) return state;
+      return {
+        ...state,
+        currentAnalysisId: state.currentObservationId === action.observationId ? null : state.currentAnalysisId,
+        analysisStatus: state.currentObservationId === action.observationId ? "idle" : state.analysisStatus,
+        lastMessage: "Registro corregido. Sus análisis y resúmenes anteriores ya no se usan como vigentes.",
+        store: {
+          ...state.store,
+          observations: state.store.observations.map((item) => item.id === action.observationId ? { ...item, completion: action.completion, sleepEstimateMinutes: action.sleepEstimateMinutes, event: action.event } : item),
+          analyses: state.store.analyses.filter((item) => item.context.experimentId !== observation.experimentId || item.context.experimentVersion !== observation.experimentVersion),
+        },
+      };
+    }
+    case "delete_observation": {
+      const observation = state.store.observations.find((item) => item.id === action.observationId);
+      if (!observation) return state;
+      return {
+        ...state,
+        currentObservationId: state.currentObservationId === action.observationId ? null : state.currentObservationId,
+        currentAnalysisId: state.currentObservationId === action.observationId ? null : state.currentAnalysisId,
+        analysisStatus: state.currentObservationId === action.observationId ? "idle" : state.analysisStatus,
+        lastMessage: "Registro eliminado. Los resúmenes se recalcularon sin ese dato.",
+        store: {
+          ...state.store,
+          observations: state.store.observations.filter((item) => item.id !== action.observationId),
+          reviews: state.store.reviews.filter((item) => item.experimentId !== observation.experimentId || item.experimentVersion !== observation.experimentVersion),
+          analyses: state.store.analyses.filter((item) => item.context.experimentId !== observation.experimentId || item.context.experimentVersion !== observation.experimentVersion),
+        },
+      };
+    }
+    case "open_history":
+      return { ...state, screen: "history" };
+    case "close_history":
+      return { ...state, screen: state.currentExperimentId ? "evolution" : "prepare" };
     case "hydrate":
       return action.state;
     case "reset":

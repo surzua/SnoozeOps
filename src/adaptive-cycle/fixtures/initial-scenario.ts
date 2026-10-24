@@ -5,7 +5,7 @@ import type { AdaptiveCycleStore } from "@/adaptive-cycle/domain/types";
  * No se carga en la demo congelada ni representa datos de una persona real.
  */
 export const initialAdaptiveScenario = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   source: "synthetic",
   shifts: [
     {
@@ -52,4 +52,5 @@ export const initialAdaptiveScenario = {
   experiments: [],
   observations: [],
   reviews: [],
+  analyses: [],
 } satisfies AdaptiveCycleStore;

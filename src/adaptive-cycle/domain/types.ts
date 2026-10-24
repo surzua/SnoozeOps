@@ -5,7 +5,7 @@
  * congelada. Las decisiones de la Etapa 1 son determinísticas y locales.
  */
 
-export const adaptiveCycleStorageKey = "snoozeops-adaptive-cycle-v1";
+export const adaptiveCycleStorageKey = "snoozeops-adaptive-cycle-v2";
 
 export type SyntheticSource = "synthetic";
 
@@ -36,7 +36,37 @@ export type ReviewDecision = "maintain" | "clarify" | "adapt" | "acknowledge_lim
 
 export type ReviewPath = "same_bedtime" | "earlier_sleep_onset" | "not_sure";
 
-export type CycleScreen = "prepare" | "proposal" | "agreed" | "review" | "evolution";
+export type CycleScreen = "prepare" | "proposal" | "agreed" | "review" | "evolution" | "history";
+
+export type AnalysisDecision = "action" | "clarification" | "abstain";
+
+export type AnalysisStatus = "idle" | "loading" | "ready" | "unavailable" | "invalid" | "stale";
+
+/** Identificador estable del catálogo: nunca se acepta texto libre del proveedor. */
+export type AllowedActionId = "write-pending" | "prepare-displaceable-task";
+
+export type AnalysisContextReference = {
+  restId: string;
+  experimentId: string;
+  experimentVersion: number;
+  shiftId: string;
+};
+
+export type AdaptiveAnalysis = {
+  id: string;
+  source: "live";
+  status: AnalysisStatus;
+  decision: AnalysisDecision;
+  rationale: string;
+  question: string | null;
+  actionId: AllowedActionId | null;
+  /** Separar declaración, inferencia e incertidumbre evita convertir una hipótesis en hecho. */
+  personSaid: string[];
+  inferred: string[];
+  unknown: string[];
+  context: AnalysisContextReference;
+  createdAt: string;
+};
 
 export type ConfirmedShift = {
   id: string;
@@ -122,7 +152,7 @@ export type ExperimentReview = {
 
 /** El futuro almacenamiento del nuevo flujo; nunca admite el estado del MVP. */
 export type AdaptiveCycleStore = {
-  schemaVersion: 1;
+  schemaVersion: 2;
   source: SyntheticSource;
   shifts: ConfirmedShift[];
   rests: NextRest[];
@@ -131,6 +161,7 @@ export type AdaptiveCycleStore = {
   experiments: Experiment[];
   observations: Observation[];
   reviews: ExperimentReview[];
+  analyses: AdaptiveAnalysis[];
 };
 
 export type AdaptiveCycleState = {
@@ -143,4 +174,6 @@ export type AdaptiveCycleState = {
   screen: CycleScreen;
   clarificationCount: number;
   lastMessage: string | null;
+  analysisStatus: AnalysisStatus;
+  currentAnalysisId: AdaptiveAnalysis["id"] | null;
 };

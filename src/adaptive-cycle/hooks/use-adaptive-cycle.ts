@@ -8,13 +8,15 @@ function isAdaptiveCycleState(value: unknown): value is AdaptiveCycleState {
   if (!value || typeof value !== "object") return false;
   const state = value as Partial<AdaptiveCycleState>;
   return (
-    state.store?.schemaVersion === 1 &&
+    state.store?.schemaVersion === 2 &&
     state.store.source === "synthetic" &&
     Array.isArray(state.store.experiments) &&
     Array.isArray(state.store.observations) &&
+    Array.isArray(state.store.analyses) &&
     typeof state.currentRestId === "string" &&
     typeof state.currentBarrierId === "string" &&
     typeof state.selectedShift === "string"
+    && typeof state.analysisStatus === "string"
   );
 }
 

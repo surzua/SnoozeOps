@@ -18,16 +18,16 @@ describe("ciclo adaptativo determinístico", () => {
       event: "other",
     });
 
-    expect(state.store.experiments[0]?.state).toBe("under_review");
-    expect(state.store.observations[0]?.sleepEstimateMinutes).toBeNull();
+    expect(state.store.experiments.find((item) => item.id === state.currentExperimentId)?.state).toBe("under_review");
+    expect(state.store.observations.find((item) => item.id === state.currentObservationId)?.sleepEstimateMinutes).toBeNull();
     expect(state.screen).toBe("evolution");
   });
 
   it("descartar una propuesta conserva el motivo sin crear una observación", () => {
     const state = adaptiveCycleReducer(draft(), { type: "reject_proposal", reason: "La franja no es viable." });
 
-    expect(state.store.experiments[0]).toMatchObject({ state: "discarded", discardedReason: "La franja no es viable." });
-    expect(state.store.observations).toHaveLength(0);
+    expect(state.store.experiments.find((item) => item.id === "experiment-rest-synthetic-day-2026-10-27")).toMatchObject({ state: "discarded", discardedReason: "La franja no es viable." });
+    expect(state.store.observations).toHaveLength(3);
     expect(state.currentExperimentId).toBeNull();
   });
 
@@ -37,8 +37,8 @@ describe("ciclo adaptativo determinístico", () => {
     expect(state.selectedShift).toBe("night");
     expect(state.screen).toBe("prepare");
     expect(state.currentExperimentId).toBeNull();
-    expect(state.store.experiments[0]).toMatchObject({ state: "paused", pausedFrom: "agreed" });
-    expect(state.store.shifts).toHaveLength(2);
+    expect(state.store.experiments.find((item) => item.id === "experiment-rest-synthetic-day-2026-10-27")).toMatchObject({ state: "paused", pausedFrom: "agreed" });
+    expect(state.store.shifts).toHaveLength(5);
   });
 
   it("no duplica una observación si se reintenta el registro", () => {
@@ -56,7 +56,7 @@ describe("ciclo adaptativo determinístico", () => {
       event: "late_bedtime",
     });
 
-    expect(retried.store.observations).toHaveLength(1);
+    expect(retried.store.observations.filter((item) => item.experimentId === "experiment-rest-synthetic-day-2026-10-27")).toHaveLength(1);
   });
 
   it("separa las ramas de revisión y limita las aclaraciones", () => {
@@ -74,5 +74,22 @@ describe("ciclo adaptativo determinístico", () => {
     expect(clarified.store.reviews[0]?.decision).toBe("adapt");
     expect(twice.clarificationCount).toBe(2);
     expect(capped).toEqual(twice);
+  });
+
+  it("corregir o eliminar un registro retira los análisis vinculados", () => {
+    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    const observationId = reviewed.currentObservationId as string;
+    const withAnalysis = adaptiveCycleReducer(reviewed, {
+      type: "receive_analysis",
+      analysis: {
+        id: "analysis-1", source: "live", status: "ready", decision: "abstain", rationale: "Falta información para una propuesta segura.", question: null, actionId: null,
+        personSaid: [], inferred: [], unknown: ["Contexto"], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
+      },
+    });
+    const corrected = adaptiveCycleReducer(withAnalysis, { type: "update_observation", observationId, completion: "partial", sleepEstimateMinutes: null, event: "interruption" });
+    const deleted = adaptiveCycleReducer(corrected, { type: "delete_observation", observationId });
+
+    expect(corrected.store.analyses).toHaveLength(0);
+    expect(deleted.store.observations.some((item) => item.id === observationId)).toBe(false);
   });
 });
