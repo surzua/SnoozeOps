@@ -1,0 +1,130 @@
+/**
+ * Contrato aislado para el ciclo adaptativo de descanso.
+ *
+ * No comparte tipos, reducer ni almacenamiento con la demo de relevo
+ * congelada. Esta etapa sólo define datos: todavía no implementa decisiones
+ * de producto, persistencia ni interfaz.
+ */
+
+export const adaptiveCycleStorageKey = "snoozeops-adaptive-cycle-v1";
+
+export type SyntheticSource = "synthetic";
+
+export type ShiftKind = "day" | "evening" | "night";
+
+export type ExperimentState =
+  | "draft"
+  | "agreed"
+  | "under_review"
+  | "closed"
+  | "paused"
+  | "discarded";
+
+export type ConstraintKind = "on_call" | "family" | "schedule" | "other";
+
+export type BarrierKind =
+  | "work_check"
+  | "late_bedtime"
+  | "sleep_onset"
+  | "interruption"
+  | "other";
+
+export type ActionCompletion = "yes" | "partial" | "no";
+
+export type ObservationEvent = "interruption" | "late_bedtime" | "sleep_onset" | "other" | "nothing_notable";
+
+export type ReviewDecision = "maintain" | "clarify" | "adapt" | "acknowledge_limit";
+
+export type ConfirmedShift = {
+  id: string;
+  source: SyntheticSource;
+  kind: ShiftKind;
+  startsAt: string;
+  endsAt: string;
+  timeZone: string;
+  confirmedAt: string;
+};
+
+export type NextRest = {
+  id: string;
+  source: SyntheticSource;
+  shiftId: ConfirmedShift["id"];
+  startsAt: string;
+  endsAt: string;
+  confirmedAt: string;
+};
+
+export type Constraint = {
+  id: string;
+  source: SyntheticSource;
+  restId: NextRest["id"];
+  kind: ConstraintKind;
+  description: string;
+  isActive: boolean;
+  confirmedAt: string;
+};
+
+export type Barrier = {
+  id: string;
+  source: SyntheticSource;
+  restId: NextRest["id"];
+  kind: BarrierKind;
+  description: string;
+  reportedAt: string;
+};
+
+export type ExperimentVersion = {
+  version: number;
+  action: string;
+  moment: string;
+  rationale: string;
+  constraintIds: Constraint["id"][];
+  observationPrompt: string;
+  createdAt: string;
+};
+
+export type Experiment = {
+  id: string;
+  source: SyntheticSource;
+  restId: NextRest["id"];
+  barrierId: Barrier["id"];
+  state: ExperimentState;
+  currentVersion: number;
+  versions: ExperimentVersion[];
+  pausedFrom?: Exclude<ExperimentState, "paused">;
+  discardedReason?: string;
+};
+
+export type Observation = {
+  id: string;
+  source: SyntheticSource;
+  experimentId: Experiment["id"];
+  experimentVersion: ExperimentVersion["version"];
+  completion: ActionCompletion;
+  sleepEstimateMinutes: number | null;
+  event: ObservationEvent;
+  detail?: string;
+  recordedAt: string;
+};
+
+export type ExperimentReview = {
+  id: string;
+  source: SyntheticSource;
+  experimentId: Experiment["id"];
+  experimentVersion: ExperimentVersion["version"];
+  decision: ReviewDecision;
+  createdAt: string;
+};
+
+/** El futuro almacenamiento del nuevo flujo; nunca admite el estado del MVP. */
+export type AdaptiveCycleStore = {
+  schemaVersion: 1;
+  source: SyntheticSource;
+  shifts: ConfirmedShift[];
+  rests: NextRest[];
+  constraints: Constraint[];
+  barriers: Barrier[];
+  experiments: Experiment[];
+  observations: Observation[];
+  reviews: ExperimentReview[];
+};
