@@ -1,4 +1,4 @@
-import { actionCatalog } from "@/adaptive-cycle/domain/catalog";
+import { actionCatalog, type CatalogAction } from "@/adaptive-cycle/domain/catalog";
 import type { AdaptiveAnalysis, AllowedActionId, AnalysisContextReference, AnalysisDecision } from "@/adaptive-cycle/domain/types";
 
 export type AnalysisRequest = {
@@ -7,6 +7,14 @@ export type AnalysisRequest = {
   restWindow: string;
   declaredBarrier: string;
   activeConstraint: string;
+  experiment: {
+    action: string;
+    moment: string;
+    hypothesis: string;
+    observationPrompt: string;
+  };
+  /** El modelo sólo puede elegir entre estas descripciones completas, nunca redactar una acción libre. */
+  allowedActions: CatalogAction[];
   observation: {
     completion: "yes" | "partial" | "no";
     sleepEstimateMinutes: number | null;

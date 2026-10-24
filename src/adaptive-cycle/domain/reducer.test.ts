@@ -67,11 +67,29 @@ describe("ciclo adaptativo determinístico", () => {
       event: "late_bedtime",
       reviewPath: "same_bedtime",
     });
-    const clarified = adaptiveCycleReducer(reviewed, { type: "answer_clarification", path: "same_bedtime" });
-    const twice = adaptiveCycleReducer(clarified, { type: "answer_clarification", path: "earlier_sleep_onset" });
-    const capped = adaptiveCycleReducer(twice, { type: "answer_clarification", path: "not_sure" });
+    const clarified = adaptiveCycleReducer(reviewed, { type: "answer_clarification", question: "¿Qué ocupó el tiempo liberado?", response: "Preparé la cena." });
+    const twice = adaptiveCycleReducer(clarified, { type: "answer_clarification", question: "¿Qué más ocurrió?", response: "Respondí un mensaje." });
+    const capped = adaptiveCycleReducer(twice, { type: "answer_clarification", question: "¿Algo más?", response: "No." });
 
-    expect(clarified.store.reviews[0]?.decision).toBe("adapt");
+    expect(clarified.store.reviews[0]).toMatchObject({ decision: "clarify", response: "Preparé la cena." });
+    expect(twice.clarificationCount).toBe(2);
+    expect(capped).toEqual(twice);
+  });
+
+  it("aplica el mismo límite a una respuesta de aclaración de IA", () => {
+    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    const withAnalysis = adaptiveCycleReducer(reviewed, {
+      type: "receive_analysis",
+      analysis: {
+        id: "analysis-question", source: "live", status: "ready", decision: "clarification", rationale: "Falta saber qué ocupó el tiempo liberado.", question: "¿Qué ocupó el tiempo?", actionId: null,
+        personSaid: [], inferred: [], unknown: ["Uso del tiempo"], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
+      },
+    });
+    const once = adaptiveCycleReducer(withAnalysis, { type: "respond_to_analysis_question", response: "Preparé comida." });
+    const twice = adaptiveCycleReducer(once, { type: "answer_clarification", question: "¿Algo más?", response: "No." });
+    const capped = adaptiveCycleReducer(twice, { type: "respond_to_analysis_question", response: "Otro dato." });
+
+    expect(once.clarificationCount).toBe(1);
     expect(twice.clarificationCount).toBe(2);
     expect(capped).toEqual(twice);
   });
@@ -90,7 +108,10 @@ describe("ciclo adaptativo determinístico", () => {
     const deleted = adaptiveCycleReducer(corrected, { type: "delete_observation", observationId });
 
     expect(corrected.store.analyses).toHaveLength(0);
+    expect(corrected.store.reviews).toHaveLength(0);
     expect(deleted.store.observations.some((item) => item.id === observationId)).toBe(false);
+    expect(deleted.historyReturnScreen).toBe("agreed");
+    expect(deleted.store.experiments.find((item) => item.id === deleted.currentExperimentId)?.state).toBe("agreed");
   });
 
   it("vuelve desde registros a la pantalla exacta desde la que se abrió", () => {

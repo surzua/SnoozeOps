@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isCoherentAnalysis, parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
+import { actionCatalog } from "@/adaptive-cycle/domain/catalog";
 
 const base = {
   decision: "clarification",
@@ -18,6 +19,13 @@ const request: AnalysisRequest = {
   restWindow: "23:30–06:30",
   declaredBarrier: "Volvió a revisar tickets.",
   activeConstraint: "Guardia vigente.",
+  experiment: {
+    action: actionCatalog[0].action,
+    moment: actionCatalog[0].moment,
+    hypothesis: actionCatalog[0].rationale,
+    observationPrompt: actionCatalog[0].observationPrompt,
+  },
+  allowedActions: [...actionCatalog],
   observation: { completion: "yes", sleepEstimateMinutes: null, event: "late_bedtime" },
   memory: [],
   reviewResponses: [],

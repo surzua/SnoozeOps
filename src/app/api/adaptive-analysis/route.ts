@@ -27,14 +27,23 @@ const responseSchema = {
 function isRequest(value: unknown): value is AnalysisRequest {
   if (!value || typeof value !== "object") return false;
   const item = value as Partial<AnalysisRequest>;
-  return Boolean(item.context && typeof item.shiftKind === "string" && typeof item.restWindow === "string" && typeof item.declaredBarrier === "string" && typeof item.activeConstraint === "string" && item.observation && Array.isArray(item.memory) && Array.isArray(item.reviewResponses));
+  return Boolean(
+    item.context && typeof item.shiftKind === "string" && typeof item.restWindow === "string" &&
+    typeof item.declaredBarrier === "string" && typeof item.activeConstraint === "string" &&
+    item.experiment && typeof item.experiment.action === "string" && typeof item.experiment.moment === "string" &&
+    typeof item.experiment.hypothesis === "string" && typeof item.experiment.observationPrompt === "string" &&
+    Array.isArray(item.allowedActions) && item.allowedActions.length > 0 && item.observation &&
+    Array.isArray(item.memory) && Array.isArray(item.reviewResponses),
+  );
 }
 
 function instructions() {
   return `Eres un revisor de experimentos de descanso en una demo completamente sintética. Devuelve sólo JSON que siga el esquema.\n
 Límites: no diagnostiques, no prescribas ni hables de medicación. No modifiques turnos, alertas, obligaciones, políticas laborales ni disponibilidad. No atribuyas sueño a una intervención con un solo registro. No inventes datos.\n
 El campo completion sólo declara si realizó la acción; nunca significa que completó una ventana de descanso. sleepEstimateMinutes es una estimación declarada, no sueño medido. No digas que la persona completó la ventana, durmió una duración concreta o descansó, salvo que lo expreses exactamente como una estimación declarada incluida en el contexto.\n
-Decide exactamente una de estas alternativas: action (sólo actionId permitido), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). La memoria y las respuestas previas son contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
+La sección experiment contiene exactamente qué se probó, cuándo y su hipótesis. allowedActions contiene las únicas alternativas permitidas con sus descripciones completas. Si eliges action, el motivo debe conectar explícitamente la acción probada, el resultado declarado y la respuesta a la aclaración; no uses una justificación genérica.
+
+Decide exactamente una de estas alternativas: action (sólo actionId permitido), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). No repitas una pregunta ya respondida en reviewResponses. La memoria y las respuestas previas son contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
 }
 
 export async function POST(request: Request) {

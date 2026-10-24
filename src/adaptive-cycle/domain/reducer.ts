@@ -17,10 +17,11 @@ import type {
 } from "@/adaptive-cycle/domain/types";
 
 const timestamp = "2026-10-26T18:02:00-03:00";
+const maxClarifications = 2;
 
 export type CycleAction =
   | { type: "select_shift"; shift: ShiftKind }
-  | { type: "create_proposal" }
+  | { type: "create_proposal"; barrierDescription?: string }
   | { type: "adjust_proposal" }
   | { type: "accept_proposal" }
   | { type: "reject_proposal"; reason?: string }
@@ -32,7 +33,7 @@ export type CycleAction =
       event: ObservationEvent;
       reviewPath?: ReviewPath;
     }
-  | { type: "answer_clarification"; path: ReviewPath }
+  | { type: "answer_clarification"; question: string; response: string }
   | { type: "respond_to_analysis_question"; response: string }
   | { type: "review_analysis_action"; analysisId: string }
   | { type: "pause_review" }
@@ -153,6 +154,8 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
       const barrier = state.store.barriers.find((item) => item.id === state.currentBarrierId);
       const constraint = state.store.constraints.find((item) => item.restId === state.currentRestId && item.isActive);
       if (!barrier) return state;
+      const description = action.barrierDescription?.trim();
+      const updatedBarrier = description && description.length <= 280 ? { ...barrier, description } : barrier;
       const suggestion = getDeterministicAction(barrier);
       const experiment: Experiment = {
         id: `experiment-${state.currentRestId}`,
@@ -170,7 +173,11 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         lastMessage: null,
         analysisStatus: "idle",
         currentAnalysisId: null,
-        store: { ...state.store, experiments: [...state.store.experiments, experiment] },
+        store: {
+          ...state.store,
+          barriers: state.store.barriers.map((item) => item.id === barrier.id ? updatedBarrier : item),
+          experiments: [...state.store.experiments, experiment],
+        },
       };
     }
     case "adjust_proposal": {
@@ -239,30 +246,31 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
     }
     case "answer_clarification": {
       const experiment = currentExperiment(state);
-      if (!experiment || experiment.state !== "under_review" || state.clarificationCount >= 2) return state;
-      const decision: ReviewDecision = action.path === "same_bedtime" ? "adapt" : "clarify";
+      const response = action.response.trim();
+      const question = action.question.trim();
+      if (!experiment || experiment.state !== "under_review" || state.clarificationCount >= maxClarifications || !response || !question || response.length > 280 || question.length > 280) return state;
       return {
         ...state,
         clarificationCount: state.clarificationCount + 1,
-        lastMessage: action.path === "same_bedtime"
-          ? "El tiempo liberado no se convirtió todavía en una oportunidad de descanso. Antes de cambiar de intervención, conviene aclarar qué lo ocupó."
-          : action.path === "earlier_sleep_onset"
-            ? "Intentar dormir antes y tardar en conciliar no identifica una causa. Falta contexto antes de cambiar la propuesta."
-            : "Aún falta un dato decisivo. Puedes guardar el avance y retomarlo sin inventar una recomendación.",
-        store: { ...state.store, reviews: [...state.store.reviews, createReview(experiment.id, experiment.currentVersion, decision)] },
+        lastMessage: "Tu respuesta quedó registrada para fundamentar el siguiente paso; aún no se cambió la acción.",
+        store: {
+          ...state.store,
+          reviews: [...state.store.reviews, { ...createReview(experiment.id, experiment.currentVersion, "clarify"), id: `review-${experiment.id}-${experiment.currentVersion}-manual-${state.clarificationCount + 1}`, question, response }],
+        },
       };
     }
     case "respond_to_analysis_question": {
       const experiment = currentExperiment(state);
       const analysis = state.currentAnalysisId ? state.store.analyses.find((item) => item.id === state.currentAnalysisId) : undefined;
       const response = action.response.trim();
-      if (!experiment || experiment.state !== "under_review" || !analysis || analysis.decision !== "clarification" || !response || response.length > 280) return state;
+      if (!experiment || experiment.state !== "under_review" || state.clarificationCount >= maxClarifications || !analysis || analysis.decision !== "clarification" || !response || response.length > 280) return state;
       return {
         ...state,
+        clarificationCount: state.clarificationCount + 1,
         lastMessage: "Tu respuesta quedó guardada. Puedes pedir una nueva revisión para elegir el siguiente paso.",
         store: {
           ...state.store,
-          reviews: [...state.store.reviews, { ...createReview(experiment.id, experiment.currentVersion, "clarify"), id: `review-${experiment.id}-${experiment.currentVersion}-analysis-${analysis.id}`, response, analysisId: analysis.id }],
+          reviews: [...state.store.reviews, { ...createReview(experiment.id, experiment.currentVersion, "clarify"), id: `review-${experiment.id}-${experiment.currentVersion}-analysis-${analysis.id}`, question: analysis.question ?? undefined, response, analysisId: analysis.id }],
         },
       };
     }
@@ -309,6 +317,9 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
       const currentShift = state.store.rests.find((rest) => rest.id === state.currentRestId)?.shiftId;
       const matchesCurrent = experiment && currentShift && action.analysis.context.experimentId === experiment.id && action.analysis.context.experimentVersion === experiment.currentVersion && action.analysis.context.restId === state.currentRestId && action.analysis.context.shiftId === currentShift;
       if (!matchesCurrent) return { ...state, analysisStatus: "stale", lastMessage: "El análisis llegó para un contexto anterior y no reemplazó el plan vigente." };
+      if (action.analysis.decision === "clarification" && state.clarificationCount >= maxClarifications) {
+        return { ...state, analysisStatus: "invalid", lastMessage: "Ya se recogieron dos aclaraciones; SnoozeOps no abrirá otra pregunta sin revisar el contexto." };
+      }
       return {
         ...state,
         analysisStatus: "ready",
@@ -328,6 +339,7 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         store: {
           ...state.store,
           observations: state.store.observations.map((item) => item.id === action.observationId ? { ...item, completion: action.completion, sleepEstimateMinutes: action.sleepEstimateMinutes, event: action.event } : item),
+          reviews: state.store.reviews.filter((item) => item.experimentId !== observation.experimentId || item.experimentVersion !== observation.experimentVersion),
           analyses: state.store.analyses.filter((item) => item.context.experimentId !== observation.experimentId || item.context.experimentVersion !== observation.experimentVersion),
         },
       };
@@ -335,15 +347,20 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
     case "delete_observation": {
       const observation = state.store.observations.find((item) => item.id === action.observationId);
       if (!observation) return state;
+      const isCurrent = state.currentObservationId === action.observationId;
+      const experiment = state.store.experiments.find((item) => item.id === observation.experimentId);
+      const restoredExperiment = isCurrent && experiment?.state === "under_review" ? { ...experiment, state: "agreed" as const } : experiment;
       return {
         ...state,
-        currentObservationId: state.currentObservationId === action.observationId ? null : state.currentObservationId,
-        currentAnalysisId: state.currentObservationId === action.observationId ? null : state.currentAnalysisId,
-        analysisStatus: state.currentObservationId === action.observationId ? "idle" : state.analysisStatus,
+        currentObservationId: isCurrent ? null : state.currentObservationId,
+        currentAnalysisId: isCurrent ? null : state.currentAnalysisId,
+        analysisStatus: isCurrent ? "idle" : state.analysisStatus,
+        historyReturnScreen: isCurrent ? "agreed" : state.historyReturnScreen,
         lastMessage: "Registro eliminado. Los resúmenes se recalcularon sin ese dato.",
         store: {
           ...state.store,
           observations: state.store.observations.filter((item) => item.id !== action.observationId),
+          experiments: restoredExperiment ? state.store.experiments.map((item) => item.id === restoredExperiment.id ? restoredExperiment : item) : state.store.experiments,
           reviews: state.store.reviews.filter((item) => item.experimentId !== observation.experimentId || item.experimentVersion !== observation.experimentVersion),
           analyses: state.store.analyses.filter((item) => item.context.experimentId !== observation.experimentId || item.context.experimentVersion !== observation.experimentVersion),
         },

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
-import { getCatalogAction } from "@/adaptive-cycle/domain/catalog";
+import { actionCatalog, getCatalogAction } from "@/adaptive-cycle/domain/catalog";
 import { compareRestRecords, restRecords } from "@/adaptive-cycle/domain/summary";
 import { shiftLabels } from "@/adaptive-cycle/fixtures/scenarios";
 import { useAdaptiveCycle } from "@/adaptive-cycle/hooks/use-adaptive-cycle";
@@ -42,25 +42,40 @@ function getCurrentContext(state: AdaptiveCycleState) {
   };
 }
 
-function buildAnalysisRequest(state: AdaptiveCycleState): AnalysisRequest | null {
+function buildAnalysisRequest(state: AdaptiveCycleState, extraReviewResponse?: { question: string; response: string }): AnalysisRequest | null {
   const experiment = getExperiment(state);
   const observation = state.currentObservationId ? state.store.observations.find((item) => item.id === state.currentObservationId) : undefined;
   const { shift, rest, constraint, barrier } = getCurrentContext(state);
   if (!experiment || !observation || !shift || !rest || !constraint || !barrier) return null;
+  const version = getCurrentVersion(experiment);
+  if (!version) return null;
   const historicalFamilyConstraints = state.store.constraints.filter((item) => item.kind === "family" && item.restId !== rest.id).slice(-3);
   const reviewResponses = state.store.reviews
-    .filter((review) => review.experimentId === experiment.id && review.experimentVersion === experiment.currentVersion && review.response && review.analysisId)
-    .map((review) => ({ question: state.store.analyses.find((analysis) => analysis.id === review.analysisId)?.question ?? "Pregunta previa no disponible.", response: review.response as string }));
+    .filter((review) => review.experimentId === experiment.id && review.experimentVersion === experiment.currentVersion && review.response)
+    .map((review) => ({ question: review.question ?? state.store.analyses.find((analysis) => analysis.id === review.analysisId)?.question ?? "Pregunta previa no disponible.", response: review.response as string }));
   return {
     context: { restId: rest.id, experimentId: experiment.id, experimentVersion: experiment.currentVersion, shiftId: shift.id },
     shiftKind: shift.kind,
     restWindow: restLabel(rest.startsAt, rest.endsAt),
     declaredBarrier: barrier.description,
     activeConstraint: constraint.description,
+    experiment: {
+      action: version.action,
+      moment: version.moment,
+      hypothesis: version.rationale,
+      observationPrompt: version.observationPrompt,
+    },
+    allowedActions: [...actionCatalog],
     observation: { completion: observation.completion, sleepEstimateMinutes: observation.sleepEstimateMinutes, event: observation.event, reviewPath: observation.reviewPath },
     memory: historicalFamilyConstraints.map((item) => ({ observationId: `constraint:${item.id}`, constraint: item.description, recordedAt: item.confirmedAt })),
-    reviewResponses,
+    reviewResponses: extraReviewResponse ? [...reviewResponses, extraReviewResponse] : reviewResponses,
   };
+}
+
+function clarificationQuestion(observation: ObservationEvent, path?: ReviewPath) {
+  if (path === "same_bedtime" || observation === "late_bedtime") return "¿Qué ocupó el tiempo que liberaste al cerrar antes?";
+  if (path === "earlier_sleep_onset" || observation === "sleep_onset") return "¿Qué ocurrió desde que intentaste dormir hasta que conciliaste?";
+  return "¿Qué dato de ese descanso ayudaría a decidir el siguiente paso?";
 }
 
 function ContextCard({ state }: { state: AdaptiveCycleState }) {
@@ -112,13 +127,19 @@ function ProposalCard({ experiment }: { experiment: Experiment }) {
 }
 
 function PrepareScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch: ReturnType<typeof useAdaptiveCycle>["dispatch"] }) {
+  const barrier = state.store.barriers.find((item) => item.id === state.currentBarrierId);
+  const [barrierDescription, setBarrierDescription] = useState(barrier?.description ?? "");
   const pausedReview = getExperiment(state)?.state === "paused" && getExperiment(state)?.pausedFrom === "under_review";
   return (
     <section className="cycle-screen" aria-labelledby="prepare-title">
       <p className="cycle-kicker">1. Preparar el próximo descanso</p>
       <h1 id="prepare-title">¿Qué te impidió descansar ayer?</h1>
-      <p className="cycle-intro">Confirma el turno y parte desde la traba que la persona declaró. La acción es una propuesta y la duración es una estimación; esta demo no inventa disponibilidad ni mide el descanso.</p>
+      <p className="cycle-intro">Confirma el turno y describe la traba con tus palabras. La acción será una propuesta; esta demo no inventa disponibilidad ni mide el descanso.</p>
       <ShiftPicker state={state} onSelect={(shift) => dispatch({ type: "select_shift", shift })} />
+      <label className="cycle-open-response" htmlFor="barrier-description">
+        <span>La traba que quieres trabajar</span>
+        <textarea id="barrier-description" maxLength={280} onChange={(event) => setBarrierDescription(event.target.value)} value={barrierDescription} />
+      </label>
       <ContextCard state={state} />
       {state.lastMessage && <p className="cycle-message" role="status">{state.lastMessage}</p>}
       {pausedReview ? (
@@ -126,7 +147,7 @@ function PrepareScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatc
           Retomar el experimento guardado <span aria-hidden="true">→</span>
         </button>
       ) : (
-        <button className="button button--primary" onClick={() => dispatch({ type: "create_proposal" })} type="button">
+        <button className="button button--primary" disabled={!barrierDescription.trim()} onClick={() => dispatch({ type: "create_proposal", barrierDescription })} type="button">
           Ver una propuesta concreta <span aria-hidden="true">→</span>
         </button>
       )}
@@ -218,22 +239,21 @@ function ReviewScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch
 }
 
 function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch: ReturnType<typeof useAdaptiveCycle>["dispatch"] }) {
-  const [analysisResponse, setAnalysisResponse] = useState("");
+  const [response, setResponse] = useState("");
   const experiment = getExperiment(state);
   const observation = state.currentObservationId ? state.store.observations.find((item) => item.id === state.currentObservationId) : undefined;
   const version = getCurrentVersion(experiment);
   if (!experiment || !observation || !version) return null;
-  const hasAnswer = state.store.reviews.some((review) => review.experimentId === experiment.id && review.experimentVersion === experiment.currentVersion);
-  const question = observation.reviewPath === "same_bedtime"
-    ? "¿Intentaste dormir antes o ese tiempo terminó ocupado por otra cosa?"
-    : observation.reviewPath === "earlier_sleep_onset"
-      ? "¿Hay algún contexto relevante que convenga aclarar antes de cambiar la propuesta?"
-      : "¿Qué dato faltaría para decidir el siguiente paso?";
+  const manualQuestion = clarificationQuestion(observation.event, observation.reviewPath);
   const outcome = observation.sleepEstimateMinutes === null ? "No sabes cuánto dormiste." : `Estimas que dormiste ${observation.sleepEstimateMinutes} minutos.`;
   const analysis = state.currentAnalysisId ? state.store.analyses.find((item) => item.id === state.currentAnalysisId) : undefined;
   const hasAnsweredAnalysis = Boolean(analysis && state.store.reviews.some((review) => review.analysisId === analysis.id && review.response));
-  const requestAnalysis = async () => {
-    const request = buildAnalysisRequest(state);
+  const hasManualResponse = state.store.reviews.some((review) => review.experimentId === experiment.id && review.experimentVersion === experiment.currentVersion && !review.analysisId && review.response);
+  const displayedQuestion = analysis?.decision === "clarification" ? analysis.question ?? manualQuestion : manualQuestion;
+  const canAnswer = state.clarificationCount < 2 && (!analysis || analysis.decision === "clarification") && (analysis?.decision === "clarification" ? !hasAnsweredAnalysis : !hasManualResponse);
+  const canRetryAnalysis = state.analysisStatus !== "loading" && state.clarificationCount > 0 && (!analysis || (analysis.decision === "clarification" && hasAnsweredAnalysis));
+  const requestAnalysis = async (extraReviewResponse?: { question: string; response: string }) => {
+    const request = buildAnalysisRequest(state, extraReviewResponse);
     if (!request) return;
     dispatch({ type: "set_analysis_status", status: "loading", message: "Solicitando una revisión en vivo para este contexto sintético…" });
     try {
@@ -256,26 +276,55 @@ function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispa
     }
   };
 
+  const submitResponse = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const answer = response.trim();
+    if (!answer) return;
+    const question = displayedQuestion;
+    if (analysis?.decision === "clarification") {
+      dispatch({ type: "respond_to_analysis_question", response: answer });
+    } else {
+      dispatch({ type: "answer_clarification", question, response: answer });
+    }
+    setResponse("");
+    void requestAnalysis({ question, response: answer });
+  };
+
+  const nextStep = state.analysisStatus === "loading"
+    ? "Estamos revisando tu respuesta junto con la acción y el contexto confirmados."
+    : analysis?.decision === "action"
+      ? `Revisa una nueva acción: ${getCatalogAction(analysis.actionId ?? "write-pending")?.action ?? "acción no disponible"}. ${analysis.rationale}`
+      : analysis?.decision === "abstain"
+        ? `Mantén el plan actual por ahora. ${analysis.rationale}`
+        : analysis?.decision === "clarification" && !hasAnsweredAnalysis
+          ? analysis.question ?? manualQuestion
+          : hasManualResponse || hasAnsweredAnalysis
+            ? "Tu respuesta quedó en el contexto de la revisión. No se cambió la acción automáticamente."
+            : state.clarificationCount >= 2
+              ? "Ya recogimos dos aclaraciones. Conserva este contexto para revisarlo sin inventar una nueva acción."
+              : manualQuestion;
+
   return (
     <section className="cycle-screen" aria-labelledby="evolution-title">
       <p className="cycle-kicker">Evolución del experimento</p>
-      <h1 id="evolution-title">Lo registrado no prueba una causa.</h1>
+      <h1 id="evolution-title">Cerrar antes todavía no adelantó el descanso.</h1>
+      <p className="cycle-intro">Es un aprendizaje de este registro, no una causa probada: la duración sigue siendo una estimación declarada.</p>
       <section className="cycle-evolution">
         <div><span>Qué probamos</span><strong>{version.action}</strong></div>
         <div><span>Qué ocurrió</span><strong>{observation.completion === "yes" ? "Declaraste que realizaste la acción." : observation.completion === "partial" ? "Declaraste que la realizaste parcialmente." : "Declaraste que no pudiste realizarla."} {outcome}</strong></div>
-        <div><span>Siguiente paso y motivo</span><strong>{hasAnswer ? state.lastMessage : question}</strong></div>
+        <div><span>Siguiente paso y motivo</span><strong>{nextStep}</strong></div>
       </section>
-      {!hasAnswer && (
-        <div className="cycle-actions">
-          <button className="button button--primary" onClick={() => dispatch({ type: "answer_clarification", path: observation.reviewPath ?? "not_sure" })} type="button">Responder esta aclaración</button>
-          <button className="button button--secondary" onClick={() => dispatch({ type: "answer_clarification", path: "not_sure" })} type="button">No sé todavía</button>
-        </div>
+      {canAnswer && (
+        <form className="cycle-ai__response" onSubmit={submitResponse}>
+          <label htmlFor="clarification-response">{displayedQuestion}</label>
+          <textarea id="clarification-response" maxLength={280} onChange={(event) => setResponse(event.target.value)} placeholder="Describe sólo lo que recuerdes; no hace falta completar una respuesta perfecta." value={response} />
+          <button className="button button--primary" disabled={!response.trim() || state.analysisStatus === "loading"} type="submit">Guardar respuesta y revisar el siguiente paso</button>
+        </form>
       )}
-      {hasAnswer && <p className="cycle-message" role="status">Decisión determinística guardada. No se cambió automáticamente de intervención.</p>}
+      {state.analysisStatus === "loading" && <p className="cycle-message" role="status">Analizando la acción acordada, lo que ocurrió y tu respuesta…</p>}
       <section className="cycle-ai" aria-labelledby="ai-title">
-        <div><p className="cycle-eyebrow">Revisión adaptativa</p><h2 id="ai-title">{analysis ? "Generado en vivo" : "Aún sin nuevo análisis"}</h2></div>
-        {!analysis && <p>La revisión se solicita al servidor sólo con este escenario sintético. Si el proveedor no está disponible, no se suplanta con una respuesta guardada.</p>}
-        {state.analysisStatus === "loading" && <p role="status">Analizando el contexto confirmado…</p>}
+        <div><p className="cycle-eyebrow">Revisión adaptativa</p><h2 id="ai-title">{analysis ? "Fundamento del siguiente paso" : "Disponible después de la aclaración"}</h2></div>
+        {!analysis && <p>La revisión recibe la acción acordada, su momento, la hipótesis y el catálogo completo de alternativas permitidas. Si no está disponible, no se inventa una recomendación.</p>}
         {state.analysisStatus === "unavailable" && <p className="cycle-ai__warning" role="status">{state.lastMessage}</p>}
         {state.analysisStatus === "invalid" && <p className="cycle-ai__warning" role="status">{state.lastMessage}</p>}
         {analysis && (
@@ -290,19 +339,9 @@ function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispa
             <p className="cycle-ai__context">Contexto usado: experimento {analysis.context.experimentId}, versión {analysis.context.experimentVersion}. Generado: {analysis.createdAt.slice(0, 16).replace("T", " ")}.</p>
           </div>
         )}
-        {analysis?.decision === "clarification" && !hasAnsweredAnalysis && (
-          <form className="cycle-ai__response" onSubmit={(event) => { event.preventDefault(); dispatch({ type: "respond_to_analysis_question", response: analysisResponse }); setAnalysisResponse(""); }}>
-            <label htmlFor="analysis-response">Tu respuesta</label>
-            <textarea id="analysis-response" maxLength={280} onChange={(event) => setAnalysisResponse(event.target.value)} placeholder="Responde sólo lo que sepas; también puedes dejarlo para después." value={analysisResponse} />
-            <button className="button button--primary" disabled={!analysisResponse.trim()} type="submit">Guardar respuesta</button>
-          </form>
-        )}
-        {analysis?.decision === "clarification" && hasAnsweredAnalysis && <p className="cycle-message" role="status">La respuesta quedó en el contexto de la próxima revisión.</p>}
-        {analysis?.decision === "action" && analysis.actionId && (
-          <button className="button button--primary" onClick={() => dispatch({ type: "review_analysis_action", analysisId: analysis.id })} type="button">Revisar esta acción antes de acordarla</button>
-        )}
-        <button className="button button--secondary" disabled={state.analysisStatus === "loading"} onClick={requestAnalysis} type="button">{analysis ? "Solicitar nueva revisión" : "Solicitar revisión IA en vivo"}</button>
       </section>
+      {analysis?.decision === "action" && analysis.actionId && <button className="button button--primary" onClick={() => dispatch({ type: "review_analysis_action", analysisId: analysis.id })} type="button">Revisar esta acción antes de acordarla</button>}
+      {canRetryAnalysis && <button className="button button--secondary" onClick={() => void requestAnalysis()} type="button">Reintentar la revisión con esta respuesta</button>}
       <button className="text-button" onClick={() => dispatch({ type: "pause_review" })} type="button">Guardar y retomar después</button>
     </section>
   );
@@ -385,7 +424,7 @@ export function AdaptiveCycleApp() {
   const screen = state.screen === "history"
     ? <HistoryScreen dispatch={dispatch} state={state} />
     : state.screen === "prepare"
-    ? <PrepareScreen dispatch={dispatch} state={state} />
+    ? <PrepareScreen dispatch={dispatch} key={state.currentRestId} state={state} />
     : state.screen === "proposal"
       ? <ProposalScreen dispatch={dispatch} state={state} />
       : state.screen === "agreed"

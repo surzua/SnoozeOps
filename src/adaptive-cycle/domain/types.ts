@@ -150,6 +150,7 @@ export type ExperimentReview = {
   experimentId: Experiment["id"];
   experimentVersion: ExperimentVersion["version"];
   decision: ReviewDecision;
+  question?: string;
   response?: string;
   analysisId?: AdaptiveAnalysis["id"];
   createdAt: string;
