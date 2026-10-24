@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SnoozeOps | Pitch</title>
+<style>
+@page { size: 13.333in 7.5in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Avenir Next", "Helvetica Neue", Arial, sans-serif; color: #10202c; }
+body { background: #d9e0e6; }
+.slide { position: relative; width: 13.333in; height: 7.5in; padding: .72in .82in .62in; overflow: hidden; background: #f7f9fb; page-break-after: always; break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.cover { color: white; background: #061725 url('../../generated_images/exec-cf2c6d87-f97e-4b07-b41b-198ef8bf3b6d.png') center/cover no-repeat; padding: .86in .92in; }
+.cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(4,19,32,.18), rgba(4,19,32,0) 77%); }
+.cover > * { position: relative; z-index: 1; }
+.brand { font-size: 18px; letter-spacing: .02em; font-weight: 700; color: #e4f5fa; }
+.brand span { color: #76d6e1; }
+.cover h1 { margin: 1.18in 0 .18in; max-width: 8.5in; font-size: 50px; line-height: 1.04; letter-spacing: -.04em; font-weight: 650; }
+.cover .sub { margin: .28in 0 0; font-size: 20px; color: #c3d5df; max-width: 6.2in; line-height: 1.4; }
+.cover .descriptor { position: absolute; bottom: .62in; left: .92in; color: #9db6c4; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+.kicker { margin: 0 0 .25in; color: #0b879b; font-size: 12px; letter-spacing: .15em; text-transform: uppercase; font-weight: 750; }
+h2 { margin: 0; font-size: 36px; line-height: 1.1; letter-spacing: -.035em; font-weight: 650; max-width: 10.7in; }
+.lead { margin: .28in 0 0; font-size: 20px; line-height: 1.4; color: #425563; max-width: 9.3in; }
+.bottom { position: absolute; left: .82in; right: .82in; bottom: .34in; display: flex; justify-content: space-between; font-size: 10px; color: #71838e; letter-spacing: .04em; }
+.rule { width: .72in; height: 3px; background: #15a4b4; margin: .35in 0 .42in; }
+.problem-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: .7in; margin-top: .42in; align-items: end; }
+.big-quote { font-size: 31px; letter-spacing: -.03em; line-height: 1.18; max-width: 5.4in; color: #0b2231; }
+.profile { border-left: 2px solid #18a0b1; padding: .08in 0 .05in .3in; }
+.profile .name { font-size: 23px; font-weight: 700; margin-bottom: .15in; }
+.profile p { margin: .1in 0; font-size: 16px; color: #425563; line-height: 1.35; }
+.profile strong { color: #10202c; }
+.insight { position: absolute; bottom: 1in; left: .82in; font-size: 17px; font-weight: 600; color: #287385; }
+.steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .42in; margin-top: .63in; }
+.step { padding-top: .19in; border-top: 2px solid #18a0b1; }
+.step .n { font-size: 12px; color: #078596; font-weight: 750; letter-spacing: .08em; }
+.step h3 { margin: .16in 0 .12in; font-size: 23px; line-height: 1.15; font-weight: 650; letter-spacing: -.02em; }
+.step p { margin: 0; font-size: 15px; line-height: 1.45; color: #536672; max-width: 3.35in; }
+.demo { color: #eef6f9; background: #081d2b; }
+.demo .kicker { color: #75d7df; }
+.demo h2 { color: white; max-width: 9in; font-size: 43px; }
+.demo .lead { color: #b8ccd6; max-width: 8in; }
+.demo-lines { margin-top: .65in; width: 9.6in; border-top: 1px solid #315161; }
+.demo-line { display: flex; gap: .28in; align-items: baseline; padding: .18in 0; border-bottom: 1px solid #315161; font-size: 17px; }
+.demo-line b { color: #7cdae3; font-size: 12px; min-width: .35in; }
+.demo-note { margin-top: .38in; font-size: 13px; color: #8faab7; }
+.close h2 { max-width: 10in; }
+.close .promise { margin-top: .75in; max-width: 10in; font-size: 27px; line-height: 1.3; letter-spacing: -.025em; color: #0c3141; }
+.close .truth { margin-top: .3in; max-width: 8.8in; font-size: 16px; line-height: 1.5; color: #536672; }
+.appendix { background: #eef3f6; }
+.appendix h2 { font-size: 32px; }
+.appendix .kicker { color: #69818d; }
+.architecture { margin-top: .42in; border-top: 1px solid #c7d3d9; }
+.arch-row { display: grid; grid-template-columns: 2.1in 1fr; padding: .17in 0; border-bottom: 1px solid #c7d3d9; gap: .35in; }
+.arch-row strong { font-size: 15px; color: #087e90; }
+.arch-row p { margin: 0; font-size: 15px; color: #3e535f; line-height: 1.38; }
+.twocol { display:grid; grid-template-columns:1fr 1fr; gap:.6in; margin-top:.42in; }
+.textcol h3 { font-size:18px; margin:0 0 .15in; }
+.textcol p { font-size:15px; line-height:1.45; color:#425763; margin:.08in 0 .22in; }
+.keyline { font-size:25px; line-height:1.25; color:#0a3948; max-width:9.5in; margin-top:.52in; letter-spacing:-.02em; }
+.small-note { position:absolute; left:.82in; bottom:.68in; font-size:12px; color:#657a85; max-width:9.7in; line-height:1.4; }
+.qa { margin-top:.34in; border-top:1px solid #c7d3d9; }
+.qa-row { display:grid; grid-template-columns:3.25in 1fr; gap:.35in; padding:.13in 0; border-bottom:1px solid #c7d3d9; }
+.qa-row strong { font-size:14px; line-height:1.3; }
+.qa-row p { margin:0; color:#465c68; font-size:13px; line-height:1.35; }
+@media screen { .slide { margin: .24in auto; box-shadow: 0 4px 20px rgba(12,30,45,.16); } }
+@media print { body { background: white; } .slide { margin:0; box-shadow:none; } }
+</style>
+</head>
+<body>
+<section class="slide cover">
+  <div class="brand">Snooze<span>Ops</span></div>
+  <h1>El turno termina.<br>La cabeza sigue de guardia.</h1>
+  <p class="sub">Una forma concreta de ayudar a Rodrigo a probar un cambio para su próximo descanso.</p>
+  <div class="descriptor">Hackatón Señales · Pitch · Octubre 2026</div>
+</section>
+<section class="slide">
+  <p class="kicker">01 / El problema</p>
+  <h2>Rodrigo sabe que duerme poco.<br>Decidir qué cambiar es más difícil.</h2>
+  <div class="problem-grid">
+    <div class="big-quote">El trabajo puede seguir ocupando la cabeza cuando llega el momento de descansar.</div>
+    <div class="profile">
+      <div class="name">Rodrigo · 41 · soporte TI</div>
+      <p>Turnos rotativos en Concepción.</p>
+      <p><strong>5–6 horas</strong> de sueño desde hace 14 meses, según el caso entregado.</p>
+      <p>Su objetivo: acercarse a <strong>una hora más</strong> de descanso.</p>
+    </div>
+  </div>
+  <div class="insight">La oportunidad está en una traba cotidiana que sí pueda cambiar.</div>
+  <div class="bottom"><span>SnoozeOps</span><span>0:20–0:55</span></div>
+</section>
+<section class="slide">
+  <p class="kicker">02 / La solución</p>
+  <h2>De una traba reciente a un experimento pequeño.</h2>
+  <p class="lead">SnoozeOps parte con una pregunta sencilla: “¿Qué dificultó tu último descanso?”</p>
+  <div class="steps">
+    <div class="step"><div class="n">01</div><h3>Nombrar la traba</h3><p>Rodrigo la describe y confirma manualmente qué la representa. El sistema no adivina una causa por una palabra.</p></div>
+    <div class="step"><div class="n">02</div><h3>Acordar una acción</h3><p>Recibe una propuesta acotada para el próximo descanso. Puede aceptarla, ajustarla o rechazarla.</p></div>
+    <div class="step"><div class="n">03</div><h3>Revisar qué pasó</h3><p>Registra si la hizo y cuánto estima que durmió. El siguiente paso responde a su experiencia.</p></div>
+  </div>
+  <div class="bottom"><span>SnoozeOps</span><span>0:55–1:20</span></div>
+</section>
+<section class="slide demo">
+  <p class="kicker">03 / Demo en vivo</p>
+  <h2>La prueba está en cómo cambia el siguiente paso.</h2>
+  <p class="lead">Veamos una propuesta, una respuesta inesperada y la revisión que SnoozeOps ofrece después.</p>
+  <div class="demo-lines">
+    <div class="demo-line"><b>01</b><span>Declarar la traba y confirmar el contexto</span></div>
+    <div class="demo-line"><b>02</b><span>Aceptar o rechazar una sola acción viable</span></div>
+    <div class="demo-line"><b>03</b><span>Registrar el resultado y observar cómo se adapta la pregunta</span></div>
+  </div>
+  <p class="demo-note">Datos de demostración sintéticos · La revisión con IA es opcional y ocurre en la app.</p>
+  <div class="bottom"><span>SnoozeOps</span><span>1:20–4:10 · compartir app</span></div>
+</section>
+<section class="slide close">
+  <p class="kicker">04 / Por qué Rodrigo probaría</p>
+  <h2>El primer paso cabe en su próximo descanso.</h2>
+  <p class="promise">Una traba. Una acción que puede aceptar. Una revisión breve para decidir si repetirla o cambiarla.</p>
+  <p class="truth">La demo no demuestra una hora adicional de sueño. Demuestra un ciclo que permite a Rodrigo probar un cambio con control y aprender de lo que sí ocurrió.</p>
+  <div class="bottom"><span>SnoozeOps</span><span>4:10–5:00</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 01</p>
+  <h2>Arquitectura actual de la demo</h2>
+  <p class="lead">Una app web con lógica de decisión local y una revisión de IA opcional en el servidor.</p>
+  <div class="architecture">
+    <div class="arch-row"><strong>Interfaz web</strong><p>Next.js 16 y React. Captura turno, descanso, traba, propuesta y observación; maneja el ciclo de pantallas.</p></div>
+    <div class="arch-row"><strong>Dominio del ciclo</strong><p>TypeScript: catálogo acotado, reducer de estados, validación de transiciones, resúmenes y comparaciones.</p></div>
+    <div class="arch-row"><strong>Persistencia</strong><p>Almacenamiento local del navegador, separado del MVP histórico. La demo usa fixtures sintéticas.</p></div>
+    <div class="arch-row"><strong>Ruta de análisis</strong><p><code>/api/adaptive-analysis</code> valida la entrada, llama al proveedor opcional y valida la respuesta antes de mostrarla.</p></div>
+    <div class="arch-row"><strong>Proveedor</strong><p>Gemini desde el servidor mediante <code>GEMINI_API_KEY</code>. Si no está disponible, el registro manual sigue funcionando.</p></div>
+  </div>
+  <div class="bottom"><span>SnoozeOps · Apéndice técnico</span><span>06</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 02</p>
+  <h2>La IA asiste dentro de límites claros</h2>
+  <div class="twocol">
+    <div class="textcol"><h3>Puede decidir</h3><p>Mantener la acción vigente.</p><p>Pedir una aclaración.</p><p>Proponer otra acción del catálogo.</p><p>Abstenerse y reconocer un límite.</p></div>
+    <div class="textcol"><h3>La aplicación controla</h3><p>Formato y contenido permitido de la respuesta.</p><p>Referencia al experimento y versión vigentes.</p><p>Confirmación humana para adoptar un cambio.</p><p>Ruta manual cuando el proveedor falla o responde inválidamente.</p></div>
+  </div>
+  <p class="keyline">La IA no cambia turnos, alertas, obligaciones ni protocolos. Tampoco diagnostica ni prescribe.</p>
+  <p class="small-note">Las credenciales permanecen del lado servidor. La demo no envía datos de una persona real.</p>
+  <div class="bottom"><span>SnoozeOps · Apéndice técnico</span><span>07</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 03</p>
+  <h2>Qué registra y qué puede concluir</h2>
+  <div class="twocol">
+    <div class="textcol"><h3>Registra</h3><p>Contexto confirmado del turno y descanso.</p><p>Traba declarada y acción acordada.</p><p>Realización declarada y duración estimada, que también puede quedar desconocida.</p><p>Correcciones y eliminación del registro.</p></div>
+    <div class="textcol"><h3>Puede concluir</h3><p>Si los registros cumplen las condiciones de comparación.</p><p>Qué ocurrió según la persona.</p><p>Qué conviene aclarar, mantener, adaptar o reconocer como límite.</p><p>Una observación no establece causalidad.</p></div>
+  </div>
+  <p class="keyline">La app ayuda a aprender qué merece otra prueba. No mide el sueño ni demuestra eficacia clínica.</p>
+  <div class="bottom"><span>SnoozeOps · Evidencia y límites</span><span>08</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 04</p>
+  <h2>Por qué podría cambiar un hábito</h2>
+  <div class="architecture">
+    <div class="arch-row"><strong>Empieza en su experiencia</strong><p>Rodrigo describe una fricción concreta en vez de completar un cuestionario extenso sobre sueño.</p></div>
+    <div class="arch-row"><strong>Reduce el tamaño del paso</strong><p>Prueba una sola acción para el próximo descanso, con momento y motivo explícitos.</p></div>
+    <div class="arch-row"><strong>Conserva su decisión</strong><p>Puede ajustar o rechazar. El sistema no registra un rechazo como incumplimiento.</p></div>
+    <div class="arch-row"><strong>Da una razón para volver</strong><p>Al despertar, revisa qué pudo hacer y qué ocurrió. La siguiente recomendación puede responder a ese dato.</p></div>
+  </div>
+  <p class="small-note">Hipótesis de diseño para validar con Rodrigo y otras personas en turnos. La demo no prueba adopción ni efectividad.</p>
+  <div class="bottom"><span>SnoozeOps · Cambio de conducta</span><span>09</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 05</p>
+  <h2>Respuestas breves para las preguntas</h2>
+  <div class="qa">
+    <div class="qa-row"><strong>¿Por qué cambiaría Rodrigo?</strong><p>El primer paso es concreto y está bajo su decisión. La app vuelve útil una observación para el próximo intento.</p></div>
+    <div class="qa-row"><strong>¿La demo prueba que dormirá una hora más?</strong><p>No. Esa es la meta del caso. Hace falta un piloto y observaciones comparables para medir el cambio.</p></div>
+    <div class="qa-row"><strong>¿Qué aporta frente a un tracker?</strong><p>Propone y revisa un cambio acordado, en lugar de limitarse a mostrar estimaciones.</p></div>
+    <div class="qa-row"><strong>¿Qué pasa si falla la IA?</strong><p>La revisión no se inventa. Rodrigo conserva el plan y puede guardar el registro manual.</p></div>
+    <div class="qa-row"><strong>¿Qué ocurre si el problema depende de la empresa?</strong><p>SnoozeOps lo reconoce como límite. No ofrece cobertura ni cambia obligaciones o alertas.</p></div>
+    <div class="qa-row"><strong>¿Cómo validarían una hora extra?</strong><p>Con un piloto consentido, medidas definidas antes de empezar y comparación de descansos equivalentes.</p></div>
+  </div>
+  <div class="bottom"><span>SnoozeOps · Preguntas</span><span>10</span></div>
+</section>
+<section class="slide appendix">
+  <p class="kicker">Anexos / 06</p>
+  <h2>La demo cubre los tres criterios</h2>
+  <div class="architecture">
+    <div class="arch-row"><strong>Problema entendido · ⅓</strong><p>Rodrigo ya sabe que duerme poco. El problema de diseño es elegir un cambio viable entre turnos y fricciones laborales.</p></div>
+    <div class="arch-row"><strong>Solución construida · ⅓</strong><p>Demo funcional del ciclo, con estados, ramas de resultado, historial y revisión IA opcional. La app se muestra en vivo.</p></div>
+    <div class="arch-row"><strong>Cambio creíble · ⅓</strong><p>Acción pequeña, elección humana y retorno con aprendizaje. La promesa se mantiene como hipótesis por validar.</p></div>
+  </div>
+  <p class="keyline">La decisión del jurado: ¿qué solución ayudaría de verdad a Rodrigo a probar un cambio?</p>
+  <p class="small-note">Pitch: 5 minutos. Demo: 2 min 50 s. Preguntas: 3 minutos. Material principal: páginas 1–5.</p>
+  <div class="bottom"><span>SnoozeOps · Criterios de evaluación</span><span>11</span></div>
+</section>
+</body>
+</html>
