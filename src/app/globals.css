@@ -196,3 +196,54 @@ button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset:
 @media (max-width: 22rem) { .simulation-section__title { flex-direction: column; } .scenario-label { max-width: none; text-align: left; } .incident-card__heading { align-items: flex-start; flex-direction: column; } }
 @media (min-width: 38rem) { .app-shell { padding-top: 1.5rem; } .screen { gap: 1.3rem; } .simulator__actions { grid-template-columns: 1fr 1fr; } .simulation-outcomes { grid-template-columns: 1fr 1fr; } .simulation-outcomes > p { grid-column: 1 / -1; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* Etapa 1: ciclo adaptativo aislado de la demo de relevo congelada. */
+.cycle-app { width: min(100%, 43rem); min-height: 100vh; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.cycle-app--loading { opacity: 0; }
+.cycle-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line); }
+.cycle-header strong { font-size: 1.2rem; letter-spacing: -0.06em; }
+.cycle-header strong span { color: var(--teal); }
+.cycle-header p { margin: 0.22rem 0 0; color: var(--muted); font-size: 0.77rem; }
+.cycle-stage { padding: 0.35rem 0.5rem; border: 1px solid #356f70; border-radius: 0.45rem; color: var(--teal); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.cycle-screen { display: grid; gap: 1.15rem; padding-top: 2rem; }
+.cycle-kicker, .cycle-eyebrow { margin: 0; color: var(--teal); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.11em; text-transform: uppercase; }
+.cycle-screen h1 { max-width: 15ch; margin: -0.5rem 0 0; font-size: clamp(2rem, 8vw, 3.4rem); line-height: 1.02; letter-spacing: -0.065em; }
+.cycle-screen h2 { margin: 0; font-size: 1.2rem; line-height: 1.3; letter-spacing: -0.03em; }
+.cycle-intro { max-width: 42rem; margin: -0.35rem 0 0; color: var(--muted); line-height: 1.5; }
+.cycle-shifts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; padding: 0.3rem; border: 1px solid var(--line); border-radius: 0.85rem; background: #0e2035; }
+.cycle-shift { min-height: 2.75rem; border: 1px solid transparent; border-radius: 0.6rem; color: var(--muted); background: transparent; font-weight: 800; }
+.cycle-shift--selected { color: #052829; background: var(--teal); }
+.cycle-context { display: grid; overflow: hidden; border: 1px solid var(--line); border-radius: 1rem; background: rgba(16, 35, 58, 0.82); }
+.cycle-context p { display: grid; gap: 0.35rem; margin: 0; padding: 0.9rem 1rem; }
+.cycle-context p + p { border-top: 1px solid var(--line); }
+.cycle-context span, .cycle-evolution span, .cycle-card dt { color: var(--muted); font-size: 0.73rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.cycle-context strong { font-size: 0.93rem; line-height: 1.4; }
+.cycle-message, .cycle-safe-note { margin: 0; padding: 0.85rem 0.95rem; border: 1px solid #4d7990; border-radius: 0.75rem; color: var(--text); background: rgba(24, 64, 82, 0.45); line-height: 1.45; }
+.cycle-safe-note { border-color: #8b693a; color: var(--amber); background: rgba(76, 56, 32, 0.36); }
+.cycle-card { display: grid; gap: 0.95rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 1rem; background: rgba(16, 35, 58, 0.88); }
+.cycle-card--proposal { border-color: #3d817b; background: linear-gradient(125deg, rgba(15, 61, 65, 0.82), rgba(16, 35, 58, 0.88)); }
+.cycle-card dl { display: grid; gap: 0.85rem; margin: 0; }
+.cycle-card dl div { display: grid; gap: 0.25rem; }
+.cycle-card dd { margin: 0; color: var(--muted); line-height: 1.45; }
+.cycle-actions { display: grid; gap: 0.65rem; }
+.cycle-form { display: grid; gap: 1rem; }
+.cycle-form fieldset { display: grid; gap: 0.7rem; margin: 0; padding: 1rem; border: 1px solid var(--line); border-radius: 0.9rem; background: rgba(16, 35, 58, 0.68); }
+.cycle-form legend { padding: 0 0.3rem; font-weight: 800; }
+.cycle-form label { display: flex; gap: 0.55rem; align-items: flex-start; color: var(--text); line-height: 1.35; }
+.cycle-form input { margin-top: 0.15rem; accent-color: var(--teal); }
+.cycle-form .cycle-number { align-items: center; }
+.cycle-number input { width: 6rem; margin: 0; padding: 0.5rem; border: 1px solid #5f7892; border-radius: 0.45rem; color: var(--text); background: #071426; }
+.cycle-number input:disabled { color: #8294a7; }
+.cycle-evolution { display: grid; overflow: hidden; border: 1px solid #3d817b; border-radius: 1rem; background: rgba(16, 35, 58, 0.88); }
+.cycle-evolution div { display: grid; gap: 0.35rem; padding: 1rem; }
+.cycle-evolution div + div { border-top: 1px solid var(--line); }
+.cycle-evolution div:last-child { background: rgba(120, 221, 203, 0.08); }
+.cycle-evolution strong { line-height: 1.45; }
+.cycle-controls { display: grid; gap: 0.75rem; margin-top: 2.2rem; padding: 0.9rem 1rem; border: 1px dashed #627c95; border-radius: 0.85rem; color: var(--muted); }
+.cycle-controls summary { cursor: pointer; color: var(--text); font-weight: 800; }
+.cycle-controls p { margin: 0; font-size: 0.83rem; line-height: 1.4; }
+.cycle-controls__buttons { display: grid; gap: 0.55rem; }
+.cycle-controls button { min-height: 2.6rem; padding: 0.55rem 0.7rem; border: 1px solid #5d7892; border-radius: 0.6rem; color: var(--text); background: transparent; font-weight: 700; }
+.cycle-controls button:disabled { cursor: not-allowed; border-color: #354b62; color: #8294a7; }
+.cycle-controls__reset { border-color: #a36058 !important; color: #ffd6d1 !important; }
+@media (min-width: 38rem) { .cycle-app { padding-top: 2rem; } .cycle-screen { gap: 1.35rem; } .cycle-form fieldset { padding: 1.1rem; } .cycle-controls__buttons { grid-template-columns: 1fr 1fr; } .cycle-controls__reset { grid-column: 1 / -1; } }

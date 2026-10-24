@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SnoozeOps",
-  description: "Una demo de relevo verificable para guardias de soporte TI.",
+  description: "Demo sintética de experimentos de descanso para turnos rotativos.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

@@ -20,7 +20,7 @@ La ruta `/` continúa siendo exclusivamente la demo histórica de relevo. Esta e
 | Estado local `snoozeops-demo-state-v1` | Reserva de almacenamiento `snoozeops-adaptive-cycle-v1` |
 | Relevo, tickets e incidentes | Turno, próximo descanso, restricciones, traba, experimento y observación |
 
-`src/adaptive-cycle/` no tiene ruta, componente, hook, reducer ni persistencia todavía. Ningún módulo del MVP lo importa. La Etapa 1 deberá conectar ese espacio desde esta línea aislada o una rama sucesora, sin reescribir la referencia protegida.
+Al cierre de la Etapa 0, `src/adaptive-cycle/` no tenía ruta, componente, hook, reducer ni persistencia. La Etapa 1 lo conecta desde esta línea aislada; el MVP histórico sigue sin importarlo ni reescribirse.
 
 ## Contrato mínimo acordado
 
@@ -32,7 +32,7 @@ El contrato vive en `src/adaptive-cycle/domain/types.ts` y usa únicamente datos
 - Observación posterior vinculada al identificador y versión del experimento; una estimación desconocida se representa con `null`, no con cero.
 - Decisión de revisión separada del estado del experimento.
 
-El escenario inicial de `src/adaptive-cycle/fixtures/initial-scenario.ts` es una fixture sintética de validación del contrato. No contiene una recomendación acordada ni añade lógica de producto.
+El escenario inicial de `src/adaptive-cycle/fixtures/initial-scenario.ts` es una fixture sintética de validación del contrato. No contiene una recomendación acordada; la lógica determinística posterior se documenta en la Etapa 1.
 
 ## Comprobaciones de la etapa
 

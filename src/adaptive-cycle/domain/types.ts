@@ -2,8 +2,7 @@
  * Contrato aislado para el ciclo adaptativo de descanso.
  *
  * No comparte tipos, reducer ni almacenamiento con la demo de relevo
- * congelada. Esta etapa sólo define datos: todavía no implementa decisiones
- * de producto, persistencia ni interfaz.
+ * congelada. Las decisiones de la Etapa 1 son determinísticas y locales.
  */
 
 export const adaptiveCycleStorageKey = "snoozeops-adaptive-cycle-v1";
@@ -34,6 +33,10 @@ export type ActionCompletion = "yes" | "partial" | "no";
 export type ObservationEvent = "interruption" | "late_bedtime" | "sleep_onset" | "other" | "nothing_notable";
 
 export type ReviewDecision = "maintain" | "clarify" | "adapt" | "acknowledge_limit";
+
+export type ReviewPath = "same_bedtime" | "earlier_sleep_onset" | "not_sure";
+
+export type CycleScreen = "prepare" | "proposal" | "agreed" | "review" | "evolution";
 
 export type ConfirmedShift = {
   id: string;
@@ -103,6 +106,7 @@ export type Observation = {
   completion: ActionCompletion;
   sleepEstimateMinutes: number | null;
   event: ObservationEvent;
+  reviewPath?: ReviewPath;
   detail?: string;
   recordedAt: string;
 };
@@ -127,4 +131,16 @@ export type AdaptiveCycleStore = {
   experiments: Experiment[];
   observations: Observation[];
   reviews: ExperimentReview[];
+};
+
+export type AdaptiveCycleState = {
+  store: AdaptiveCycleStore;
+  selectedShift: ShiftKind;
+  currentRestId: NextRest["id"];
+  currentBarrierId: Barrier["id"];
+  currentExperimentId: Experiment["id"] | null;
+  currentObservationId: Observation["id"] | null;
+  screen: CycleScreen;
+  clarificationCount: number;
+  lastMessage: string | null;
 };
