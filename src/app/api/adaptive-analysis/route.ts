@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   if (!apiKey) return Response.json({ error: "provider_unavailable", message: "No hay proveedor configurado para un nuevo análisis." }, { status: 503 });
 
   try {
-    const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+    const model = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
     const requestBody = JSON.stringify({
       contents: [{ role: "user", parts: [{ text: `${instructions()}\n\nContexto sintético confirmado:\n${JSON.stringify(body)}` }] }],
       generationConfig: {
