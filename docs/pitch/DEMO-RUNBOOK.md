@@ -17,7 +17,7 @@
 
 ## Recorrido recomendado para el pitch final
 
-Seguir [PITCH.md](PITCH.md): PDF páginas 1 y 2 → app → PDF página 5. Preparar manualmente la categoría **Revisión voluntaria de tickets**, aceptar y registrar **Sí**, **360 minutos**, **Intenté dormir a la misma hora**. Guardar una aclaración concreta antes de solicitar la IA. Hacer una sola llamada en el pitch y describir su resultado real. Después restaurar y simular la dificultad para conciliar. Registros queda opcional según el tiempo.
+Seguir [PITCH_CICLO_ADAPTATIVO_FINAL.md](PITCH_CICLO_ADAPTATIVO_FINAL.md). Como resumen: apertura breve → app → cierre breve. Preparar manualmente la categoría **Revisión voluntaria de tickets**, aceptar y registrar **Sí**, **360 minutos**, **Intenté dormir a la misma hora**. Guardar una aclaración concreta antes de solicitar la IA. Hacer una sola llamada en el pitch y describir su resultado real. Después restaurar y simular la dificultad para conciliar. Registros queda opcional según el tiempo.
 
 Compartir la ventana completa del navegador. Llevar la vista arriba tras cambiar de pantalla si conserva el desplazamiento. Tener la versión local abierta como respaldo y probar la IA en producción antes de presentar. En la revisión local hubo una respuesta generada y otra solicitud rechazada por el proveedor con HTTP 503; no depender de una acción específica del modelo.
 

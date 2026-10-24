@@ -1,6 +1,6 @@
 # Pitch vigente — SnoozeOps
 
-La demo vigente es el **ciclo adaptativo de descanso** con datos sintéticos. El guion cronometrado y el procedimiento de presentación viven en [docs/pitch/PITCH.md](docs/pitch/PITCH.md) y [docs/pitch/DEMO-RUNBOOK.md](docs/pitch/DEMO-RUNBOOK.md).
+La demo vigente es el **ciclo adaptativo de descanso** con datos sintéticos. El pitch final vigente está en [docs/pitch/PITCH_CICLO_ADAPTATIVO_FINAL.md](docs/pitch/PITCH_CICLO_ADAPTATIVO_FINAL.md). El pitch anterior queda como antecedente; el procedimiento operativo de demo vive en [docs/pitch/DEMO-RUNBOOK.md](docs/pitch/DEMO-RUNBOOK.md).
 
 ## Idea central
 
