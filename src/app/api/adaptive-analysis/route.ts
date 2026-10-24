@@ -3,23 +3,22 @@ import { parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/dom
 export const runtime = "nodejs";
 
 const responseSchema = {
-  type: "object",
-  additionalProperties: false,
+  // La API REST de generateContent usa los valores Schema en mayúsculas.
+  type: "OBJECT",
   required: ["decision", "rationale", "question", "actionId", "personSaid", "inferred", "unknown", "context"],
   properties: {
-    decision: { type: "string", enum: ["action", "clarification", "abstain"] },
-    rationale: { type: "string" },
-    question: { type: ["string", "null"] },
-    actionId: { type: ["string", "null"], enum: ["write-pending", "prepare-displaceable-task", null] },
-    personSaid: { type: "array", items: { type: "string" } },
-    inferred: { type: "array", items: { type: "string" } },
-    unknown: { type: "array", items: { type: "string" } },
+    decision: { type: "STRING", enum: ["action", "clarification", "abstain"] },
+    rationale: { type: "STRING" },
+    question: { type: "STRING", nullable: true },
+    actionId: { type: "STRING", enum: ["write-pending", "prepare-displaceable-task"], nullable: true },
+    personSaid: { type: "ARRAY", items: { type: "STRING" } },
+    inferred: { type: "ARRAY", items: { type: "STRING" } },
+    unknown: { type: "ARRAY", items: { type: "STRING" } },
     context: {
-      type: "object",
-      additionalProperties: false,
+      type: "OBJECT",
       required: ["restId", "experimentId", "experimentVersion", "shiftId"],
       properties: {
-        restId: { type: "string" }, experimentId: { type: "string" }, experimentVersion: { type: "number" }, shiftId: { type: "string" },
+        restId: { type: "STRING" }, experimentId: { type: "STRING" }, experimentVersion: { type: "NUMBER" }, shiftId: { type: "STRING" },
       },
     },
   },
@@ -46,30 +45,51 @@ export async function POST(request: Request) {
   }
   if (!isRequest(body)) return Response.json({ error: "invalid_request" }, { status: 400 });
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return Response.json({ error: "provider_unavailable", message: "No hay proveedor configurado para un nuevo análisis." }, { status: 503 });
 
   try {
-    const upstream = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-5-mini",
-        store: false,
-        instructions: instructions(),
-        input: JSON.stringify(body),
-        text: { format: { type: "json_schema", name: "adaptive_rest_review", strict: true, schema: responseSchema } },
-      }),
+    const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+    const requestBody = JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: `${instructions()}\n\nContexto sintético confirmado:\n${JSON.stringify(body)}` }] }],
+      generationConfig: {
+        response_mime_type: "application/json",
+        response_schema: responseSchema,
+      },
     });
-    if (!upstream.ok) return Response.json({ error: "provider_unavailable", message: "El proveedor no pudo entregar un análisis seguro." }, { status: 503 });
-    const data = await upstream.json() as { output_text?: unknown };
-    if (typeof data.output_text !== "string") return Response.json({ error: "invalid_analysis" }, { status: 422 });
-    const parsed = parseAnalysisPayload(JSON.parse(data.output_text));
+    let upstream: Response | null = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        body: requestBody,
+        signal: AbortSignal.timeout(45_000),
+      });
+      const transient = upstream.status === 429 || upstream.status >= 500;
+      if (!transient || attempt === 2) break;
+      await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)));
+    }
+    if (!upstream) return Response.json({ error: "provider_unavailable", message: "No hubo un nuevo análisis; el registro manual sigue disponible." }, { status: 503 });
+    if (!upstream.ok) {
+      console.warn(`[adaptive-analysis] Gemini rechazó la solicitud con HTTP ${upstream.status}.`);
+      return Response.json({ error: "provider_unavailable", message: `El proveedor rechazó la solicitud (HTTP ${upstream.status}).` }, { status: 503 });
+    }
+    const data = await upstream.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: unknown }> } }> };
+    const outputText = data.candidates?.[0]?.content?.parts?.map((part) => part.text).filter((text): text is string => typeof text === "string").join("");
+    if (!outputText) return Response.json({ error: "invalid_analysis" }, { status: 422 });
+    let generated: unknown;
+    try {
+      generated = JSON.parse(outputText);
+    } catch {
+      return Response.json({ error: "invalid_analysis" }, { status: 422 });
+    }
+    const parsed = parseAnalysisPayload(generated);
     if (!parsed || parsed.context.experimentId !== body.context.experimentId || parsed.context.experimentVersion !== body.context.experimentVersion || parsed.context.restId !== body.context.restId || parsed.context.shiftId !== body.context.shiftId) {
       return Response.json({ error: "invalid_analysis" }, { status: 422 });
     }
     return Response.json({ analysis: parsed, generatedAt: new Date().toISOString() });
-  } catch {
+  } catch (error) {
+    console.error("[adaptive-analysis] Error de conexión con Gemini:", error instanceof Error ? error.message : "error desconocido");
     return Response.json({ error: "provider_unavailable", message: "No hubo un nuevo análisis; el registro manual sigue disponible." }, { status: 503 });
   }
 }

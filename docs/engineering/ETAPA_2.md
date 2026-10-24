@@ -1,6 +1,6 @@
 # Etapa 2 — IA acotada y revisión adaptativa
 
-La demo conserva datos exclusivamente sintéticos. La revisión opcional se solicita desde `src/app/api/adaptive-analysis/route.ts`; `OPENAI_API_KEY` sólo se lee allí y la clave jamás llega al navegador.
+La demo conserva datos exclusivamente sintéticos. La revisión opcional se solicita desde `src/app/api/adaptive-analysis/route.ts`; `GEMINI_API_KEY` sólo se lee allí y la clave jamás llega al navegador.
 
 ## Contrato y controles
 
@@ -14,7 +14,7 @@ La demo conserva datos exclusivamente sintéticos. La revisión opcional se soli
 
 La fixture incluye tres descansos históricos sintéticos. Una obligación familiar de un descanso previo se incluye como memoria descriptiva para que el análisis deba confirmarla antes de tratarla como vigente. El cambio de turno pausa el experimento actual y requiere un contexto nuevo.
 
-La configuración es opcional mediante `.env.example`. El modelo por defecto es `gpt-5-mini`, configurable con `OPENAI_MODEL`.
+La configuración es opcional mediante `.env.example`. El modelo por defecto es `gemini-2.5-flash`, configurable con `GEMINI_MODEL`. La llamada usa el endpoint REST `generateContent` y Structured Output JSON de Gemini.
 
 ## Validación de salida
 

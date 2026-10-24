@@ -25,6 +25,8 @@ npm install
 npm run dev
 ```
 
+La revisión IA usa Gemini de forma opcional. Copia `.env.example` a `.env.local`, completa `GEMINI_API_KEY` localmente y reinicia el servidor; nunca uses una variable `NEXT_PUBLIC_` ni subas `.env.local`.
+
 Abre la URL local indicada, normalmente `http://localhost:3000`. Para validar el proyecto completo:
 
 ```bash
