@@ -1,40 +1,28 @@
-# Runbook de demo — SnoozeOps
+# Runbook de demo — ciclo adaptativo
 
-## Estado inicial y preflight
+## Preflight
 
-1. Abrir la versión local en el navegador principal y en un navegador o dispositivo de respaldo.
-2. Pulsar el wordmark **SnoozeOps** para ejecutar Hard Reset.
-3. Confirmar: turno Día, Pantalla 1, relevo no solicitado, simulador cerrado, red simulada desactivada e historiales vacíos.
-4. Cerrar notificaciones, terminales, pestañas irrelevantes y cualquier ventana con información personal.
-5. Tener el video corto local disponible sólo como contingencia, sin abrirlo. Ensayar el recorrido con cronómetro y detenerse a los 4:45.
+1. Ejecutar la versión local y pulsar **Reiniciar escenario sintético**.
+2. Confirmar turno Día, pantalla “¿Qué dificultó tu último descanso?” y Registros cerrado.
+3. Si habrá IA en vivo, poner `GEMINI_API_KEY` sólo en `.env.local`. Tener listo el camino sin proveedor.
 
-## Recorrido principal del pitch
+## Recorrido central
 
-1. En **Tu próximo turno**, mantener Día y seleccionar **Preparar mi descanso**.
-2. En el plan, seleccionar **Revisar y cerrar mi guardia**.
-3. Mostrar pendientes y resumen; seleccionar **Solicitar relevo a Andrea**.
-4. En Demo controlada, seleccionar **Aceptar relevo**; luego **Activar sueño protegido**.
-5. Seleccionar **Ver actividad**.
-6. Bajo **Escenario habitual**, seleccionar **Simular cambio de contraseña · P3**. Señalar que se agrupa para revisión.
-7. Bajo **Prueba de seguridad · escenario sintético**, seleccionar **Simular base de datos caída · P1**.
-8. Seleccionar **Simular que Andrea no responde**. Aclarar que representa el plazo de 60 segundos y mostrar que se alerta a Rodrigo.
-9. Seleccionar **Simular la mañana**. Mostrar sólo el P3 del escenario habitual y la ventana con **+60 min reservados para descansar**.
+1. Pulsar **Restaurar punto de bifurcación** y mostrar la acción acordable.
+2. Restaurar ya deja la acción aceptada. Para demostrar el formulario, pulsar **Registrar después de despertar →**; para usar una simulación, quedarse en el estado de acción acordada.
+3. Para una bifurcación reproducible, pulsar **Restaurar punto de bifurcación** y luego **Simular: misma hora**. Mostrar que pregunta qué ocupó el tiempo disponible.
+4. Pulsar **Restaurar punto de bifurcación** y luego **Simular: tardó en conciliar**. Mostrar que explora ese intervalo sin diagnosticar. Ambas preguntas son deterministas; no atribuirlas al modelo.
+5. Pulsar **Solicitar revisión IA en vivo**. Si falla, decir: “No hubo revisión nueva; el plan y el registro manual siguen disponibles.”
+6. Abrir **Registros** y volver con **Volver al ciclo**.
 
-## Ensayos obligatorios
+## Recorrido recomendado para el pitch final
 
-Ejecutar cada recorrido tres veces seguidas, empezando con Hard Reset y comprobando que no queda estado heredado.
+Seguir [PITCH_CICLO_ADAPTATIVO_FINAL.md](PITCH_CICLO_ADAPTATIVO_FINAL.md). Como resumen: apertura breve → app → cierre breve. Preparar manualmente la categoría **Revisión voluntaria de tickets**, aceptar y registrar **Sí**, **360 minutos**, **Intenté dormir a la misma hora**. Guardar una aclaración concreta antes de solicitar la IA. Hacer una sola llamada en el pitch y describir su resultado real. Después restaurar y simular la dificultad para conciliar. Registros queda opcional según el tiempo.
 
-| Recorrido | Pasos | Resultado esperado |
-| --- | --- | --- |
-| Noche habitual | Aceptar relevo → Sueño protegido → P3 → mañana. | P3 agrupado y pendiente de revisión; mañana no incorpora P1. |
-| Prueba confirmada | Aceptar relevo → Sueño protegido → P1 → Andrea confirma. | Andrea asume el P1; Rodrigo no recibe alerta por la prueba. |
-| Escalamiento conservador | Aceptar relevo → Sueño protegido → P1 → Andrea no responde. | Rodrigo recibe alerta crítica simulada; la prueba no se mezcla con el escenario habitual. |
+Compartir la ventana completa del navegador. Llevar la vista arriba tras cambiar de pantalla si conserva el desplazamiento. Tener la versión local abierta como respaldo y probar la IA en producción antes de presentar. En la revisión local hubo una respuesta generada y otra solicitud rechazada por el proveedor con HTTP 503; no depender de una acción específica del modelo.
 
-## Recuperación
+## Recuperaciones
 
-| Problema | Acción inmediata | Qué decir |
-| --- | --- | --- |
-| Estado incorrecto o simulador abierto | Pulsar wordmark y retomar Pantalla 1. | “Reinicio el escenario sintético.” |
-| Navegador o URL falla | Abrir la versión local en el entorno de respaldo. | Mantener la demo en vivo como primera alternativa. |
-| Ambos entornos fallan | Reproducir el video local y narrar el guion. | “Este es el respaldo; la demo en vivo fue la ruta prevista.” |
-| Pregunta fuera de alcance | Volver a tesis, límite y siguiente validación. | No inventar métricas, integración ni evidencia clínica. |
+- Para ruido externo: declarar “Hubo ruido de construcción”, confirmar **Otra traba fuera de estas dos acciones** y mostrar el reconocimiento de límite.
+- Para reiniciar sólo la demo: **Reiniciar escenario sintético**.
+- Si hubo una recarga durante carga: la interfaz indica que la revisión fue interrumpida y permite pedirla otra vez.

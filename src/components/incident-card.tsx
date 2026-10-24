@@ -15,20 +15,20 @@ const statusCopy: Record<RoutingStatus, { icon: string; title: string; detail: s
   },
   acknowledged_by_backup: {
     icon: "✓",
-    title: "Andrea confirmó y asume el incidente",
-    detail: "Rodrigo no será alertado.",
+    title: "Andrea confirmó en la prueba sintética",
+    detail: "La decisión quedó en manos de Andrea; no representa una alerta operativa real.",
     tone: "safe",
   },
   alerted_to_primary: {
     icon: "!",
-    title: "Alerta crítica enviada a Rodrigo",
-    detail: "Andrea no confirmó dentro del plazo de 60 segundos.",
+    title: "Fallback simulado a Rodrigo",
+    detail: "Atajo de demo: se eligió no confirmar dentro de 60 segundos simulados.",
     tone: "critical",
   },
   routed_directly_to_primary: {
     icon: "!",
-    title: "Alerta enviada directamente a Rodrigo",
-    detail: "No hay relevo aceptado para esta ventana.",
+    title: "Ruta directa a Rodrigo",
+    detail: "No hay relevo aceptado para esta ventana sintética.",
     tone: "critical",
   },
 };
@@ -45,7 +45,9 @@ export function IncidentCard({ decision }: { decision: RoutingDecision }) {
         </span>
         <span className="incident-confidence">Confianza {decision.incident.confidence === "high" ? "alta" : "baja"}</span>
       </div>
+      <p className="incident-scenario">{decision.incident.scenario === "security_test" ? "Prueba de seguridad · escenario sintético" : "Escenario habitual · simulación local"}</p>
       <h3>{decision.incident.title}</h3>
+      <p className="incident-metadata">Impacto {decision.incident.impact === "growing" ? "creciente" : "estable"} · datos del escenario, no telemetría real.</p>
       <p className="incident-card__rule"><strong>Regla aplicada:</strong> {decision.rule}</p>
       <div className="incident-status">
         <span aria-hidden="true" className="incident-status__icon">{status.icon}</span>

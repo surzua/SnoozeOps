@@ -2,7 +2,13 @@
 
 **Fecha:** 24 de octubre de 2026, hora de Santiago.
 
-**Estado:** definición del producto acordada después del feedback del checkpoint 2 y de revisar la ficha completa de Rodrigo. Es la única fuente vigente para el diseño y evolución del producto. No describe funcionalidades ya implementadas; el MVP presentado permanece congelado.
+**Estado:** definición vigente y referencia de la demo adaptativa local. El MVP histórico permanece congelado y usa almacenamiento aislado.
+
+## Estado implementado de la demo (24 de octubre de 2026)
+
+La demo actual implementa dos familias deliberadamente acotadas: cierre de una revisión voluntaria y preparación de una tarea no urgente. La persona conserva su declaración original y confirma manualmente la categoría antes de recibir una propuesta; una traba externa, ambigua o inamovible se guarda como límite, sin disfrazarla de revisión de tickets.
+
+Cada rechazo conserva un intento descartado y el siguiente recibe identidad propia. El ciclo permite aceptar, ajustar, registrar, pausar, retomar, corregir y eliminar; correcciones y eliminaciones invalidan análisis dependientes. La revisión opcional puede mantener explícitamente la acción, proponer otra distinta para aceptación humana, pedir una aclaración o abstenerse. La IA real sigue siendo opcional: sin proveedor la demo conserva plan y registro manual.
 
 ## 1. La solución en una frase
 

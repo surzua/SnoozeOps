@@ -1,19 +1,12 @@
-# Q&A — SnoozeOps
+# Q&A — ciclo adaptativo
 
-Cada respuesta está pensada para 20–30 segundos. La evidencia indica la pantalla o regla que se puede mostrar si se pide profundizar.
-
-| Pregunta | Respuesta corta | Evidencia demostrable |
-| --- | --- | --- |
-| ¿Por qué Rodrigo usaría esto si abandonó su reloj? | El reloj le mostraba el problema después de ocurrir. SnoozeOps interviene antes de dormir sobre la causa inmediata: no sabe si puede dejar la guardia. El relevo visible convierte esa incertidumbre en una decisión concreta. | Plan y aceptación de Andrea. |
-| ¿Cómo saben que dormirá una hora más? | No lo afirmamos. El MVP reserva 60 minutos de ventana protegida, no mide sueño real. Una validación posterior, con consentimiento y fuera de la hackatón, compararía hora declarada de acostarse, activación de relevo y descanso reportado contra la propia línea base por turno. | Pantalla de mañana: “+60 min reservados para descansar” y “Sueño real no medido”. |
-| ¿Dónde está la IA? | Esta demo del MVP no ejecuta un LLM ni una API de IA; usa un motor local y determinístico. La definición vigente propone usar IA para formular y revisar experimentos de hábitos, con restricciones explícitas y observaciones declaradas. Eso describe la dirección posterior al checkpoint, no una capacidad de esta demo. | Intro del simulador para demostrar el motor actual; [definición vigente](../product/SOLUCION_PRODUCTO.md), sólo como dirección futura. |
-| ¿La IA podría silenciar una alerta crítica? | No en el diseño objetivo. Ninguna propuesta automática basta para silenciar; ante alerta crítica, ambigua, desconocida o de baja confianza, la regla es escalar. La demo enseña esa ruta conservadora sin depender de IA. | P1 sintético y regla de interrupción. |
-| ¿Qué pasa si Andrea no puede cubrir? | SnoozeOps no promete Sueño protegido. Expone cobertura incompleta y permite Guardia filtrada: los incidentes críticos o ambiguos llegan directamente a Rodrigo. | Respuesta “No puedo cubrir” y pantalla Guardia filtrada. |
-| ¿Por qué no integraron WhatsApp? | Primero validamos el mecanismo de comportamiento: cierre, aceptación y escalamiento claro. Una integración real añade privacidad, autenticación y riesgo técnico, sin demostrar mejor ese mecanismo en dos días. | Demo local sin credenciales; límites del README. |
-| ¿Esto no es otro sistema de tickets? | El ticket es el gatillo, no el fin. El producto actúa al ir a dormir y durante la transferencia de responsabilidad; la métrica de producto es una ventana adicional reservada para descansar, no productividad de tickets. | Flujo de cierre y comparación de ventanas. |
-
-## Respuestas de control
-
-**¿El modo offline desconecta internet?** No. El switch sólo representa un estado visual de la demo; el motor ya es local y determinístico, y sus decisiones no cambian.
-
-**¿Qué significa el plazo simulado de Andrea?** Los botones representan el resultado del plazo operacional de 60 segundos sin esperar un minuto real. Es un atajo de demo, no mensajería ni sincronización real.
+| Pregunta | Respuesta breve |
+| --- | --- |
+| ¿Por qué Rodrigo volvería mañana? | Porque sale con una sola decisión viable y puede revisar qué ocurrió sin empezar de cero. |
+| ¿Qué aporta frente a un chat general? | Un contrato limitado: contexto de turno y restricción, catálogo autorizado, aceptación humana e historial corregible. |
+| ¿Y frente a un tracker? | El tracker describe; SnoozeOps acuerda y revisa un cambio concreto, sin convertir una estimación en evidencia causal. |
+| ¿Qué parte usa IA? | La revisión puede mantener, preguntar, proponer una acción distinta o abstenerse. Reglas controlan catálogo, referencias, límites y aceptación. |
+| ¿Si la acción no ayuda? | No se fuerza otro hábito: primero distingue si no se realizó, fue parcial, faltan datos o existe una restricción. |
+| ¿Si depende de la empresa? | Lo reconoce. La aplicación no crea relevo ni modifica alertas, protocolos o cobertura. |
+| ¿Cómo validarían una hora adicional? | Con un estudio posterior de observaciones comparables y medidas acordadas; esta demo no lo demuestra. |
+| ¿Qué queda fuera? | Cuentas, persistencia remota, wearables, WhatsApp real, tickets reales, notificaciones y diagnóstico. |

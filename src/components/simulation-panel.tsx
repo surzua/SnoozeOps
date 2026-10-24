@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { IncidentCard } from "@/components/incident-card";
 import type { DemoAction, SimulationState } from "@/domain/types";
 
@@ -25,14 +26,26 @@ export function SimulationPanel({
   dispatch,
   simulation,
   isCovered,
+  onClose,
 }: {
   dispatch: Dispatch;
   simulation: SimulationState;
   isCovered: boolean;
+  onClose: () => void;
 }) {
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const securityTest = simulation.securityTest;
   const waitingForAck = securityTest?.status === "escalated_waiting_for_ack";
   const passwordAlreadySimulated = simulation.nightHistory.some((decision) => decision.incident.id === passwordIncident.id);
+
+  useEffect(() => {
+    titleRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   return (
     <section aria-labelledby="simulation-title" className="simulation-panel" role="dialog" aria-modal="true">
@@ -40,16 +53,16 @@ export function SimulationPanel({
       <div className="simulation-panel__header">
         <div>
           <p className="kicker">Actividad de la ventana</p>
-          <h2 id="simulation-title">Simulador de incidentes</h2>
+          <h2 ref={titleRef} id="simulation-title" tabIndex={-1}>Simulador de incidentes</h2>
         </div>
-        <button aria-label="Cerrar simulador" className="icon-button" onClick={() => dispatch({ type: "toggle_simulation" })} type="button">×</button>
+        <button aria-label="Cerrar simulador" className="icon-button" onClick={onClose} type="button">×</button>
       </div>
       <p className="simulation-panel__intro">
         Rutas determinísticas y offline. {isCovered ? "Andrea es el relevo confirmado." : "No hay relevo confirmado: lo crítico llega a Rodrigo."}
       </p>
 
       <section className={simulation.isNetworkMocked ? "network-status network-status--offline" : "network-status"} aria-label="Estado de conectividad simulada">
-        <div className="network-status__message" aria-live="polite">
+        <div className="network-status__message" role="status" aria-live="polite">
           <span aria-hidden="true" className="network-status__icon">{simulation.isNetworkMocked ? "!" : "✓"}</span>
           <div>
             <strong>{simulation.isNetworkMocked ? "Conexión simulada no disponible · Motor local activo" : "Conexión simulada disponible · Motor local listo"}</strong>
@@ -112,7 +125,7 @@ export function SimulationPanel({
       <button className="button button--primary" onClick={() => dispatch({ type: "simulate_morning" })} type="button">
         Simular la mañana <span aria-hidden="true">→</span>
       </button>
-      <button className="button button--quiet simulation-panel__close" onClick={() => dispatch({ type: "toggle_simulation" })} type="button">
+      <button className="button button--quiet simulation-panel__close" onClick={onClose} type="button">
         Cerrar simulador
       </button>
     </section>

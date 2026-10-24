@@ -1,5 +1,5 @@
-import { DemoApp } from "@/components/demo-app";
+import { AdaptiveCycleApp } from "@/adaptive-cycle/components/adaptive-cycle-app";
 
 export default function Home() {
-  return <DemoApp />;
+  return <AdaptiveCycleApp />;
 }
