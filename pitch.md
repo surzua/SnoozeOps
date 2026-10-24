@@ -115,6 +115,12 @@ Dejar visible el recibo de activación y el resumen de la mañana.
 
 La prioridad no es agregar funciones al azar. Es aumentar la evidencia sin romper la demo ni trasladar riesgo a una operación real.
 
+### Versión breve para decir — 30–40 segundos
+
+> “El roadmap tiene seis pasos. Primero congelamos y hacemos reproducible este MVP. Después hacemos discovery documental para separar evidencia de hipótesis. Luego construimos una superficie de confianza: un pasaporte de relevo y decisiones auditables. Con eso podemos hacer un piloto operacional pequeño, primero en sandbox o modo espejo. Sólo cuando exista trazabilidad comparamos una IA en modo sombra, para resumir o detectar información faltante, nunca para silenciar críticos. Finalmente medimos resultados, carga y seguridad para decidir si escalar, iterar o detenernos.”
+
+El orden completo es: **base protegida → descubrimiento documental → superficie de confianza → piloto operacional → copiloto de IA responsable → resultado y escalamiento**.
+
 ### 1. Congelar la evidencia actual
 
 - Ejecutar `npm run lint`, `npm run typecheck`, `npm test` y `npm run build`.
@@ -122,13 +128,17 @@ La prioridad no es agregar funciones al azar. Es aumentar la evidencia sin rompe
 - Crear el tag `checkpoint-2-mvp` y mantener la demo presentada sin cambios.
 - Preparar un video local sólo como contingencia de hardware.
 
-### 2. Hacer visible y auditable el relevo
+### 2. Hacer discovery documental
+
+Contrastar la tesis con fuentes públicas, revisar los límites del MVP y distinguir claramente qué es evidencia, qué es inferencia y qué todavía no ha sido validado con personas. No presentar esta etapa como investigación de usuarios.
+
+### 3. Hacer visible y auditable el relevo
 
 Primera evolución de producto: un pasaporte de relevo más explícito, con responsable, ventana, pendientes, política aplicada, confirmaciones y condición de escalamiento. La cobertura debe derivarse de estados verificables; ninguna pantalla debe declarar cobertura completa sin aceptación válida.
 
 La primera puerta es interna: reglas, transiciones y copy coherentes en los casos normal, rechazo, P1 confirmado, P1 sin respuesta, ambiguo y baja confianza.
 
-### 3. Validar la hipótesis antes de conectar producción
+### 4. Validar la hipótesis antes de conectar producción
 
 Después del checkpoint hay que comprobar si el ritual realmente reduce incertidumbre y si el relevo recibe información accionable. La primera validación debe ser acotada, con consentimiento, datos mínimos y sin usar métricas para vigilar desempeño individual.
 
@@ -140,9 +150,13 @@ Sólo después de esa evidencia tendría sentido avanzar hacia:
 - integración read-only con una fuente operacional;
 - políticas configurables por servicio.
 
-### 4. IA, si la evidencia la justifica
+### 5. IA, si la evidencia la justifica
 
 La IA no es el siguiente titular del pitch. Si se incorpora, debe empezar en modo sombra para resumir, detectar información faltante o proponer una clasificación explicable. Nunca debe silenciar, cerrar o degradar un incidente crítico; las reglas y la revisión humana siguen teniendo autoridad.
+
+### 6. Medir resultados y decidir escala
+
+Cerrar el ciclo con un informe de piloto: valor para quien entrega la guardia, carga para quien recibe el relevo, seguridad operacional y límites. La decisión final debe ser explícita: escalar, iterar o detenerse; no confundir adopción puntual con impacto probado.
 
 ## Respuestas cortas para preguntas probables
 
