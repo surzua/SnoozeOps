@@ -7,6 +7,11 @@ const base = { decision: "clarification", rationale: "El resultado no permite id
 const request: AnalysisRequest = { context, shiftKind: "day", restWindow: "23:30–06:30", declaredBarrier: "Volvió a revisar tickets.", activeConstraint: "Guardia vigente.", experiment: { actionId: "write-pending", action: actionCatalog[0].action, moment: actionCatalog[0].moment, hypothesis: actionCatalog[0].rationale, observationPrompt: actionCatalog[0].observationPrompt }, allowedActions: [...actionCatalog], observation: { completion: "yes", sleepEstimateMinutes: null, event: "late_bedtime" }, memory: [], reviewResponses: [] };
 describe("contrato de análisis adaptativo", () => {
   it("acepta mantener y una aclaración estructurados", () => { expect(parseAnalysisPayload(base)).toMatchObject({ decision: "clarification" }); expect(parseAnalysisPayload({ ...base, decision: "maintain", question: null })).toMatchObject({ decision: "maintain" }); });
+  it("rechaza mantener o abstenerse con un actionId: no adopta una salida ambigua", () => {
+    expect(parseAnalysisPayload({ ...base, decision: "maintain", question: null, actionId: "write-pending" })).toBeNull();
+    expect(parseAnalysisPayload({ ...base, decision: "abstain", question: null, actionId: "write-pending" })).toBeNull();
+    expect(parseAnalysisPayload({ ...base, decision: "abstain", question: null, actionId: null })).toMatchObject({ decision: "abstain" });
+  });
   it("rechaza acciones fuera del catálogo o la misma acción como adaptación", () => { expect(parseAnalysisPayload({ ...base, decision: "action", question: null, actionId: "take-medication" })).toBeNull(); const same = parseAnalysisPayload({ ...base, decision: "action", question: null, actionId: "write-pending" }); expect(same).not.toBeNull(); expect(isCoherentAnalysis(same!, request)).toBe(false); });
   it("rechaza afirmar sueño medido o conocido cuando falta estimación", () => { const payload = parseAnalysisPayload({ ...base, rationale: "Dormiste 360 minutos y completaste la ventana de descanso." }); expect(payload).not.toBeNull(); expect(isCoherentAnalysis(payload!, request)).toBe(false); });
 });
