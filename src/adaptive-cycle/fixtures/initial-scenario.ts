@@ -5,7 +5,7 @@ import type { AdaptiveCycleStore } from "@/adaptive-cycle/domain/types";
  * No se carga en la demo congelada ni representa datos de una persona real.
  */
 export const initialAdaptiveScenario = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   source: "synthetic",
   shifts: [
     {
@@ -46,6 +46,7 @@ export const initialAdaptiveScenario = {
       source: "synthetic",
       restId: "rest-synthetic-day-2026-10-27",
       kind: "work_check",
+      interpretationSource: "deterministic",
       description: "La persona declara que vuelve a revisar tickets después de cerrar el notebook.",
       reportedAt: "2026-10-26T18:01:00-03:00",
     },

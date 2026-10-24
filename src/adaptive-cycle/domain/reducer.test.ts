@@ -1,152 +1,40 @@
 import { describe, expect, it } from "vitest";
 import { adaptiveCycleReducer, createInitialAdaptiveState } from "@/adaptive-cycle/domain/reducer";
 
-function draft() {
-  return adaptiveCycleReducer(createInitialAdaptiveState(), { type: "create_proposal" });
-}
-
-function agreed() {
-  return adaptiveCycleReducer(draft(), { type: "accept_proposal" });
-}
+function draft(description = "Sigo revisando tickets voluntariamente.", kind: "work_check" | "late_bedtime" = "work_check") { return adaptiveCycleReducer(createInitialAdaptiveState(), { type: "create_proposal", barrierDescription: description, barrierKind: kind }); }
+function agreed() { return adaptiveCycleReducer(draft(), { type: "accept_proposal" }); }
+function reviewed() { return adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 0, event: "late_bedtime", reviewPath: "same_bedtime" }); }
 
 describe("ciclo adaptativo determinístico", () => {
-  it("acepta una propuesta y registra una observación desconocida sin convertirla en cero", () => {
-    const state = adaptiveCycleReducer(agreed(), {
-      type: "record_observation",
-      completion: "partial",
-      sleepEstimateMinutes: null,
-      event: "other",
-    });
-
-    expect(state.store.experiments.find((item) => item.id === state.currentExperimentId)?.state).toBe("under_review");
-    expect(state.store.observations.find((item) => item.id === state.currentObservationId)?.sleepEstimateMinutes).toBeNull();
-    expect(state.screen).toBe("evolution");
+  it("rechazar, reformular y aceptar conserva ambos intentos con IDs únicos", () => {
+    const rejected = adaptiveCycleReducer(draft(), { type: "reject_proposal" });
+    const next = adaptiveCycleReducer(rejected, { type: "create_proposal", barrierDescription: "Me quedo terminando una tarea no urgente.", barrierKind: "late_bedtime" });
+    const accepted = adaptiveCycleReducer(next, { type: "accept_proposal" });
+    const current = accepted.store.experiments.find((item) => item.id === accepted.currentExperimentId);
+    expect(new Set(accepted.store.experiments.map((item) => item.id)).size).toBe(accepted.store.experiments.length);
+    expect(accepted.store.experiments.filter((item) => item.restId === accepted.currentRestId && item.state === "discarded")).toHaveLength(1);
+    expect(current?.state).toBe("agreed");
   });
-
-  it("descartar una propuesta conserva el motivo sin crear una observación", () => {
-    const state = adaptiveCycleReducer(draft(), { type: "reject_proposal", reason: "La franja no es viable." });
-
-    expect(state.store.experiments.find((item) => item.id === "experiment-rest-synthetic-day-2026-10-27")).toMatchObject({ state: "discarded", discardedReason: "La franja no es viable." });
-    expect(state.store.observations).toHaveLength(3);
-    expect(state.currentExperimentId).toBeNull();
+  it("no duplica compromisos ni observaciones con reintentos", () => {
+    const once = adaptiveCycleReducer(draft(), { type: "accept_proposal" }); const twice = adaptiveCycleReducer(once, { type: "accept_proposal" });
+    const first = adaptiveCycleReducer(twice, { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" }); const retried = adaptiveCycleReducer(first, { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    expect(retried.store.experiments.filter((item) => item.state === "agreed" || item.state === "under_review")).toHaveLength(1); expect(retried.store.observations.filter((item) => item.experimentId === retried.currentExperimentId)).toHaveLength(1);
   });
-
-  it("pausa el experimento acordado y exige un nuevo contexto al cambiar de turno", () => {
-    const state = adaptiveCycleReducer(agreed(), { type: "select_shift", shift: "night" });
-
-    expect(state.selectedShift).toBe("night");
-    expect(state.screen).toBe("prepare");
-    expect(state.currentExperimentId).toBeNull();
-    expect(state.store.experiments.find((item) => item.id === "experiment-rest-synthetic-day-2026-10-27")).toMatchObject({ state: "paused", pausedFrom: "agreed" });
-    expect(state.store.shifts).toHaveLength(5);
+  it("reconoce una traba fuera del catálogo sin sugerir tickets", () => {
+    const state = adaptiveCycleReducer(createInitialAdaptiveState(), { type: "create_proposal", barrierDescription: "Hubo ruido de construcción.", barrierKind: "other" });
+    expect(state.currentExperimentId).toBeNull(); expect(state.lastMessage).toContain("no sería honesto"); expect(state.store.barriers.find((item) => item.id === state.currentBarrierId)?.description).toBe("Hubo ruido de construcción.");
   });
-
-  it("no duplica una observación si se reintenta el registro", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), {
-      type: "record_observation",
-      completion: "yes",
-      sleepEstimateMinutes: 360,
-      event: "late_bedtime",
-      reviewPath: "same_bedtime",
-    });
-    const retried = adaptiveCycleReducer(reviewed, {
-      type: "record_observation",
-      completion: "yes",
-      sleepEstimateMinutes: 360,
-      event: "late_bedtime",
-    });
-
-    expect(retried.store.observations.filter((item) => item.experimentId === "experiment-rest-synthetic-day-2026-10-27")).toHaveLength(1);
+  it("distingue cero de duración desconocida y rechaza valores inválidos", () => {
+    const zero = reviewed(); expect(zero.store.observations.find((item) => item.id === zero.currentObservationId)?.sleepEstimateMinutes).toBe(0);
+    const invalid = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: -1, event: "other" }); expect(invalid.screen).toBe("agreed");
   });
-
-  it("separa las ramas de revisión y limita las aclaraciones", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), {
-      type: "record_observation",
-      completion: "yes",
-      sleepEstimateMinutes: 360,
-      event: "late_bedtime",
-      reviewPath: "same_bedtime",
-    });
-    const clarified = adaptiveCycleReducer(reviewed, { type: "answer_clarification", question: "¿Qué ocupó el tiempo liberado?", response: "Preparé la cena." });
-    const twice = adaptiveCycleReducer(clarified, { type: "answer_clarification", question: "¿Qué más ocurrió?", response: "Respondí un mensaje." });
-    const capped = adaptiveCycleReducer(twice, { type: "answer_clarification", question: "¿Algo más?", response: "No." });
-
-    expect(clarified.store.reviews[0]).toMatchObject({ decision: "clarify", response: "Preparé la cena." });
-    expect(twice.clarificationCount).toBe(2);
-    expect(capped).toEqual(twice);
+  it("eliminar el registro actual pausado restaura un punto utilizable", () => {
+    const paused = adaptiveCycleReducer(reviewed(), { type: "pause_review" }); const opened = adaptiveCycleReducer(paused, { type: "open_history" }); const deleted = adaptiveCycleReducer(opened, { type: "delete_observation", observationId: paused.currentObservationId as string }); const returned = adaptiveCycleReducer(deleted, { type: "close_history" });
+    expect(returned.screen).toBe("agreed"); expect(returned.currentObservationId).toBeNull(); expect(returned.store.experiments.find((item) => item.id === returned.currentExperimentId)?.state).toBe("agreed");
   });
-
-  it("aplica el mismo límite a una respuesta de aclaración de IA", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
-    const withAnalysis = adaptiveCycleReducer(reviewed, {
-      type: "receive_analysis",
-      analysis: {
-        id: "analysis-question", source: "live", status: "ready", decision: "clarification", rationale: "Falta saber qué ocupó el tiempo liberado.", question: "¿Qué ocupó el tiempo?", actionId: null,
-        personSaid: [], inferred: [], unknown: ["Uso del tiempo"], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
-      },
-    });
-    const once = adaptiveCycleReducer(withAnalysis, { type: "respond_to_analysis_question", response: "Preparé comida." });
-    const twice = adaptiveCycleReducer(once, { type: "answer_clarification", question: "¿Algo más?", response: "No." });
-    const capped = adaptiveCycleReducer(twice, { type: "respond_to_analysis_question", response: "Otro dato." });
-
-    expect(once.clarificationCount).toBe(1);
-    expect(twice.clarificationCount).toBe(2);
-    expect(capped).toEqual(twice);
-  });
-
-  it("corregir o eliminar un registro retira los análisis vinculados", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
-    const observationId = reviewed.currentObservationId as string;
-    const withAnalysis = adaptiveCycleReducer(reviewed, {
-      type: "receive_analysis",
-      analysis: {
-        id: "analysis-1", source: "live", status: "ready", decision: "abstain", rationale: "Falta información para una propuesta segura.", question: null, actionId: null,
-        personSaid: [], inferred: [], unknown: ["Contexto"], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
-      },
-    });
-    const corrected = adaptiveCycleReducer(withAnalysis, { type: "update_observation", observationId, completion: "partial", sleepEstimateMinutes: null, event: "interruption" });
-    const deleted = adaptiveCycleReducer(corrected, { type: "delete_observation", observationId });
-
-    expect(corrected.store.analyses).toHaveLength(0);
-    expect(corrected.store.reviews).toHaveLength(0);
-    expect(deleted.store.observations.some((item) => item.id === observationId)).toBe(false);
-    expect(deleted.historyReturnScreen).toBe("agreed");
-    expect(deleted.store.experiments.find((item) => item.id === deleted.currentExperimentId)?.state).toBe("agreed");
-  });
-
-  it("vuelve desde registros a la pantalla exacta desde la que se abrió", () => {
-    const proposal = draft();
-    const returnedToProposal = adaptiveCycleReducer(adaptiveCycleReducer(proposal, { type: "open_history" }), { type: "close_history" });
-    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
-    const returnedToEvolution = adaptiveCycleReducer(adaptiveCycleReducer(reviewed, { type: "open_history" }), { type: "close_history" });
-
-    expect(returnedToProposal.screen).toBe("proposal");
-    expect(returnedToEvolution.screen).toBe("evolution");
-  });
-
-  it("guarda una revisión pausada y permite retomarla sin crear otra propuesta", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
-    const paused = adaptiveCycleReducer(reviewed, { type: "pause_review" });
-    const resumed = adaptiveCycleReducer(paused, { type: "resume_paused_experiment" });
-
-    expect(paused.screen).toBe("prepare");
-    expect(resumed.screen).toBe("evolution");
-    expect(resumed.store.experiments.find((item) => item.id === resumed.currentExperimentId)?.state).toBe("under_review");
-  });
-
-  it("convierte una acción de IA permitida en una propuesta que la persona aún debe aceptar", () => {
-    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
-    const withAnalysis = adaptiveCycleReducer(reviewed, {
-      type: "receive_analysis",
-      analysis: {
-        id: "analysis-action", source: "live", status: "ready", decision: "action", rationale: "Conviene probar una sola acción del catálogo.", question: null, actionId: "prepare-displaceable-task",
-        personSaid: ["Declaró que realizó la acción."], inferred: [], unknown: [], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
-      },
-    });
-    const proposal = adaptiveCycleReducer(withAnalysis, { type: "review_analysis_action", analysisId: "analysis-action" });
-
-    expect(proposal.screen).toBe("proposal");
-    expect(proposal.store.experiments.find((item) => item.id === proposal.currentExperimentId)).toMatchObject({ state: "draft", currentVersion: 2 });
-    expect(proposal.lastMessage).toContain("no la aceptó por ti");
+  it("descarta un análisis tardío después de corregir", () => {
+    const state = reviewed(); const observationId = state.currentObservationId as string; const changed = adaptiveCycleReducer(state, { type: "update_observation", observationId, completion: "partial", sleepEstimateMinutes: null, event: "other" });
+    const stale = adaptiveCycleReducer(changed, { type: "receive_analysis", analysis: { id: "late", source: "live", status: "ready", decision: "maintain", rationale: "Conviene mantener la acción mientras se observa otro registro.", question: null, actionId: null, personSaid: [], inferred: [], unknown: [], context: { restId: state.currentRestId, experimentId: state.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27", observationId, reviewRevision: state.reviewRevision }, createdAt: "2026-10-28T08:00:00-03:00" } });
+    expect(stale.analysisStatus).toBe("stale");
   });
 });

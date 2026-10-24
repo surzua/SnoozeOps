@@ -15,7 +15,7 @@ describe("escenario inicial del ciclo adaptativo", () => {
   });
 
   it("reserva un espacio de persistencia distinto al del MVP", () => {
-    expect(adaptiveCycleStorageKey).toBe("snoozeops-adaptive-cycle-v2");
+    expect(adaptiveCycleStorageKey).toBe("snoozeops-adaptive-cycle-v3");
     expect(adaptiveCycleStorageKey).not.toBe("snoozeops-demo-state-v1");
   });
 });

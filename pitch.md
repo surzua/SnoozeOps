@@ -6,7 +6,7 @@ La demo vigente es el **ciclo adaptativo de descanso** con datos sintéticos. El
 
 SnoozeOps ayuda a Rodrigo, una persona TI con turnos rotativos, a identificar una traba de su próximo descanso, acordar una sola acción viable y revisar lo ocurrido sin inventar disponibilidad, medir sueño ni afirmar causalidad.
 
-La revisión IA es opcional y acotada: puede pedir una aclaración, proponer una acción del catálogo o abstenerse. Siempre separa lo declarado, lo inferido y lo desconocido. Rodrigo responde las aclaraciones y confirma cualquier acción propuesta.
+La revisión IA es opcional y acotada: puede mantener explícitamente la acción vigente, pedir una aclaración, proponer una acción distinta del catálogo o abstenerse. Siempre separa lo declarado, lo inferido y lo desconocido. Rodrigo responde las aclaraciones y confirma cualquier acción propuesta.
 
 ## Límites para la demo
 

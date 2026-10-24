@@ -21,7 +21,7 @@ const constraints: Constraint[] = [
   { id: "constraint-history-evening-family", source, restId: rests[2].id, kind: "family", description: "La franja previa estuvo ocupada por una obligación familiar.", isActive: true, confirmedAt: "2026-10-23T18:00:00-03:00" },
 ];
 
-const barriers: Barrier[] = rests.map((rest) => ({ id: `barrier-${rest.id}`, source, restId: rest.id, kind: "work_check", description: "Revisó tickets voluntariamente después de cerrar.", reportedAt: rest.confirmedAt }));
+const barriers: Barrier[] = rests.map((rest) => ({ id: `barrier-${rest.id}`, source, restId: rest.id, kind: "work_check", interpretationSource: "deterministic", description: "Revisó tickets voluntariamente después de cerrar.", reportedAt: rest.confirmedAt }));
 
 const action = "Anota un pendiente y cuándo retomarlo antes de terminar la revisión voluntaria.";
 const experiments: Experiment[] = rests.map((rest, index) => ({
@@ -31,7 +31,7 @@ const experiments: Experiment[] = rests.map((rest, index) => ({
   barrierId: barriers[index].id,
   state: "closed",
   currentVersion: 1,
-  versions: [{ version: 1, action, moment: "Al cerrar el notebook, antes del próximo descanso confirmado.", rationale: "Registro sintético histórico.", constraintIds: constraints.filter((constraint) => constraint.restId === rest.id).map((constraint) => constraint.id), observationPrompt: "Registrar lo ocurrido.", createdAt: rest.confirmedAt }],
+  versions: [{ version: 1, actionId: "write-pending", action, moment: "Al cerrar el notebook, antes del próximo descanso confirmado.", rationale: "Registro sintético histórico.", constraintIds: constraints.filter((constraint) => constraint.restId === rest.id).map((constraint) => constraint.id), observationPrompt: "Registrar lo ocurrido.", createdAt: rest.confirmedAt }],
 }));
 
 const observations: Observation[] = [

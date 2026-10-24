@@ -1,10 +1,12 @@
 # Q&A — ciclo adaptativo
 
-| Pregunta | Respuesta breve | Evidencia en la demo |
-| --- | --- | --- |
-| ¿Cómo saben que Rodrigo dormirá más? | No lo sabemos. La duración es una estimación declarada y una observación no prueba causalidad. | Formulario y límite visible en evolución e historial. |
-| ¿La IA decide por Rodrigo? | No. Puede pedir una aclaración, proponer una acción de catálogo o abstenerse; Rodrigo responde y acepta la propuesta explícitamente. | Campo de respuesta y pantalla de propuesta. |
-| ¿Qué ocurre si Gemini falla? | El registro, la propuesta ya acordada y la revisión determinística siguen disponibles. La interfaz declara que no hubo una revisión nueva. | Estado de proveedor no disponible. |
-| ¿Por qué no comparan todos los descansos? | Para no mezclar contextos: exigen mismo turno y franja, sin transición y con restricciones y traba equivalentes. | Leyenda y tarjetas de Registros. |
-| ¿La aplicación modifica la guardia? | No. Sólo incorpora la restricción declarada para evitar una recomendación que presuponga disponibilidad. | Contexto y motivo de la propuesta. |
-| ¿Para qué sirve guardar y retomar? | Conserva la revisión y sus incertidumbres sin fabricar un siguiente paso. | Botón «Retomar el experimento guardado». |
+| Pregunta | Respuesta breve |
+| --- | --- |
+| ¿Por qué Rodrigo volvería mañana? | Porque sale con una sola decisión viable y puede revisar qué ocurrió sin empezar de cero. |
+| ¿Qué aporta frente a un chat general? | Un contrato limitado: contexto de turno y restricción, catálogo autorizado, aceptación humana e historial corregible. |
+| ¿Y frente a un tracker? | El tracker describe; SnoozeOps acuerda y revisa un cambio concreto, sin convertir una estimación en evidencia causal. |
+| ¿Qué parte usa IA? | La revisión puede mantener, preguntar, proponer una acción distinta o abstenerse. Reglas controlan catálogo, referencias, límites y aceptación. |
+| ¿Si la acción no ayuda? | No se fuerza otro hábito: primero distingue si no se realizó, fue parcial, faltan datos o existe una restricción. |
+| ¿Si depende de la empresa? | Lo reconoce. La aplicación no crea relevo ni modifica alertas, protocolos o cobertura. |
+| ¿Cómo validarían una hora adicional? | Con un estudio posterior de observaciones comparables y medidas acordadas; esta demo no lo demuestra. |
+| ¿Qué queda fuera? | Cuentas, persistencia remota, wearables, WhatsApp real, tickets reales, notificaciones y diagnóstico. |

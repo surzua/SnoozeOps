@@ -1,4 +1,5 @@
 import { isCoherentAnalysis, parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
+import { actionCatalog } from "@/adaptive-cycle/domain/catalog";
 
 export const runtime = "nodejs";
 
@@ -7,7 +8,7 @@ const responseSchema = {
   type: "OBJECT",
   required: ["decision", "rationale", "question", "actionId", "personSaid", "inferred", "unknown", "context"],
   properties: {
-    decision: { type: "STRING", enum: ["action", "clarification", "abstain"] },
+    decision: { type: "STRING", enum: ["maintain", "action", "clarification", "abstain"] },
     rationale: { type: "STRING" },
     question: { type: "STRING", nullable: true },
     actionId: { type: "STRING", enum: ["write-pending", "prepare-displaceable-task"], nullable: true },
@@ -18,7 +19,7 @@ const responseSchema = {
       type: "OBJECT",
       required: ["restId", "experimentId", "experimentVersion", "shiftId"],
       properties: {
-        restId: { type: "STRING" }, experimentId: { type: "STRING" }, experimentVersion: { type: "NUMBER" }, shiftId: { type: "STRING" },
+        restId: { type: "STRING" }, experimentId: { type: "STRING" }, experimentVersion: { type: "NUMBER" }, shiftId: { type: "STRING" }, observationId: { type: "STRING" }, reviewRevision: { type: "NUMBER" },
       },
     },
   },
@@ -30,7 +31,7 @@ function isRequest(value: unknown): value is AnalysisRequest {
   return Boolean(
     item.context && typeof item.shiftKind === "string" && typeof item.restWindow === "string" &&
     typeof item.declaredBarrier === "string" && typeof item.activeConstraint === "string" &&
-    item.experiment && typeof item.experiment.action === "string" && typeof item.experiment.moment === "string" &&
+    item.experiment && typeof item.experiment.actionId === "string" && typeof item.experiment.action === "string" && typeof item.experiment.moment === "string" &&
     typeof item.experiment.hypothesis === "string" && typeof item.experiment.observationPrompt === "string" &&
     Array.isArray(item.allowedActions) && item.allowedActions.length > 0 && item.observation &&
     Array.isArray(item.memory) && Array.isArray(item.reviewResponses),
@@ -43,7 +44,7 @@ Límites: no diagnostiques, no prescribas ni hables de medicación. No modifique
 El campo completion sólo declara si realizó la acción; nunca significa que completó una ventana de descanso. sleepEstimateMinutes es una estimación declarada, no sueño medido. No digas que la persona completó la ventana, durmió una duración concreta o descansó, salvo que lo expreses exactamente como una estimación declarada incluida en el contexto.\n
 La sección experiment contiene exactamente qué se probó, cuándo y su hipótesis. allowedActions contiene las únicas alternativas permitidas con sus descripciones completas. Si eliges action, el motivo debe conectar explícitamente la acción probada, el resultado declarado y la respuesta a la aclaración; no uses una justificación genérica.
 
-Decide exactamente una de estas alternativas: action (sólo actionId permitido), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). No repitas una pregunta ya respondida en reviewResponses. La memoria y las respuestas previas son contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
+Decide exactamente una alternativa: maintain (mantener explícitamente la acción vigente), action (sólo un actionId distinto del vigente), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). No repitas una pregunta ya respondida en reviewResponses. La memoria y las respuestas previas son contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
 }
 
 export async function POST(request: Request) {
@@ -54,6 +55,8 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
   if (!isRequest(body)) return Response.json({ error: "invalid_request" }, { status: 400 });
+  // El cliente puede describir el catálogo, pero no autorizar acciones nuevas.
+  const safeBody: AnalysisRequest = { ...body, allowedActions: [...actionCatalog] };
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return Response.json({ error: "provider_unavailable", message: "No hay proveedor configurado para un nuevo análisis." }, { status: 503 });
@@ -61,23 +64,26 @@ export async function POST(request: Request) {
   try {
     const model = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
     const requestBody = JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: `${instructions()}\n\nContexto sintético confirmado:\n${JSON.stringify(body)}` }] }],
+      contents: [{ role: "user", parts: [{ text: `${instructions()}\n\nContexto sintético confirmado:\n${JSON.stringify(safeBody)}` }] }],
       generationConfig: {
         response_mime_type: "application/json",
         response_schema: responseSchema,
       },
     });
     let upstream: Response | null = null;
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+    const deadline = Date.now() + 12_000;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const remaining = deadline - Date.now();
+      if (remaining < 500) break;
       upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
         body: requestBody,
-        signal: AbortSignal.timeout(45_000),
+        signal: AbortSignal.timeout(Math.min(remaining, 8_000)),
       });
       const transient = upstream.status === 429 || upstream.status >= 500;
-      if (!transient || attempt === 2) break;
-      await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)));
+      if (!transient || attempt === 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
     if (!upstream) return Response.json({ error: "provider_unavailable", message: "No hubo un nuevo análisis; el registro manual sigue disponible." }, { status: 503 });
     if (!upstream.ok) {
@@ -94,7 +100,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "invalid_analysis" }, { status: 422 });
     }
     const parsed = parseAnalysisPayload(generated);
-    if (!parsed || !isCoherentAnalysis(parsed, body) || parsed.context.experimentId !== body.context.experimentId || parsed.context.experimentVersion !== body.context.experimentVersion || parsed.context.restId !== body.context.restId || parsed.context.shiftId !== body.context.shiftId) {
+    if (!parsed || !isCoherentAnalysis(parsed, safeBody) || JSON.stringify(parsed.context) !== JSON.stringify(safeBody.context)) {
       return Response.json({ error: "invalid_analysis" }, { status: 422 });
     }
     return Response.json({ analysis: parsed, generatedAt: new Date().toISOString() });
