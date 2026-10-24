@@ -37,6 +37,7 @@ export type ReviewDecision = "maintain" | "clarify" | "adapt" | "acknowledge_lim
 export type ReviewPath = "same_bedtime" | "earlier_sleep_onset" | "not_sure";
 
 export type CycleScreen = "prepare" | "proposal" | "agreed" | "review" | "evolution" | "history";
+export type CycleReturnScreen = Exclude<CycleScreen, "history">;
 
 export type AnalysisDecision = "action" | "clarification" | "abstain";
 
@@ -85,6 +86,8 @@ export type NextRest = {
   startsAt: string;
   endsAt: string;
   confirmedAt: string;
+  /** Un cambio de turno altera el contexto; null confirma que no hubo transición. */
+  shiftTransition: { from: ShiftKind; to: ShiftKind } | null;
 };
 
 export type Constraint = {
@@ -147,6 +150,8 @@ export type ExperimentReview = {
   experimentId: Experiment["id"];
   experimentVersion: ExperimentVersion["version"];
   decision: ReviewDecision;
+  response?: string;
+  analysisId?: AdaptiveAnalysis["id"];
   createdAt: string;
 };
 
@@ -176,4 +181,6 @@ export type AdaptiveCycleState = {
   lastMessage: string | null;
   analysisStatus: AnalysisStatus;
   currentAnalysisId: AdaptiveAnalysis["id"] | null;
+  /** Pantalla exacta desde la que se abrió Registros. */
+  historyReturnScreen: CycleReturnScreen;
 };

@@ -1,4 +1,4 @@
-import { parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
+import { isCoherentAnalysis, parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
 
 export const runtime = "nodejs";
 
@@ -27,13 +27,14 @@ const responseSchema = {
 function isRequest(value: unknown): value is AnalysisRequest {
   if (!value || typeof value !== "object") return false;
   const item = value as Partial<AnalysisRequest>;
-  return Boolean(item.context && typeof item.shiftKind === "string" && typeof item.restWindow === "string" && typeof item.declaredBarrier === "string" && typeof item.activeConstraint === "string" && item.observation && Array.isArray(item.memory));
+  return Boolean(item.context && typeof item.shiftKind === "string" && typeof item.restWindow === "string" && typeof item.declaredBarrier === "string" && typeof item.activeConstraint === "string" && item.observation && Array.isArray(item.memory) && Array.isArray(item.reviewResponses));
 }
 
 function instructions() {
   return `Eres un revisor de experimentos de descanso en una demo completamente sintética. Devuelve sólo JSON que siga el esquema.\n
 Límites: no diagnostiques, no prescribas ni hables de medicación. No modifiques turnos, alertas, obligaciones, políticas laborales ni disponibilidad. No atribuyas sueño a una intervención con un solo registro. No inventes datos.\n
-Decide exactamente una de estas alternativas: action (sólo actionId permitido), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). La memoria es contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
+El campo completion sólo declara si realizó la acción; nunca significa que completó una ventana de descanso. sleepEstimateMinutes es una estimación declarada, no sueño medido. No digas que la persona completó la ventana, durmió una duración concreta o descansó, salvo que lo expreses exactamente como una estimación declarada incluida en el contexto.\n
+Decide exactamente una de estas alternativas: action (sólo actionId permitido), clarification (una pregunta breve si falta un dato decisivo) o abstain (si la información es ambigua, contradictoria o una obligación no deja margen). La memoria y las respuestas previas son contexto descriptivo, no prueba causal. Si existe una restricción previa potencialmente cambiante, pide confirmarla en vez de asumirla vigente. Separa con precisión lo declarado, lo inferido provisionalmente y lo desconocido.`;
 }
 
 export async function POST(request: Request) {
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "invalid_analysis" }, { status: 422 });
     }
     const parsed = parseAnalysisPayload(generated);
-    if (!parsed || parsed.context.experimentId !== body.context.experimentId || parsed.context.experimentVersion !== body.context.experimentVersion || parsed.context.restId !== body.context.restId || parsed.context.shiftId !== body.context.shiftId) {
+    if (!parsed || !isCoherentAnalysis(parsed, body) || parsed.context.experimentId !== body.context.experimentId || parsed.context.experimentVersion !== body.context.experimentVersion || parsed.context.restId !== body.context.restId || parsed.context.shiftId !== body.context.shiftId) {
       return Response.json({ error: "invalid_analysis" }, { status: 422 });
     }
     return Response.json({ analysis: parsed, generatedAt: new Date().toISOString() });

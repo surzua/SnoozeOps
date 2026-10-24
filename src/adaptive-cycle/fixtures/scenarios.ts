@@ -25,6 +25,7 @@ const contexts: Record<ShiftKind, ScenarioContext> = {
       startsAt: "2026-10-27T23:30:00-03:00",
       endsAt: "2026-10-28T06:30:00-03:00",
       confirmedAt: "2026-10-26T18:00:00-03:00",
+      shiftTransition: null,
     },
     constraint: {
       id: "constraint-synthetic-day-on-call",
@@ -61,6 +62,7 @@ const contexts: Record<ShiftKind, ScenarioContext> = {
       startsAt: "2026-10-28T00:30:00-03:00",
       endsAt: "2026-10-28T08:00:00-03:00",
       confirmedAt: "2026-10-26T18:00:00-03:00",
+      shiftTransition: { from: "day", to: "evening" },
     },
     constraint: {
       id: "constraint-synthetic-evening-on-call",
@@ -97,6 +99,7 @@ const contexts: Record<ShiftKind, ScenarioContext> = {
       startsAt: "2026-10-28T09:00:00-03:00",
       endsAt: "2026-10-28T15:00:00-03:00",
       confirmedAt: "2026-10-26T18:00:00-03:00",
+      shiftTransition: { from: "evening", to: "night" },
     },
     constraint: {
       id: "constraint-synthetic-night-on-call",

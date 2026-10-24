@@ -26,6 +26,7 @@ export const initialAdaptiveScenario = {
       startsAt: "2026-10-27T23:30:00-03:00",
       endsAt: "2026-10-28T06:30:00-03:00",
       confirmedAt: "2026-10-26T18:00:00-03:00",
+      shiftTransition: null,
     },
   ],
   constraints: [

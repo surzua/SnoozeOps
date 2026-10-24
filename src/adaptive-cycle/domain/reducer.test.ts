@@ -92,4 +92,40 @@ describe("ciclo adaptativo determinístico", () => {
     expect(corrected.store.analyses).toHaveLength(0);
     expect(deleted.store.observations.some((item) => item.id === observationId)).toBe(false);
   });
+
+  it("vuelve desde registros a la pantalla exacta desde la que se abrió", () => {
+    const proposal = draft();
+    const returnedToProposal = adaptiveCycleReducer(adaptiveCycleReducer(proposal, { type: "open_history" }), { type: "close_history" });
+    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    const returnedToEvolution = adaptiveCycleReducer(adaptiveCycleReducer(reviewed, { type: "open_history" }), { type: "close_history" });
+
+    expect(returnedToProposal.screen).toBe("proposal");
+    expect(returnedToEvolution.screen).toBe("evolution");
+  });
+
+  it("guarda una revisión pausada y permite retomarla sin crear otra propuesta", () => {
+    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    const paused = adaptiveCycleReducer(reviewed, { type: "pause_review" });
+    const resumed = adaptiveCycleReducer(paused, { type: "resume_paused_experiment" });
+
+    expect(paused.screen).toBe("prepare");
+    expect(resumed.screen).toBe("evolution");
+    expect(resumed.store.experiments.find((item) => item.id === resumed.currentExperimentId)?.state).toBe("under_review");
+  });
+
+  it("convierte una acción de IA permitida en una propuesta que la persona aún debe aceptar", () => {
+    const reviewed = adaptiveCycleReducer(agreed(), { type: "record_observation", completion: "yes", sleepEstimateMinutes: 360, event: "late_bedtime" });
+    const withAnalysis = adaptiveCycleReducer(reviewed, {
+      type: "receive_analysis",
+      analysis: {
+        id: "analysis-action", source: "live", status: "ready", decision: "action", rationale: "Conviene probar una sola acción del catálogo.", question: null, actionId: "prepare-displaceable-task",
+        personSaid: ["Declaró que realizó la acción."], inferred: [], unknown: [], context: { restId: reviewed.currentRestId, experimentId: reviewed.currentExperimentId as string, experimentVersion: 1, shiftId: "shift-synthetic-day-2026-10-27" }, createdAt: "2026-10-28T08:00:00-03:00",
+      },
+    });
+    const proposal = adaptiveCycleReducer(withAnalysis, { type: "review_analysis_action", analysisId: "analysis-action" });
+
+    expect(proposal.screen).toBe("proposal");
+    expect(proposal.store.experiments.find((item) => item.id === proposal.currentExperimentId)).toMatchObject({ state: "draft", currentVersion: 2 });
+    expect(proposal.lastMessage).toContain("no la aceptó por ti");
+  });
 });

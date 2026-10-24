@@ -1,4 +1,4 @@
-import { getDeterministicAction } from "@/adaptive-cycle/domain/catalog";
+import { getCatalogAction, getDeterministicAction } from "@/adaptive-cycle/domain/catalog";
 import { getSyntheticScenario } from "@/adaptive-cycle/fixtures/scenarios";
 import { historicalRecords } from "@/adaptive-cycle/fixtures/historical-records";
 import type {
@@ -33,7 +33,10 @@ export type CycleAction =
       reviewPath?: ReviewPath;
     }
   | { type: "answer_clarification"; path: ReviewPath }
+  | { type: "respond_to_analysis_question"; response: string }
+  | { type: "review_analysis_action"; analysisId: string }
   | { type: "pause_review" }
+  | { type: "resume_paused_experiment" }
   | { type: "set_analysis_status"; status: AnalysisStatus; message?: string }
   | { type: "receive_analysis"; analysis: AdaptiveAnalysis }
   | { type: "update_observation"; observationId: string; completion: ActionCompletion; sleepEstimateMinutes: number | null; event: ObservationEvent }
@@ -74,6 +77,7 @@ export function createInitialAdaptiveState(shift: ShiftKind = "day"): AdaptiveCy
     lastMessage: null,
     analysisStatus: "idle",
     currentAnalysisId: null,
+    historyReturnScreen: "prepare",
   };
 }
 
@@ -112,6 +116,7 @@ function addContext(state: AdaptiveCycleState, shift: ShiftKind): AdaptiveCycleS
     clarificationCount: 0,
     analysisStatus: "idle",
     currentAnalysisId: null,
+    historyReturnScreen: "prepare",
     lastMessage: paused
       ? "El experimento anterior quedó pausado: el turno cambió y el nuevo descanso requiere confirmación."
       : "El turno cambió. Confirma el contexto del próximo descanso antes de proponer una acción.",
@@ -247,6 +252,38 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         store: { ...state.store, reviews: [...state.store.reviews, createReview(experiment.id, experiment.currentVersion, decision)] },
       };
     }
+    case "respond_to_analysis_question": {
+      const experiment = currentExperiment(state);
+      const analysis = state.currentAnalysisId ? state.store.analyses.find((item) => item.id === state.currentAnalysisId) : undefined;
+      const response = action.response.trim();
+      if (!experiment || experiment.state !== "under_review" || !analysis || analysis.decision !== "clarification" || !response || response.length > 280) return state;
+      return {
+        ...state,
+        lastMessage: "Tu respuesta quedó guardada. Puedes pedir una nueva revisión para elegir el siguiente paso.",
+        store: {
+          ...state.store,
+          reviews: [...state.store.reviews, { ...createReview(experiment.id, experiment.currentVersion, "clarify"), id: `review-${experiment.id}-${experiment.currentVersion}-analysis-${analysis.id}`, response, analysisId: analysis.id }],
+        },
+      };
+    }
+    case "review_analysis_action": {
+      const experiment = currentExperiment(state);
+      const analysis = state.store.analyses.find((item) => item.id === action.analysisId);
+      const catalogAction = analysis?.decision === "action" && analysis.actionId ? getCatalogAction(analysis.actionId) : undefined;
+      if (!experiment || experiment.state !== "under_review" || !analysis || !catalogAction) return state;
+      const nextVersion = experiment.currentVersion + 1;
+      const previousVersion = experiment.versions.find((item) => item.version === experiment.currentVersion);
+      return {
+        ...updateExperiment(state, {
+          ...experiment,
+          state: "draft",
+          currentVersion: nextVersion,
+          versions: [...experiment.versions, { version: nextVersion, ...catalogAction, constraintIds: previousVersion?.constraintIds ?? [], createdAt: timestamp }],
+        }),
+        screen: "proposal",
+        lastMessage: "Revisa la acción sugerida antes de acordarla. La IA no la aceptó por ti.",
+      };
+    }
     case "pause_review": {
       const experiment = currentExperiment(state);
       if (!experiment || experiment.state !== "under_review") return state;
@@ -254,6 +291,15 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
         ...updateExperiment(state, { ...experiment, state: "paused", pausedFrom: "under_review" }),
         screen: "prepare",
         lastMessage: "El avance quedó guardado sin una nueva propuesta.",
+      };
+    }
+    case "resume_paused_experiment": {
+      const experiment = currentExperiment(state);
+      if (!experiment || experiment.state !== "paused" || experiment.pausedFrom !== "under_review" || !state.currentObservationId) return state;
+      return {
+        ...updateExperiment(state, { ...experiment, state: "under_review" }),
+        screen: "evolution",
+        lastMessage: "Retomaste la revisión guardada. El registro y sus límites siguen visibles.",
       };
     }
     case "set_analysis_status":
@@ -304,11 +350,11 @@ export function adaptiveCycleReducer(state: AdaptiveCycleState, action: CycleAct
       };
     }
     case "open_history":
-      return { ...state, screen: "history" };
+      return { ...state, historyReturnScreen: state.screen === "history" ? state.historyReturnScreen : state.screen, screen: "history" };
     case "close_history":
-      return { ...state, screen: state.currentExperimentId ? "evolution" : "prepare" };
+      return { ...state, screen: state.historyReturnScreen };
     case "hydrate":
-      return action.state;
+      return { ...action.state, historyReturnScreen: action.state.historyReturnScreen ?? (action.state.screen === "history" ? "prepare" : action.state.screen) };
     case "reset":
       return createInitialAdaptiveState();
   }

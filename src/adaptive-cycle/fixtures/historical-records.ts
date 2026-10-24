@@ -9,9 +9,9 @@ const shifts: ConfirmedShift[] = [
 ];
 
 const rests: NextRest[] = [
-  { id: "rest-history-day-1", source, shiftId: shifts[0].id, startsAt: "2026-10-20T23:30:00-03:00", endsAt: "2026-10-21T06:30:00-03:00", confirmedAt: "2026-10-19T18:00:00-03:00" },
-  { id: "rest-history-day-2", source, shiftId: shifts[1].id, startsAt: "2026-10-22T23:30:00-03:00", endsAt: "2026-10-23T06:30:00-03:00", confirmedAt: "2026-10-21T18:00:00-03:00" },
-  { id: "rest-history-evening", source, shiftId: shifts[2].id, startsAt: "2026-10-25T00:30:00-03:00", endsAt: "2026-10-25T08:00:00-03:00", confirmedAt: "2026-10-23T18:00:00-03:00" },
+  { id: "rest-history-day-1", source, shiftId: shifts[0].id, startsAt: "2026-10-20T23:30:00-03:00", endsAt: "2026-10-21T06:30:00-03:00", confirmedAt: "2026-10-19T18:00:00-03:00", shiftTransition: null },
+  { id: "rest-history-day-2", source, shiftId: shifts[1].id, startsAt: "2026-10-22T23:30:00-03:00", endsAt: "2026-10-23T06:30:00-03:00", confirmedAt: "2026-10-21T18:00:00-03:00", shiftTransition: null },
+  { id: "rest-history-evening", source, shiftId: shifts[2].id, startsAt: "2026-10-25T00:30:00-03:00", endsAt: "2026-10-25T08:00:00-03:00", confirmedAt: "2026-10-23T18:00:00-03:00", shiftTransition: { from: "day", to: "evening" } },
 ];
 
 const constraints: Constraint[] = [

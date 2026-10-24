@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { parseAnalysisPayload, type AnalysisRequest } from "@/adaptive-cycle/domain/analysis";
+import { getCatalogAction } from "@/adaptive-cycle/domain/catalog";
 import { compareRestRecords, restRecords } from "@/adaptive-cycle/domain/summary";
 import { shiftLabels } from "@/adaptive-cycle/fixtures/scenarios";
 import { useAdaptiveCycle } from "@/adaptive-cycle/hooks/use-adaptive-cycle";
@@ -47,6 +48,9 @@ function buildAnalysisRequest(state: AdaptiveCycleState): AnalysisRequest | null
   const { shift, rest, constraint, barrier } = getCurrentContext(state);
   if (!experiment || !observation || !shift || !rest || !constraint || !barrier) return null;
   const historicalFamilyConstraints = state.store.constraints.filter((item) => item.kind === "family" && item.restId !== rest.id).slice(-3);
+  const reviewResponses = state.store.reviews
+    .filter((review) => review.experimentId === experiment.id && review.experimentVersion === experiment.currentVersion && review.response && review.analysisId)
+    .map((review) => ({ question: state.store.analyses.find((analysis) => analysis.id === review.analysisId)?.question ?? "Pregunta previa no disponible.", response: review.response as string }));
   return {
     context: { restId: rest.id, experimentId: experiment.id, experimentVersion: experiment.currentVersion, shiftId: shift.id },
     shiftKind: shift.kind,
@@ -55,6 +59,7 @@ function buildAnalysisRequest(state: AdaptiveCycleState): AnalysisRequest | null
     activeConstraint: constraint.description,
     observation: { completion: observation.completion, sleepEstimateMinutes: observation.sleepEstimateMinutes, event: observation.event, reviewPath: observation.reviewPath },
     memory: historicalFamilyConstraints.map((item) => ({ observationId: `constraint:${item.id}`, constraint: item.description, recordedAt: item.confirmedAt })),
+    reviewResponses,
   };
 }
 
@@ -107,17 +112,24 @@ function ProposalCard({ experiment }: { experiment: Experiment }) {
 }
 
 function PrepareScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch: ReturnType<typeof useAdaptiveCycle>["dispatch"] }) {
+  const pausedReview = getExperiment(state)?.state === "paused" && getExperiment(state)?.pausedFrom === "under_review";
   return (
     <section className="cycle-screen" aria-labelledby="prepare-title">
       <p className="cycle-kicker">1. Preparar el próximo descanso</p>
-      <h1 id="prepare-title">Una acción viable, sin inventar disponibilidad.</h1>
-      <p className="cycle-intro">Confirma el turno y parte desde la traba que la persona declaró. Todos los datos de esta demo son sintéticos.</p>
+      <h1 id="prepare-title">¿Qué te impidió descansar ayer?</h1>
+      <p className="cycle-intro">Confirma el turno y parte desde la traba que la persona declaró. La acción es una propuesta y la duración es una estimación; esta demo no inventa disponibilidad ni mide el descanso.</p>
       <ShiftPicker state={state} onSelect={(shift) => dispatch({ type: "select_shift", shift })} />
       <ContextCard state={state} />
       {state.lastMessage && <p className="cycle-message" role="status">{state.lastMessage}</p>}
-      <button className="button button--primary" onClick={() => dispatch({ type: "create_proposal" })} type="button">
-        Ver una propuesta concreta <span aria-hidden="true">→</span>
-      </button>
+      {pausedReview ? (
+        <button className="button button--primary" onClick={() => dispatch({ type: "resume_paused_experiment" })} type="button">
+          Retomar el experimento guardado <span aria-hidden="true">→</span>
+        </button>
+      ) : (
+        <button className="button button--primary" onClick={() => dispatch({ type: "create_proposal" })} type="button">
+          Ver una propuesta concreta <span aria-hidden="true">→</span>
+        </button>
+      )}
     </section>
   );
 }
@@ -206,6 +218,7 @@ function ReviewScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch
 }
 
 function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatch: ReturnType<typeof useAdaptiveCycle>["dispatch"] }) {
+  const [analysisResponse, setAnalysisResponse] = useState("");
   const experiment = getExperiment(state);
   const observation = state.currentObservationId ? state.store.observations.find((item) => item.id === state.currentObservationId) : undefined;
   const version = getCurrentVersion(experiment);
@@ -218,6 +231,7 @@ function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispa
       : "¿Qué dato faltaría para decidir el siguiente paso?";
   const outcome = observation.sleepEstimateMinutes === null ? "No sabes cuánto dormiste." : `Estimas que dormiste ${observation.sleepEstimateMinutes} minutos.`;
   const analysis = state.currentAnalysisId ? state.store.analyses.find((item) => item.id === state.currentAnalysisId) : undefined;
+  const hasAnsweredAnalysis = Boolean(analysis && state.store.reviews.some((review) => review.analysisId === analysis.id && review.response));
   const requestAnalysis = async () => {
     const request = buildAnalysisRequest(state);
     if (!request) return;
@@ -266,13 +280,26 @@ function EvolutionScreen({ state, dispatch }: { state: AdaptiveCycleState; dispa
         {state.analysisStatus === "invalid" && <p className="cycle-ai__warning" role="status">{state.lastMessage}</p>}
         {analysis && (
           <div className="cycle-ai__result">
-            <p><span>Decisión</span><strong>{analysis.decision === "clarification" ? analysis.question : analysis.decision === "action" ? "Acción posible del catálogo (no acordada)" : "Se abstiene de proponer"}</strong></p>
+            <p><span>Decisión</span><strong>{analysis.decision === "clarification" ? "Necesita una aclaración" : analysis.decision === "action" ? "Propone una acción para tu revisión" : "Se abstiene de proponer"}</strong></p>
+            {analysis.decision === "clarification" && <p><span>Pregunta</span><strong>{analysis.question}</strong></p>}
+            {analysis.decision === "action" && <p><span>Acción propuesta</span><strong>{analysis.actionId ? getCatalogAction(analysis.actionId)?.action : "Acción no disponible."}</strong></p>}
             <p><span>Motivo</span><strong>{analysis.rationale}</strong></p>
             <p><span>Dijiste</span><strong>{analysis.personSaid.join(" ") || "Sin declaración adicional."}</strong></p>
             <p><span>Inferido provisionalmente</span><strong>{analysis.inferred.join(" ") || "Nada."}</strong></p>
             <p><span>Falta confirmar</span><strong>{analysis.unknown.join(" ") || "Nada adicional."}</strong></p>
             <p className="cycle-ai__context">Contexto usado: experimento {analysis.context.experimentId}, versión {analysis.context.experimentVersion}. Generado: {analysis.createdAt.slice(0, 16).replace("T", " ")}.</p>
           </div>
+        )}
+        {analysis?.decision === "clarification" && !hasAnsweredAnalysis && (
+          <form className="cycle-ai__response" onSubmit={(event) => { event.preventDefault(); dispatch({ type: "respond_to_analysis_question", response: analysisResponse }); setAnalysisResponse(""); }}>
+            <label htmlFor="analysis-response">Tu respuesta</label>
+            <textarea id="analysis-response" maxLength={280} onChange={(event) => setAnalysisResponse(event.target.value)} placeholder="Responde sólo lo que sepas; también puedes dejarlo para después." value={analysisResponse} />
+            <button className="button button--primary" disabled={!analysisResponse.trim()} type="submit">Guardar respuesta</button>
+          </form>
+        )}
+        {analysis?.decision === "clarification" && hasAnsweredAnalysis && <p className="cycle-message" role="status">La respuesta quedó en el contexto de la próxima revisión.</p>}
+        {analysis?.decision === "action" && analysis.actionId && (
+          <button className="button button--primary" onClick={() => dispatch({ type: "review_analysis_action", analysisId: analysis.id })} type="button">Revisar esta acción antes de acordarla</button>
         )}
         <button className="button button--secondary" disabled={state.analysisStatus === "loading"} onClick={requestAnalysis} type="button">{analysis ? "Solicitar nueva revisión" : "Solicitar revisión IA en vivo"}</button>
       </section>
@@ -332,7 +359,7 @@ function HistoryScreen({ state, dispatch }: { state: AdaptiveCycleState; dispatc
           <article className="cycle-record" key={item.id}>
             <p className="cycle-eyebrow">{item.recordedAt.slice(0, 10)} · turno {shiftLabels[item.shiftKind as ShiftKind]}</p>
             <strong>{item.action}</strong>
-            <p>{item.completion === "yes" ? "Acción realizada" : item.completion === "partial" ? "Acción parcial" : "No pudo realizarla"} · {item.sleepEstimateMinutes === null ? "duración desconocida" : `${item.sleepEstimateMinutes} min estimados`} · restricción: {item.constraintSignature}</p>
+            <p>{item.completion === "yes" ? "Acción realizada" : item.completion === "partial" ? "Acción parcial" : "No pudo realizarla"} · {item.sleepEstimateMinutes === null ? "duración desconocida" : `${item.sleepEstimateMinutes} min estimados`} · franja: {item.restWindow} · restricción: {item.constraintSignature} · {item.hasShiftTransition ? "hubo transición de turno" : "sin transición de turno"}</p>
             <div className="cycle-record__actions"><button onClick={() => openEdit(item)} type="button">Corregir</button><button className="cycle-record__delete" onClick={() => dispatch({ type: "delete_observation", observationId: item.id })} type="button">Eliminar</button></div>
           </article>
         ))}

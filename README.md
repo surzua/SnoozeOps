@@ -12,7 +12,7 @@ SnoozeOps explora un ciclo breve para personas TI con turnos rotativos: identifi
 - Cambio de turno que pausa el experimento anterior para revalidar el contexto.
 - Revisión adaptativa opcional desde el servidor: una salida estructurada sólo puede pedir una aclaración, proponer una acción del catálogo o abstenerse. Sin proveedor, el registro manual sigue disponible y la UI lo declara explícitamente.
 - Historial de tres descansos sintéticos, memoria de una restricción previa y gestión local para corregir o eliminar registros.
-- Comparación conservadora: exige mismo turno, restricciones confirmadas y dos duraciones conocidas; nunca crea puntajes de salud ni atribuye una causa.
+- Comparación conservadora: exige mismo turno y franja, ausencia de transición de turno, restricciones y traba confirmadas equivalentes, además de dos duraciones conocidas; nunca crea puntajes de salud ni atribuye una causa.
 
 El estado se conserva sólo en el dispositivo bajo una clave distinta a la del MVP histórico. Los controles de demostración cargan fixtures sintéticas, simulan dos resultados alternativos y reinician sólo este flujo.
 

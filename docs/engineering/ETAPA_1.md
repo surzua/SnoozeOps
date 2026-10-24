@@ -13,7 +13,7 @@ El cambio de turno pausa un experimento acordado y conserva el registro anterior
 
 ## Persistencia y demo
 
-El estado se guarda sólo en el navegador bajo `snoozeops-adaptive-cycle-v1`, separado del almacenamiento del MVP de relevo. Al recargar, se recupera el experimento y la observación existentes. Un mismo experimento acordado no admite dos observaciones del mismo registro.
+El estado se guarda sólo en el navegador bajo `snoozeops-adaptive-cycle-v2`, separado del almacenamiento del MVP de relevo. Al recargar, se recupera el experimento y la observación existentes. Un mismo experimento acordado no admite dos observaciones del mismo registro.
 
 Los controles de demostración permiten cargar un escenario sintético, simular las dos ramas de resultado y reiniciar explícitamente los datos de esta nueva demo. Una vez registrada una rama, no se puede registrar la alternativa sin reiniciar, evitando mezclar resultados.
 

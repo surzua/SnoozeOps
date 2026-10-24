@@ -13,4 +13,17 @@ describe("comparación conservadora de descansos", () => {
     const records = compareRestRecords(createInitialAdaptiveState().store).records;
     expect(records.some((item) => item.sleepEstimateMinutes === null)).toBe(true);
   });
+
+  it("separa una franja distinta o una transición de turno", () => {
+    const state = createInitialAdaptiveState();
+    const changedWindow = {
+      ...state.store,
+      rests: state.store.rests.map((rest) => rest.id === "rest-history-day-2" ? { ...rest, startsAt: "2026-10-22T00:30:00-03:00" } : rest),
+    };
+    const comparison = compareRestRecords(changedWindow);
+
+    expect(comparison.comparable).toBeNull();
+    expect(comparison.message).toContain("franja");
+    expect(comparison.records.find((record) => record.shiftKind === "evening")?.hasShiftTransition).toBe(true);
+  });
 });
