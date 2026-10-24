@@ -193,5 +193,5 @@ No. El MVP muestra un mecanismo de cierre y escalamiento; no reemplaza protocolo
 - [Guion cronometrado original](docs/pitch/PITCH.md)
 - [Runbook de demo](docs/pitch/DEMO-RUNBOOK.md)
 - [Q&A](docs/pitch/QA.md)
-- [Roadmap post-checkpoint](docs/product/ROADMAP_POST_CHECKPOINT_2.md)
+- [Definición vigente de la solución](docs/product/SOLUCION_PRODUCTO.md)
 - [README del proyecto](README.md)
